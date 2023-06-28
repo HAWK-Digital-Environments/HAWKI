@@ -1,0 +1,4 @@
+<Files "\*.svg">
+Order allow,deny
+Allow from all
+</Files>
