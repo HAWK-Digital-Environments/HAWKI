@@ -2,18 +2,15 @@
 
 ## About
 
-HAWKI is a didactic interface for universities based on the API of OpenAI. It is not necessary for users to create an account, the university ID is sufficient for login - no user-related data is stored.
+HAWKI is a didactic interface for universities based on the OpenAI API. It is not necessary for users to create an account, the university ID is sufficient for login - no user-related data is stored.
 
-The service was developed in the Interaction Design Lab at HAWK (Hochschule für angewandte Wissenschaft und Kunst) to give all university members the opportunity to integrate artificial intelligence into their work processes and to have a meeting space so that new ways of working might emerge and an internal university discussion about the use of A.I. can take place. Currently, the interface is divided into three areas:
+The service was developed in the Interaction Design Lab at the HAWK University of Applied Sciences and Arts in order to give all members of the university the opportunity to integrate artificial intelligence into their work processes and to have a meeting place where new ways of working may emerge and an internal university discussion about the use of AI can take place. The interface is currently divided into three areas:
 
-Conversation:
-A chat area like ChatGPT, for a quick start to any task.
+Conversation: A chat area similar to ChatGPT, for a quick start to any task.
 
-Virtual office:
-Conversations with fictitious experts as a mental model to get familiar with non-technical areas and to make more targeted inquiries to real university experts.
+Virtual office: Conversations with fictional experts as a mental model to familiarise yourself with non-technical areas and to make more targeted enquiries to real university experts.
 
-Learning space:
-The learning spaces are designed to help understand the various support options and learn what makes an effective prompt.
+Learning Space: The learning spaces are designed to help you understand the different support options and learn what makes an effective prompt.
 
 We welcome constructive feedback to further develop this project based on your needs and insights.
 
