@@ -6,13 +6,13 @@ HAWKI is a didactic interface for universities based on the API of OpenAI. It is
 
 The service was developed in the Interaction Design Lab at HAWK (Hochschule für angewandte Wissenschaft und Kunst) to give all university members the opportunity to integrate artificial intelligence into their work processes and to have a meeting space so that new ways of working might emerge and an internal university discussion about the use of A.I. can take place. Currently, the interface is divided into three areas:
 
-Conversation
+Conversation:
 A chat area like ChatGPT, for a quick start to any task.
 
-Virtual office
+Virtual office:
 Conversations with fictitious experts as a mental model to get familiar with non-technical areas and to make more targeted inquiries to real university experts.
 
-Learning space
+Learning space:
 The learning spaces are designed to help understand the various support options and learn what makes an effective prompt.
 
 We welcome constructive feedback to further develop this project based on your needs and insights.
