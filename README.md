@@ -2,7 +2,17 @@
 
 ## About
 
-HAWKI was developed in the Interaction Design Lab of the HAWK (Hochschule für angewandte Wissenschaft und Kunst) to give all university members the opportunity to integrate artificial intelligence into their work processes and to have a meeting space so that new working methods may arise and an internal university discussion about the use of AI can arise. This project would also like to provide didactic support in developing an understanding of how such a language model works and therefore also provides information on well-functioning prompts (text inputs) in the various areas. We welcome constructive feedback to further develop this project based on your needs and insights.
+HAWKI is a didactic interface for universities based on the OpenAI API. It is not necessary for users to create an account, the university ID is sufficient for login - no user-related data is stored.
+
+The service was developed by Jonas Trippler, Vincent Timm and Stefan Woelwer at the Interaction Design Lab at the HAWK University of Applied Sciences and Arts in order to give all members of the university the opportunity to integrate artificial intelligence into their work processes and to have a meeting place where new ways of working may emerge and an internal university discussion about the use of AI can take place. The interface is currently divided into three areas:
+
+Conversation: A chat area similar to ChatGPT, for a quick start to any task.
+
+Virtual office: Conversations with fictional experts as a mental model to familiarise yourself with non-technical areas and to make more targeted enquiries to real university experts.
+
+Learning Space: The learning spaces are designed to help you understand the different support options and learn what makes an effective prompt.
+
+We welcome constructive feedback to further develop this project based on your needs and insights.
 
 ![HAWKI Login](/img/hawki-screenshot-login.png)
 _HAWKI Login Screen_
