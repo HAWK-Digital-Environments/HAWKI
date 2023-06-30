@@ -40,7 +40,11 @@
 		return false;
 	  }
 
-	  if (($result = ldap_search($connection, $search_dn, "(|(uid=$username)(mail=$username))")) == false) {
+	  $sanitizedUsername = ldap_escape($username, "", LDAP_ESCAPE_FILTER);
+
+	  $filter = "(|(uid=$sanitizedUsername)(mail=$sanitizedUsername)";
+
+	  if (($result = ldap_search($connection, $search_dn, $filter)) == false) {
 		print "Fehler: Suche im LDAP-Baum fehlgeschlagen<br>";
 		return false;
 	  }

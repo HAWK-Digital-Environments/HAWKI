@@ -57,4 +57,4 @@ Of course, you can modify stylesheets and html files and adjust them to your lik
 
 ## Contact & License
 
-This project is licensed under the terms of the MIT license. If you have any questions feel free to get in touch via [Email](mailto:vincent.timm2@hawk.de)
+This project is licensed under the terms of the MIT license. If you have any questions, feel free to get in touch via [Email](mailto:vincent.timm2@hawk.de)
