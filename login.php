@@ -60,7 +60,7 @@
 	  }
 
 	  /* Authentifizierung des User */
-	  if (($link_id = ldap_bind($connection, $user_dn, $password)) == false) {
+	  if ((ldap_bind($connection, $user_dn, $password)) == false) {
 		print "Fehler: Authentifizierung fehlgeschlagen: $user_dn<br>";
 		return false;
 	  }
@@ -72,7 +72,7 @@
 	  echo $initials; // Output: "JT"
 	  $_SESSION['username'] = $initials;
 
-	  ldap_unbind($link_id);
+	  ldap_unbind($connection);
 	  return true;
 	}
 
