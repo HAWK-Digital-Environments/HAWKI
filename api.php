@@ -5,6 +5,7 @@ $env = parse_ini_file('.env');
 $apiKey = $env["OPENAI_API_KEY"];
 
 if (!isset($_SESSION['username'])) {
+	http_response_code(401);
 	exit;
 }
 
@@ -35,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	// Process the response
 	if ($response === false) {
 		echo json_encode(['error' => curl_error($curl)]);
+		http_response_code(500);
 		exit;
 	} else {
 		echo $response;

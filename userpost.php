@@ -2,6 +2,7 @@
 
 session_start();
 if (!isset($_SESSION['username'])) {
+	http_response_code(401);
 	exit;
 }
 
@@ -12,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Check if decoding was successful and if the JSON is valid
     if ($jsonData === null && json_last_error() !== JSON_ERROR_NONE) {
         echo('invalid data');
+		http_response_code(400);
 		exit;
     }
 
@@ -23,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	
 	if(empty($sanitizedContent) || empty($sanitizedRole)) {
 		echo('invalid data');
+		http_response_code(400);
 		exit;
 	}
 
