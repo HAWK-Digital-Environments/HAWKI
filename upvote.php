@@ -5,11 +5,24 @@ if (!isset($_SESSION['username'])) {
 	exit;
 }
 
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$id = file_get_contents("php://input");
-	$json = json_decode(file_get_contents("feedback/$id"), true);
+	
+	$sanitizedId = htmlspecialchars($id, ENT_QUOTES, 'UTF-8');
+
+	$file = "feedback/" . $sanitizedId;
+
+	if (!file_exists($file)) {
+		echo('File does not exist');
+		exit;
+	}
+
+	$json = json_decode(file_get_contents("feedback/$sanitizedId"), true);
 	$json["up"] = $json["up"] + 1;
-	file_put_contents("feedback/$id", json_encode($json));
+
+	file_put_contents("feedback/$sanitizedId", json_encode($json));
+
 	echo json_encode($json);
 }
 
