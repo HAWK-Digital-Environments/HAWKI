@@ -2,6 +2,7 @@
 
 session_start();
 if (!isset($_SESSION['username'])) {
+	http_response_code(401);
 	exit;
 }
 
@@ -14,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 	if (!file_exists($file)) {
 		echo('File does not exist');
+		http_response_code(404);
 		exit;
 	}
 
