@@ -1,11 +1,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
 
 if (!isset($_SESSION['username'])) {
-	header("Location: login.php");
-	exit;
+  require("login.php");
+  exit;
 }
 
 ?>

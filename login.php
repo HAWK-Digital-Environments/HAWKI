@@ -1,9 +1,11 @@
 <?php
-  session_start();
+  if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+  }
 
   if (isset($_SESSION['username'])) {
-	header("Location: interface.php");
-	exit;
+    include("interface.php");
+    exit;
   }
   if (isset($_POST["account"]) && isset($_POST["password"])) {
 	function auth(
@@ -83,14 +85,14 @@
 	if ($testuser && $_POST["account"] == "tester" && $_POST["password"] == "superlangespasswort123") {
 	  echo "login erfolgreich!";
 	  $_SESSION['username'] = "T";
-	  header("Location: interface.php");
+      require("interface.php");
 	  exit;
 	}
 
 	if (auth($_POST["account"], $_POST["password"])) {
 	  echo "login erfolgreich!";
 
-	  header("Location: interface.php");
+      require("interface.php");
 	  exit;
 	} else {
 	  echo "Anmelden fehlgeschlagen";

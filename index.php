@@ -1,4 +1,4 @@
 <?php
-header("Location: login.php");
+include("login.php");
 exit;
 
