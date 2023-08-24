@@ -10,12 +10,11 @@ use Jumbojett\OpenIDConnectClient;
 
 // Create OpenID connect client
 $env = parse_ini_file('.env');
-$keycloakkey = $env["KEYCLOAK_KEY"];
 
 $oidc = new OpenIDConnectClient(
-    'https://id.dev.sonia.de/realms/dev',
-    'app3',
-    $keycloakkey
+    $env["OIC_IDP"],
+    $env["OIC_CLIENT_ID"],
+    $env["KEYCLOAK_KEY"]
 );
 
 # Demo is dealing with HTTP rather than HTTPS
@@ -25,14 +24,14 @@ if ($testuser) {
 }
 
 # default scope is "openid"
-$oidc->addScope( "email" );
-$oidc->addScope( "phone" );
+# $oidc->addScope( "email" );
+# $oidc->addScope( "phone" );
 
 $oidc->authenticate();
 
 $_SESSION['oidcClient'] = $oidc;
 
-// Store session variable username
+// Set session variable username as further source code depends on it
 $_SESSION['username'] = $oidc->requestUserInfo('given_name');
 
 // echo "ich bin bei Keycloak angemeldet als {$_SESSION['username']} <br>";

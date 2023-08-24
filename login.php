@@ -85,14 +85,14 @@
 	if ($testuser && $_POST["account"] == "tester" && $_POST["password"] == "superlangespasswort123") {
 	  echo "login erfolgreich!";
 	  $_SESSION['username'] = "T";
-      require("interface.php");
+	  header("Location: /interface.php");
 	  exit;
 	}
 
 	if (auth($_POST["account"], $_POST["password"])) {
 	  echo "login erfolgreich!";
 
-      require("interface.php");
+	  header("Location: /interface.php");
 	  exit;
 	} else {
 	  echo "Anmelden fehlgeschlagen";
@@ -119,12 +119,21 @@
   <aside>
 	<img src="/img/logo.svg" alt="">
 	<h2>Willkommen zurück!</h2>
-      <form action="phpinfo.php" class="column" method="post">
+<!--      <form action="phpinfo.php" class="column" method="post">
           <button>Phpinfo</button>
-      </form>
-      <form action="keycloak_login.php" class="column" method="post">
-          <button>Keycloak Login</button>
-      </form>
+      </form>-->
+      <?php
+      $env = parse_ini_file('.env');
+      $keycloakkey = $env["KEYCLOAK"];
+      if ($keycloakkey) {
+          echo
+              '<form action="keycloak_login.php" class="column" method="post">
+                    <button>Keycloak Login</button>
+               </form>';
+      }
+      ?>
+
+
 	<form action="<?php echo $_SERVER['PHP_SELF']; ?>" class="column" method="post">
 	  <label for="account">Benutzername</label>
 	  <input type="text" name="account" id="account">
