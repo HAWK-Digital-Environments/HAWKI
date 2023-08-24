@@ -1,16 +1,17 @@
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
 <?php
+
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
 
 if (!isset($_SESSION['username'])) {
-  require("login.php");
+  header("Location: /login.php");
   exit;
 }
 
 ?>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="stylesheet" href="app.css">	
 

@@ -1,10 +1,14 @@
 <?php
 
-echo 'TODO: jetzt lenken wir auf keycloak um<br>';
-require __DIR__ . '/vendor/autoload.php';
+// use library for dealing with OpenID connect
+$env = parse_ini_file('.env');
+$composerpath = $env["COMPOSER_PATH"];
+
+require($composerpath . '/vendor/autoload.php');
 
 use Jumbojett\OpenIDConnectClient;
 
+// Create OpenID connect client
 $env = parse_ini_file('.env');
 $keycloakkey = $env["KEYCLOAK_KEY"];
 
@@ -15,7 +19,10 @@ $oidc = new OpenIDConnectClient(
 );
 
 # Demo is dealing with HTTP rather than HTTPS
-$oidc->setHttpUpgradeInsecureRequests(false);
+$testuser = $env["TESTUSER"];
+if ($testuser) {
+    $oidc->setHttpUpgradeInsecureRequests(false);
+}
 
 # default scope is "openid"
 $oidc->addScope( "email" );
@@ -25,7 +32,13 @@ $oidc->authenticate();
 
 $_SESSION['oidcClient'] = $oidc;
 
-header("Location: /userinfo.php");
+// Store session variable username
+$_SESSION['username'] = $oidc->requestUserInfo('given_name');
+
+// echo "ich bin bei Keycloak angemeldet als {$_SESSION['username']} <br>";
+// echo $_SERVER['PHP_SELF'];
+
+header("Location: /interface.php");
 exit();
 
 ?>
