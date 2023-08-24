@@ -340,7 +340,7 @@ if (!isset($_SESSION['username'])) {
 			},
 			body: JSON.stringify(data)
 		});
-	
+
 		return response.body;
 	}
 	
@@ -359,13 +359,12 @@ if (!isset($_SESSION['username'])) {
 	
 		while (true) {
 			const { done, value } = await reader.read();
-	
 			if (done) {
 				console.log('Stream closed.');
 				document.querySelector(".message:last-child").querySelector(".message-text").innerHTML = linkify(document.querySelector(".message:last-child").querySelector(".message-text").innerHTML);
 				break;
 			}
-	
+
 			const decodedData = new TextDecoder().decode(value);
 			let chunks = decodedData.split("data: ");
 			chunks.forEach((chunk, index) => {
@@ -373,8 +372,15 @@ if (!isset($_SESSION['username'])) {
 				if(chunk.indexOf('DONE') > 0) return false;
 				if(chunk.indexOf('role') > 0) return false;
 				if(chunk.length == 0) return false;
-				if(chunk != "") console.log(JSON.parse(chunk)["choices"][0]["delta"])
-				console.log(JSON.parse(chunk)["choices"][0]["delta"]);
+				// First check if chunk is valid json.
+				// Otherwise we do not see the correct error message.
+				try {
+					JSON.parse(chunk);
+				} catch(error) {
+					console.log(chunk);
+					console.error(error.message);
+				}
+				// console.log(JSON.parse(chunk)["choices"][0]["delta"]);
 				document.querySelector(".message:last-child").querySelector(".message-text").innerHTML +=  JSON.parse(chunk)["choices"][0]["delta"].content;	
 			})
 			

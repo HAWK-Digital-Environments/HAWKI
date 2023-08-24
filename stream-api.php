@@ -1,4 +1,10 @@
 <?php
+
+// Set options if not set in php.ini file:
+ini_set('zlib.output_compression',0);
+ini_set('implicit_flush',1);
+
+
 header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
 header('Connection: keep-alive');
@@ -34,8 +40,8 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, [
 ]);
 curl_setopt($ch, CURLOPT_WRITEFUNCTION, function($ch, $data) {
 	echo $data;
-	ob_flush();
-	flush();
+	// ob_flush();
+	// flush();
 	return strlen($data);
 });
 
