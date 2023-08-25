@@ -30,6 +30,12 @@ HAWKI uses LDAP under the hood in order to authenticate users. Make sure you hav
 
 _**Testing without LDAP:**_ You can try out HAWKI without an LDAP server. To do so, set `TESTUSER` to `true` in the configuration file (see [Configuration](#configuration)) and sign in with username `tester` and `superlangespasswort123`
 
+### OpenID Connect
+
+As an alternative to LDAP, OpenID connect can also be used to 
+authenticate users. It requires the jumbojett/openid-connect-php
+library (https://github.com/jumbojett/OpenID-Connect-PHP).
+
 ### Open AI Access
 
 To generate answers HAWKI uses the Open AI api. Follow the instructions on https://platform.openai.com/docs/introduction to generate an API key and paste it in the configuration file like instructed in chapter [Configuration](#configuration).
