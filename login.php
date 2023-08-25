@@ -124,7 +124,7 @@
       </form>-->
       <?php
       $env = parse_ini_file('.env');
-      $keycloakkey = $env["KEYCLOAK"];
+      $keycloakkey = $env["OPENID_CONNECT"];
       if ($keycloakkey) {
           echo
               '<form action="keycloak_login.php" class="column" method="post">

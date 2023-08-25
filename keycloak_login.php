@@ -14,7 +14,7 @@ $env = parse_ini_file('.env');
 $oidc = new OpenIDConnectClient(
     $env["OIC_IDP"],
     $env["OIC_CLIENT_ID"],
-    $env["KEYCLOAK_KEY"]
+    $env["OIC_CLIENT_SECRET"]
 );
 
 # Demo is dealing with HTTP rather than HTTPS
@@ -23,10 +23,6 @@ if ($testuser) {
     $oidc->setHttpUpgradeInsecureRequests(false);
 }
 
-# default scope is "openid"
-# $oidc->addScope( "email" );
-# $oidc->addScope( "phone" );
-
 $oidc->authenticate();
 
 $_SESSION['oidcClient'] = $oidc;
@@ -34,8 +30,6 @@ $_SESSION['oidcClient'] = $oidc;
 // Set session variable username as further source code depends on it
 $_SESSION['username'] = $oidc->requestUserInfo('given_name');
 
-// echo "ich bin bei Keycloak angemeldet als {$_SESSION['username']} <br>";
-// echo $_SERVER['PHP_SELF'];
 
 header("Location: /interface.php");
 exit();
