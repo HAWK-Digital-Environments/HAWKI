@@ -124,12 +124,15 @@
       </form>-->
       <?php
       $env = parse_ini_file('.env');
-      $keycloakkey = $env["OPENID_CONNECT"];
-      if ($keycloakkey) {
+      $oic_login = $env["OIC_LOGIN_BUTTON"];
+      if (empty($oic_login)) {
+          $oic_login = 'Login';
+      }
+      if ($env["OPENID_CONNECT"]) {
           echo
-              '<form action="keycloak_login.php" class="column" method="post">
-                    <button>Keycloak Login</button>
-               </form>';
+              "<form action='oic_login.php' class='column' method='post'>
+                    <button>$oic_login</button>
+               </form>";
       }
       ?>
 
