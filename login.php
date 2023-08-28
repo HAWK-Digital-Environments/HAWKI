@@ -83,7 +83,7 @@
 		}
 		$firstname = $userinfo["givenname"][0];
 		$surname = $userinfo["sn"][0];
-		$initials = substr($surname, 0, 1) . substr($firstname, 0, 1);
+		$initials = substr($firstname, 0, 1) . substr($surname, 0, 1);
 	  }
 	  // echo $initials; // Output: "JT"
 	  $_SESSION['username'] = $initials;
@@ -133,45 +133,35 @@
   <aside>
 	<img src="/img/logo.svg" alt="">
 	<h2>Willkommen zurück!</h2>
-<!--      <form action="phpinfo.php" class="column" method="post">
-          <button>Phpinfo</button>
-      </form>-->
 	<?php
 	  $env = parse_ini_file('.env');
 	  $login_available = false;
-	  if ($env["OPENID_CONNECT"]) {
+	  if (trim($env["Authentication"]) == "OIC") {
+		// Open ID Connect
 		$login_available = true;
-		$oic_login = $env["OIC_LOGIN_BUTTON"];
-		// Create OpenId Connect login button
-		$oic_login = $env["OIC_LOGIN_BUTTON"];
-		if (empty($oic_login)) {
-		  $oic_login = 'Login';
-		}
+		$oic_login = $env["OIC_LOGIN_BUTTON"]??'Login'; // Option for changing login button
 		echo
 		  "<form action='oic_login.php' class='column' method='post'>
 			<button>$oic_login</button>
 		  </form>";
-	}
-	if ($env["LDAP"]) {
-	  $login_available = true;
-	  $server = $_SERVER['PHP_SELF'];
-	  $ldap_login = $env["LDAP_LOGIN_BUTTON"];
-	  if (empty($ldap_login)) {
-		$ldap_login = 'Login';
 	  }
-	  echo
-		'<form action = "' . $server . '" class="column" method = "post" >
-		  <label for="account" > Benutzername</label >
-		  <input type = "text" name = "account" id = "account" >
-		  <label for="password" > Kennwort</label >
-		  <input type = "password" name = "password" id = "password" >
-		  <button>' . $ldap_login . '</button >
-		</form>';
-	}
-	if (!$login_available) {
-	  echo 'No authentication method defined';
-	  die;
-	}
+	  if (trim($env["Authentication"]) == "LDAP") {
+		$login_available = true;
+		$server = $_SERVER['PHP_SELF'];
+		$ldap_login = $env["LDAP_LOGIN_BUTTON"]??'Login';
+		echo
+		  '<form action = "' . $server . '" class="column" method = "post" >
+			<label for="account" > Benutzername</label >
+			<input type = "text" name = "account" id = "account" >
+			<label for="password" > Kennwort</label >
+			<input type = "password" name = "password" id = "password" >
+			<button>' . $ldap_login . '</button >
+		  </form>';
+	  }
+	  if (!$login_available) {
+		echo 'No authentication method defined';
+		die;
+	  }
 	?>
 	<h2 class="top-auto">Interesse?</h2>
 	<p>Wenn Sie das Interface für Ihre Hochschule ausprobieren möchten, hinterlassen Sie bitte hier Ihre E-Mail-Adresse.</p>

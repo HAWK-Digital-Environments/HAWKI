@@ -34,7 +34,8 @@ _**Testing without LDAP:**_ You can try out HAWKI without an LDAP server. To do 
 
 As an alternative to LDAP, OpenID connect can also be used to 
 authenticate users. It requires the jumbojett/openid-connect-php
-library (https://github.com/jumbojett/OpenID-Connect-PHP).
+library (https://github.com/jumbojett/OpenID-Connect-PHP)
+to be installed with composer.
 
 ### Open AI Access
 
@@ -46,10 +47,15 @@ To get started you need to add a configuration file to the project first. Copy t
 
 | Value            | Type    | Example                                | Description                                                                                                                                        |
 | ---------------- | ------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authentication   | string  | 'LDAP' or 'OIC'                        | Authentication method: LDAP or OpenID Connect                                                                                                      |
 | LDAP_HOST        | string  | "ldaps://...de"                        | The URL of your LDAP server.                                                                                                                       |
 | LDAP_BIND_PW     | string  | secretpassword                         | Password of the user that is trying to bind to the LDAP Server.                                                                                    |
 | LDAP_BASE_DN     | string  | "cn=...,ou=...,dc=..."                 | Distinguised name that is used to initially bind to your LDAP server.                                                                              |
 | LDAP_SEARCH_DN   | string  | "ou=...,dc=..."                        | Distinguished name that is used for authenticating users.                                                                                          |
+| OIC_IDP          | string  | "https://...."                         | URL of the Identity provider supporting OpenID Connect.                                                                                            |
+| OIC_CLIENT_ID    | string  | "..."                                  | Client Id for this application in Identity provider.                                                                                               |
+| OIC_CLIENT_SECRET | string  | "..."                                 | Secret key for OpenID Connect.                                                                                                                     |
+| COMPOSER_PATH    | string  | "..."                                  | Path to PHP Composer libariries (only needed for OpenID Connect).                                                                                                                     |
 | OPENAI_API_KEY   | string  | sk-...                                 | Open AI Api key                                                                                                                                    |
 | IMPRINT_LOCATION | string  | https://your-university/imprint        | A link to your imprint. Alternatively you can replace the file index.php under /impressum with your own html/ php of your imprint.                 |
 | PRIVACY_LOCATION | string  | https://your-university/privacy-policy | A link to your privacy policy. Alternatively you can replace the file index.php under /datenschutz with your own html/ php of your privacy policy. |
