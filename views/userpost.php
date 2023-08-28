@@ -1,5 +1,11 @@
 <?php 
 
+session_start();
+if (!isset($_SESSION['username'])) {
+	http_response_code(401);
+	exit;
+}
+
 $dir = '../feedback/';
 $files = preg_grep('/^([^.])/', scandir($dir ));
 rsort($files);
