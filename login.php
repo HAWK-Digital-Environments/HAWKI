@@ -94,6 +94,8 @@
 	  exit;
 	} else {
 	  echo "Anmelden fehlgeschlagen";
+	  http_response_code(401);
+	  exit;
 	}
   } else {
 	// do get

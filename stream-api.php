@@ -1,4 +1,11 @@
 <?php
+
+session_start();
+if (!isset($_SESSION['username'])) {
+	http_response_code(401);
+	exit;
+}
+
 header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
 header('Connection: keep-alive');
