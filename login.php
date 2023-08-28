@@ -44,7 +44,7 @@
 
 	  $sanitizedUsername = ldap_escape($username, "", LDAP_ESCAPE_FILTER);
 
-	  $filter = "(|(uid=$sanitizedUsername)(mail=$sanitizedUsername)";
+	  $filter = "(|(uid=$sanitizedUsername)(mail=$sanitizedUsername))";
 
 	  if (($result = ldap_search($connection, $search_dn, $filter)) == false) {
 		print "Fehler: Suche im LDAP-Baum fehlgeschlagen<br>";
@@ -68,10 +68,24 @@
 	  }
 
 	  $info = ldap_get_entries($connection, $result);
-	  $name = $info[0]["displayname"][0];
-	  $parts = explode(", ", $name);
-	  $initials = substr($parts[1], 0, 1) . substr($parts[0], 0, 1);
-	  echo $initials; // Output: "JT"
+
+	  $userinfo = $info[0];
+	  if (isset($userinfo["displayname"])) {
+		// Attribute displayname is set, expect to be comma separated names =>
+		// extract first characters
+		$name = $userinfo["displayname"][0];
+		$parts = explode(", ", $name);
+		$initials = substr($parts[1], 0, 1) . substr($parts[0], 0, 1);
+	  } else {
+		if (!isset($userinfo["givenname"]) || !isset($userinfo["sn"])) {
+			print "Fehler: Unerwartete Datenstruktur von LDAP erhalten<br>";
+			return false;
+		}
+		$firstname = $userinfo["givenname"][0];
+		$surname = $userinfo["sn"][0];
+		$initials = substr($surname, 0, 1) . substr($firstname, 0, 1);
+	  }
+	  // echo $initials; // Output: "JT"
 	  $_SESSION['username'] = $initials;
 
 	  ldap_unbind($connection);
@@ -83,14 +97,14 @@
 	$testuser = $env["TESTUSER"];
 
 	if ($testuser && $_POST["account"] == "tester" && $_POST["password"] == "superlangespasswort123") {
-	  echo "login erfolgreich!";
+	  // echo "login erfolgreich!";
 	  $_SESSION['username'] = "T";
 	  header("Location: /interface.php");
 	  exit;
 	}
 
-	if (auth($_POST["account"], $_POST["password"])) {
-	  echo "login erfolgreich!";
+	if (auth(trim($_POST["account"]), $_POST["password"])) {
+	  // echo "login erfolgreich!";
 
 	  header("Location: /interface.php");
 	  exit;
@@ -122,28 +136,35 @@
 <!--      <form action="phpinfo.php" class="column" method="post">
           <button>Phpinfo</button>
       </form>-->
-      <?php
-      $env = parse_ini_file('.env');
-      $oic_login = $env["OIC_LOGIN_BUTTON"];
-      if (empty($oic_login)) {
-          $oic_login = 'Login';
-      }
-      if ($env["OPENID_CONNECT"]) {
-          echo
-              "<form action='oic_login.php' class='column' method='post'>
-                    <button>$oic_login</button>
-               </form>";
-      }
-      ?>
-
-
-	<form action="<?php echo $_SERVER['PHP_SELF']; ?>" class="column" method="post">
-	  <label for="account">Benutzername</label>
-	  <input type="text" name="account" id="account">
-	  <label for="password">Kennwort</label>
-	  <input type="password" name="password" id="password">
-	  <button>Login</button>
-	</form>
+	<?php
+	$env = parse_ini_file('.env');
+	if ($env["OPENID_CONNECT"]) {
+	  // Create OpenId Connect login button
+	  $oic_login = $env["OIC_LOGIN_BUTTON"];
+	  if (empty($oic_login)) {
+	  	$oic_login = 'Login';
+	  }
+	  echo
+	  	"<form action='oic_login.php' class='column' method='post'>
+	  	<button>$oic_login</button>
+	  	</form>";
+	}
+	if ($env["LDAP"]) {
+	  $server = $_SERVER['PHP_SELF'];
+	  $ldap_login = $env["LDAP_LOGIN_BUTTON"];
+	  if (empty($ldap_login)) {
+	    $ldap_login = 'Login';
+	  }
+	  echo
+	    '<form action = "' . $server . '" class="column" method = "post" >
+	    <label for="account" > Benutzername</label >
+	    <input type = "text" name = "account" id = "account" >
+	    <label for="password" > Kennwort</label >
+	    <input type = "password" name = "password" id = "password" >
+	    <button>' . $ldap_login . '</button >
+	    </form>';
+	}
+	?>
 	<h2 class="top-auto">Interesse?</h2>
 	<p>Wenn Sie das Interface für Ihre Hochschule ausprobieren möchten, hinterlassen Sie bitte hier Ihre E-Mail-Adresse.</p>
 	<form action="<?php echo $_SERVER['PHP_SELF']; ?>" class="column" method="post" id="newsletterForm">
