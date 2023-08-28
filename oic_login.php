@@ -35,7 +35,7 @@ $initials = substr($firstname, 0, 1) . substr($surname, 0, 1);
 $_SESSION['username'] = $initials;
 
 
-header("Location: /interface.php");
+header("Location: interface.php");
 exit();
 
 ?>

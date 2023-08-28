@@ -4,8 +4,8 @@
   }
 
   if (isset($_SESSION['username'])) {
-    include("interface.php");
-    exit;
+      header("Location: interface.php");
+      exit;
   }
   if (isset($_POST["account"]) && isset($_POST["password"])) {
 	function auth(
@@ -99,14 +99,14 @@
 	if ($testuser && $_POST["account"] == "tester" && $_POST["password"] == "superlangespasswort123") {
 	  // echo "login erfolgreich!";
 	  $_SESSION['username'] = "T";
-	  header("Location: /interface.php");
+	  header("Location: interface.php");
 	  exit;
 	}
 
 	if (auth(trim($_POST["account"]), $_POST["password"])) {
 	  // echo "login erfolgreich!";
 
-	  header("Location: /interface.php");
+	  header("Location: interface.php");
 	  exit;
 	} else {
 	  echo "Anmelden fehlgeschlagen";
