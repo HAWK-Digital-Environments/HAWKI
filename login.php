@@ -134,7 +134,7 @@
 	  <button>Senden</button>
 	</form>
 	<a href="/datenschutz" target="_blank">Datenschutzerklärung</a>
-	<a href="https://www.hawk.de/de/hochschule/download-und-servicecenter/impressum">Impressum</a>
+	<a href="/impressum" target="_blank">Impressum</a>
   </aside>
   
   <main>
