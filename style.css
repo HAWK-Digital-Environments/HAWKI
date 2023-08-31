@@ -1,5 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap');
 
+:root {
+    /* HAWK */
+    --main-bg-color: #2F2ABF;
+}
+
 body{
   font-family: "Fira Sans", sans-serif;
   color: #0E0D39;
@@ -47,8 +52,10 @@ aside{
   margin-top: auto;
 }
 
+/* Size of logo on login page */
 img{
   width: 120px;
+/* width: 100%; */
   margin: 2rem auto;
 }
 
@@ -72,11 +79,11 @@ input{
 }
 
 input:focus{
-  border-color: #2F2ABF;
+  border-color: var(--main-bg-color);
 }
 
 a{
-  color: #2F2ABF;
+  color: var(--main-bg-color);
   text-decoration: none;
   margin-top: 0.5rem;
 }
@@ -86,7 +93,7 @@ button{
   width: max-content;
   margin-top: 1rem;
   padding: 0.75rem;
-  background: #2F2ABF;
+  background: var(--main-bg-color);
   color: #fff;
   border: 0;
   font-weight: 500;
@@ -171,7 +178,7 @@ li{
   height: 50px;
   top: 13px;
   left: 13px;
-  fill: #2F2ABF;
+  fill: var(--main-bg-color);
   opacity: 0.75;
   transition: all 0.25s ease;
 }
@@ -213,7 +220,7 @@ li{
   max-width: 800px;
 }
 
-.modal-conten video{
+.modal-content video{
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -265,7 +272,7 @@ li{
   margin: auto;
   background-size: 100%;
   background-repeat: no-repeat;
-  background-position: center: 
+  background-position: center;
   -webkit-animation:spin 180s linear infinite;
     -moz-animation:spin 180s linear infinite;
     animation:spin 180s linear infinite;
