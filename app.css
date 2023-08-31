@@ -1,3 +1,13 @@
+:root {
+  /* HAWK */
+  --main-bg-color: rgb(35,48,176);
+}
+
+/* Size of logo on interface page */
+.logo img{
+  width: 150px;
+}
+
 @font-face {
   font-family: 'Fira Sans';
   font-style: normal;
@@ -25,7 +35,7 @@
 
 a{
   text-decoration: none;
-  color: rgb(35,48,176);
+  color: var(--main-bg-color);
 }
 
 .wrapper{
@@ -117,13 +127,13 @@ a{
 }
 
 .menu-item:hover{
-  border-color: rgb(35,48,176);
-  color: rgb(35,48,176);
-  fill: rgb(35,48,176);
+  border-color: var(--main-bg-color);
+  color: var(--main-bg-color);
+  fill: var(--main-bg-color);
 }
 
 .menu-item.active{
-  border-color: rgb(35,48,176);
+  border-color: var(--main-bg-color);
   color: #222;
 }
 
@@ -155,13 +165,13 @@ a{
 }
 
 .submenu-item:hover{
-  border-color: rgb(35,48,176);
-  color: rgb(35,48,176);
-	fill: rgb(35,48,176);
+	border-color: var(--main-bg-color);
+	color: var(--main-bg-color);
+	fill: var(--main-bg-color);
 }
 
 .submenu-item.active{
-  border-color: rgb(35,48,176);
+  border-color: var(--main-bg-color);
   color: #222;
 }
 
@@ -252,7 +262,7 @@ a{
   width: 3rem;
   height: 3rem;
   border-radius: 100%;
-  background: rgb(35,48,176);
+  background: var(--main-bg-color);
   color: #fff;
   display: flex;
   justify-content: center;
@@ -303,8 +313,8 @@ a{
 }
 
 .input-send svg{
-  fill: rgb(35,48,176);
-  color: rgb(35,48,176);
+  fill: var(--main-bg-color);
+  color: var(--main-bg-color);
   width: 1.5rem;
 }
 
@@ -344,7 +354,7 @@ a{
   border: 0;
   padding: 0.75rem 1rem;
   color: #fff;
-  background: rgb(35,48,176);
+  background: var(--main-bg-color);
   align-self: flex-end;
   margin-top: 0.75rem;
 }
@@ -422,8 +432,8 @@ a{
 }
 
 .userpost-send svg{
-  fill: rgb(35,48,176);
-  color: rgb(35,48,176);
+  fill: var(--main-bg-color);
+  color: var(--main-bg-color);
   width: 1.5rem;
 }
 
@@ -444,8 +454,8 @@ a{
 }
 
 .vote-hover:hover{
-  fill: rgb(35,48,176);
-  color: rgb(35,48,176);
+  fill: var(--main-bg-color);
+  color: var(--main-bg-color);
 }
 
 .feedback-content{
@@ -488,3 +498,4 @@ details > summary::-webkit-details-marker {
   width: max-content;
   font-size: 0.9rem;
 }
+

@@ -15,7 +15,7 @@ if (!isset($_SESSION['username'])) {
 <div class="wrapper">
   <div class="sidebar">
 	<div class="logo" onclick="load(this, 'chat.htm')">
-	 <img src="/img/logo.svg" alt="Logo" width="150px">
+	 <img src="/img/logo.svg" alt="Logo">
 	</div>
 	<div class="menu">
 		<details>
