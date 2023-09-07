@@ -81,14 +81,14 @@
 	$testuser = $env["TESTUSER"];
 
 	if ($testuser && $_POST["account"] == "tester" && $_POST["password"] == "superlangespasswort123") {
-	  echo "login erfolgreich!";
+	  // echo "login erfolgreich!";
 	  $_SESSION['username'] = "T";
 	  header("Location: interface.php");
 	  exit;
 	}
 
 	if (auth($_POST["account"], $_POST["password"])) {
-	  echo "login erfolgreich!";
+	  // echo "login erfolgreich!";
 
 	  header("Location: interface.php");
 	  exit;
