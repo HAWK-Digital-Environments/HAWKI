@@ -370,33 +370,33 @@ if (!isset($_SESSION['username'])) {
 				if(chunk.indexOf('DONE') > 0) return false;
 				if(chunk.indexOf('role') > 0) return false;
 				if(chunk.length === 0) return false;
-                // First check if chunk is valid json.
-                // Otherwise we do not see the correct error message.
-                try {
-                    const json = JSON.parse(chunk);
-                    if ("choices" in json) {
-                        // console.log(json["choices"]);
-                        // normal response
-                        document.querySelector(".message:last-child").querySelector(".message-text").innerHTML +=
-                            json["choices"][0]["delta"].content;
-                    } else {
-                        if ("error" in json) {
-                            if ("message" in json.error) {
-                                // console.log(json.error.message);
-                                document.querySelector(".message:last-child").querySelector(".message-text").innerHTML =
-                                    '<em>' + json.error.message + '</em>';
-                            } else {
-                                console.log(json.error);
-                            }
-                        } else {
-                            console.log(json);
-                        }
-                    }
-                } catch(error) {
-                    console.log(chunk);
-                    console.error(error.message);
-                }
-            })
+				// First check if chunk is valid json.
+				// Otherwise we do not see the correct error message.
+				try {
+					const json = JSON.parse(chunk);
+					if ("choices" in json) {
+						// console.log(json["choices"]);
+						// normal response
+						document.querySelector(".message:last-child").querySelector(".message-text").innerHTML +=
+							json["choices"][0]["delta"].content;
+					} else {
+						if ("error" in json) {
+							if ("message" in json.error) {
+								// console.log(json.error.message);
+								document.querySelector(".message:last-child").querySelector(".message-text").innerHTML =
+									'<em>' + json.error.message + '</em>';
+							} else {
+								console.log(json.error);
+							}
+						} else {
+							console.log(json);
+						}
+					}
+				} catch(error) {
+					console.log(chunk);
+					console.error(error.message);
+				}
+			})
 
 			scrollToLast();
 		}
