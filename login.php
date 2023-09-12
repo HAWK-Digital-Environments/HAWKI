@@ -66,10 +66,23 @@
 	  }
 
 	  $info = ldap_get_entries($connection, $result);
-	  $name = $info[0]["displayname"][0];
-	  $parts = explode(", ", $name);
-	  $initials = substr($parts[1], 0, 1) . substr($parts[0], 0, 1);
-	  echo $initials; // Output: "JT"
+	  $userinfo = $info[0];
+	  if (isset($userinfo["displayname"])) {
+		// Attribute displayname is set, expect to be comma separated names =>
+		// extract first characters
+		$name = $userinfo["displayname"][0];
+		$parts = explode(", ", $name);
+		$initials = substr($parts[1], 0, 1) . substr($parts[0], 0, 1);
+	  } else {
+		if (!isset($userinfo["givenname"]) || !isset($userinfo["sn"])) {
+			echo "Fehler: Unerwartete Datenstruktur von LDAP erhalten";
+			return false;
+		}
+		$firstname = $userinfo["givenname"][0];
+		$surname = $userinfo["sn"][0];
+		$initials = substr($firstname, 0, 1) . substr($surname, 0, 1);
+	  }
+	// echo $initials; // Output: "JT"
 	  $_SESSION['username'] = $initials;
 
 	  ldap_unbind($connection);
