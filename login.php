@@ -11,16 +11,16 @@
 	  $password
 	) {
 
-	  $env = parse_ini_file('.env');
+	  #$env = parse_ini_file('.env');
 	
 	  # Hostname des LDAP-Servers
-	  $host = $env["LDAP_HOST"];
+	  $host = getenv("LDAP_HOST");
 	  # Base-DN des LDAP-Baums
-	  $base_dn = $env["LDAP_BASE_DN"];
+	  $base_dn = getenv("LDAP_BASE_DN");
 	  # das dazugehörige Passwort
-	  $bind_pw = $env["LDAP_BIND_PW"];
+	  $bind_pw = getenv("LDAP_BIND_PW");
 	  # Search-DN des LDAP-Baums
-	  $search_dn = $env["LDAP_SEARCH_DN"];
+	  $search_dn = getenv("LDAP_SEARCH_DN");
 	  
 
 	  if (empty($username) || empty($password)) {
@@ -89,9 +89,9 @@
 	  return true;
 	}
 
-	$env = parse_ini_file('.env');
+	#$env = parse_ini_file('.env');
 	# Testuser account ist aktiviert 
-	$testuser = $env["TESTUSER"];
+	$testuser = getenv("TESTUSER");
 
 	if ($testuser && $_POST["account"] == "tester" && $_POST["password"] == "superlangespasswort123") {
 	  // echo "login erfolgreich!";
@@ -133,21 +133,21 @@
 	<img src="/img/logo.svg" alt="">
 	<h2>Willkommen zurück!</h2>
 	  <?php
-	  $env = parse_ini_file('.env');
+	  #$env = parse_ini_file('.env');
 	  $login_available = false;
-	  if (trim($env["Authentication"]) == "OIC") {
+	  if (getenv("Authentication") == "OIC") {
 		  // Open ID Connect
 		  $login_available = true;
-		  $oic_login = $env["OIC_LOGIN_BUTTON"]??'Login'; // Option for changing login button
+		  $oic_login = getenv("OIC_LOGIN_BUTTON")??'Login'; // Option for changing login button
 		  echo
 		  "<form action='oic_login.php' class='column' method='post'>
 			<button>$oic_login</button>
 		  </form>";
 	  }
-	  if (trim($env["Authentication"]) == "LDAP") {
+	  if (getenv("Authentication") == "LDAP") {
 		  $login_available = true;
 		  $server = $_SERVER['PHP_SELF'];
-		  $ldap_login = $env["LDAP_LOGIN_BUTTON"]??'Login';
+		  $ldap_login = getenv("LDAP_LOGIN_BUTTON")??'Login';
 		  echo
 			  '<form action = "' . $server . '" class="column" method = "post" >
 			<label for="account" > Benutzername</label >

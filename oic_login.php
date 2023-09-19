@@ -1,24 +1,24 @@
 <?php
 
 // use library for dealing with OpenID connect
-$env = parse_ini_file('.env');
-$composerpath = $env["COMPOSER_PATH"];
+#$env = parse_ini_file('.env');
+$composerpath = getenv("COMPOSER_PATH");
 
 require($composerpath . '/vendor/autoload.php');
 
 use Jumbojett\OpenIDConnectClient;
 
 // Create OpenID connect client
-$env = parse_ini_file('.env');
+#$env = parse_ini_file('.env');
 
 $oidc = new OpenIDConnectClient(
-    $env["OIC_IDP"],
-    $env["OIC_CLIENT_ID"],
-    $env["OIC_CLIENT_SECRET"]
+    getenv("OIC_IDP"),
+    getenv("OIC_CLIENT_ID"),
+    getenv("OIC_CLIENT_SECRET")
 );
 
 # Demo is dealing with HTTP rather than HTTPS
-$testuser = $env["TESTUSER"];
+$testuser = getenv("TESTUSER");
 if ($testuser) {
     $oidc->setHttpUpgradeInsecureRequests(false);
 }
@@ -39,4 +39,3 @@ header("Location: interface.php");
 exit();
 
 ?>
-
