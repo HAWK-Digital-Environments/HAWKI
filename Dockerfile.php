@@ -9,4 +9,4 @@ RUN apt-get update \
     && chmod +x composer_install.sh && ./composer_install.sh \ 
     && mv composer.phar /usr/local/bin/composer \
     && composer install \
-    && rm compose.yml composer_install.sh Dockerfile.caddy Dockerfile.php
+    && rm composer_install.sh Dockerfile.caddy Dockerfile.php
