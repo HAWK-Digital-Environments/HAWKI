@@ -36,7 +36,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Extract Docker metadata
-      id: meta
+      id: meta-php
       uses: docker/metadata-action@v5
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-php
@@ -52,11 +52,11 @@ jobs:
         context: .
         file: ./Dockerfile.php
         push: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'}}
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta-php.outputs.tags }}
+        labels: ${{ steps.meta-php.outputs.labels }}
 
     - name: Extract Docker metadata
-      id: meta
+      id: meta-caddy
       uses: docker/metadata-action@v5
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-caddy
@@ -72,5 +72,5 @@ jobs:
         context: .
         file: ./Dockerfile.caddy
         push: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]'}}
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta-caddy.outputs.tags }}
+        labels: ${{ steps.meta-caddy.outputs.labels }}
