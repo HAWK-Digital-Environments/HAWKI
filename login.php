@@ -11,7 +11,6 @@
 	  $password
 	) {
 
-	  #$env = parse_ini_file('.env');
 	
 	  # Hostname des LDAP-Servers
 	  $host = getenv("LDAP_HOST");
@@ -89,7 +88,6 @@
 	  return true;
 	}
 
-	#$env = parse_ini_file('.env');
 	# Testuser account ist aktiviert 
 	$testuser = getenv("TESTUSER");
 
@@ -133,9 +131,8 @@
 	<img src="/img/logo.svg" alt="">
 	<h2>Willkommen zurück!</h2>
 	  <?php
-	  #$env = parse_ini_file('.env');
 	  $login_available = false;
-	  if (getenv("Authentication") == "OIC") {
+	  if (getenv("Authentication") == "OIDC") {
 		  // Open ID Connect
 		  $login_available = true;
 		  $oic_login = getenv("OIC_LOGIN_BUTTON")??'Login'; // Option for changing login button
