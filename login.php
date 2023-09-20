@@ -120,9 +120,10 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>HAWKI</title>
-  <link rel="favicon" type="image/jpg" href="/img/favicon.jpg"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HAWKI</title>
+	<link rel="shortcut icon" type="image/x-icon" href="https://mediapool.hm.edu/media/_technik/img/_technik_1/favicon.jpg" media="screen" />
+	<link rel="icon" type="image/x-icon" href="https://mediapool.hm.edu/media/_technik/img/_technik_1/favicon.jpg" media="screen" />
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
