@@ -123,7 +123,7 @@
   <title>HAWKI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="./style.css">
-  <link rel="favicon" type="image/jpg" href="img/favicon.jpg">
+  <link rel="favicon" type="image/jpg" href="img/favicon.jpg"/>
 </head>
 <body>
 <!-- partial:index.partial.html -->
