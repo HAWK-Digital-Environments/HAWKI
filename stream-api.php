@@ -20,11 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 
-$env = parse_ini_file('.env');
 
 // Replace with your API URL and API key
 $apiUrl = 'https://api.openai.com/v1/chat/completions';
-$apiKey = $env['OPENAI_API_KEY'];
+$apiKey = getenv('OPENAI_API_KEY');
 
 // Read the request payload from the client
 $requestPayload = file_get_contents('php://input');
