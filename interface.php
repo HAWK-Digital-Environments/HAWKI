@@ -100,7 +100,9 @@ if (!isset($_SESSION['username'])) {
 	<div class="info">
 	  <a href="#" onclick="load(this, 'about.htm')">Über HAWKI</a>
 	  <a href="#" id="feedback" onclick="load(this, 'userpost.php')">Feedback</a>
-	  <a href="logout.php">Abmelden (<?php echo $_SESSION['username']?>)</a>
+	  <a href=<?php if(isset($_SESSION['oidc'])){
+		echo "logout_oidc.php";
+		} else echo "logout.php" ?>>Abmelden (<?php echo $_SESSION['username']?>)</a>
 	  <br>
 	  <a href="/datenschutz" target="_blank" >Datenschutz</a>
 	  <a href="/impressum" target="_blank">Impressum</a>
