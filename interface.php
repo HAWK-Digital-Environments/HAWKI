@@ -8,13 +8,13 @@ if (!isset($_SESSION['username'])) {
 
 ?>
 <head>
-	 <title>AI Lab</title>
-	 <link   >
+	<title>AI Lab</title>
+	<link rel="favicon" type="image/jpg" href="/img/favicon.jpg"/>	
  </head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <link rel="stylesheet" href="app.css">
-<link rel="favicon" type="image/jpg" href="/img/favicon.jpg"/>	
+
 
 <div class="wrapper">
   <div class="sidebar">
