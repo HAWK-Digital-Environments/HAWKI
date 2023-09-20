@@ -33,7 +33,7 @@ $_SESSION['initials'] = $initials;
 
 $_SESSION['username'] = $oidc->requestUserInfo('email');
 
-$_SESSION['oidc'] = $oidc;
+$_SESSION['oidc'] = true;
 
 
 header("Location: interface.php");
