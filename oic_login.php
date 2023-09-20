@@ -25,11 +25,11 @@ $oidc->authenticate();
 $_SESSION['oidcClient'] = $oidc;
 
 // Set session variable username
-#$firstname = $oidc->requestUserInfo('given_name');
-#$surname = $oidc->requestUserInfo('family_name');
-#$initials = substr($firstname, 0, 1) . substr($surname, 0, 1);
+$firstname = $oidc->requestUserInfo('given_name');
+$surname = $oidc->requestUserInfo('family_name');
+$initials = substr($firstname, 0, 1) . substr($surname, 0, 1);
 #
-#$_SESSION['username'] = $initials;
+$_SESSION['initials'] = $initials;
 
 $_SESSION['username'] = $oidc->requestUserInfo('email');
 

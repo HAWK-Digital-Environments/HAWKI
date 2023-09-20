@@ -418,7 +418,7 @@ if (!isset($_SESSION['username'])) {
 		if(message.role == "assistant"){
 			messageElement.querySelector(".message-icon").textContent = "AI";
 		}else{
-			messageElement.querySelector(".message-icon").textContent = '<?= $_SESSION['username'] ?>';
+			messageElement.querySelector(".message-icon").textContent = '<?= $_SESSION['initials'] ?>';
 			messageElement.querySelector(".message").classList.add("me");
 		}
 		
@@ -465,7 +465,7 @@ if (!isset($_SESSION['username'])) {
 		const inputField = document.querySelector(".userpost-field");
 		
 		let message = {};
-		message.role = '<?= $_SESSION['username'] ?>';
+		message.role = '<?= $_SESSION['initials'] ?>';
 		message.content = inputField.value.trim();
 		
 		fetch('userpost.php', {
