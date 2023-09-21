@@ -5,16 +5,20 @@ require __DIR__ . '/vendor/autoload.php';
 
 use Jumbojett\OpenIDConnectClient;
 
+if (file_exists(".env")){
+    $env = parse_ini_file('.env');
+}
+
 // Create OpenID connect client
 
 $oidc = new OpenIDConnectClient(
-    getenv("OIC_IDP"),
-    getenv("OIC_CLIENT_ID"),
-    getenv("OIC_CLIENT_SECRET")
+    isset($env) ? $env["OIC_IDP"] : getenv("OIC_IDP"),
+    isset($env) ? $env["LDAP_HOST"] : getenv("OIC_CLIENT_ID"),
+    isset($env) ? $env["LDAP_HOST"] : getenv("OIC_CLIENT_SECRET")
 );
 
 # Demo is dealing with HTTP rather than HTTPS
-$testuser = getenv("TESTUSER");
+$testuser = isset($env) ? $env["TESTUSER"] : getenv("TESTUSER");
 if ($testuser) {
     $oidc->setHttpUpgradeInsecureRequests(false);
 }
@@ -32,9 +36,6 @@ $initials = substr($firstname, 0, 1) . substr($surname, 0, 1);
 $_SESSION['initials'] = $initials;
 
 $_SESSION['username'] = $oidc->requestUserInfo('email');
-
-$_SESSION['oidc'] = true;
-
 
 header("Location: interface.php");
 exit();

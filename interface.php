@@ -9,8 +9,18 @@ if (!isset($_SESSION['username'])) {
 ?>
 <head>
 	<title>HAWKI</title>
-	<link rel="shortcut icon" type="image/x-icon" href="https://mediapool.hm.edu/media/_technik/img/_technik_1/favicon.jpg" media="screen" />
-	<link rel="icon" type="image/x-icon" href="https://mediapool.hm.edu/media/_technik/img/_technik_1/favicon.jpg" media="screen" />
+	<?php 
+  if (file_exists(".env")){
+	$env = parse_ini_file('.env');
+  }
+  $favicon = isset($env) ? ($env["FAVICON_URI"]??false) : getenv("FAVICON_URI");
+  if ($favicon) {
+	echo 
+	'<link rel="shortcut icon" type="image/x-icon" href="'. $favicon .'" media="screen" />
+	<link rel="icon" type="image/x-icon" href="'. $favicon .'" media="screen" />
+	';
+  }
+ ?>
  </head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -102,7 +112,11 @@ if (!isset($_SESSION['username'])) {
 	<div class="info">
 	  <a href="#" onclick="load(this, 'about.htm')">Über HAWKI</a>
 	  <a href="#" id="feedback" onclick="load(this, 'userpost.php')">Feedback</a>
-	  <a href=<?php if(isset($_SESSION['oidc'])){
+	  <a href=<?php 
+	  	if (file_exists(".env")){
+			$env = parse_ini_file('.env');
+		}
+		if ((isset($env) ? $env["Authentication"] : getenv("Authentication")) == "OIDC"){
 		echo "logout_oidc.php";
 		} else echo "logout.php" ?>>Abmelden (<?php echo $_SESSION['username']?>)</a>
 	  <br>
@@ -422,7 +436,7 @@ if (!isset($_SESSION['username'])) {
 		if(message.role == "assistant"){
 			messageElement.querySelector(".message-icon").textContent = "AI";
 		}else{
-			messageElement.querySelector(".message-icon").textContent = '<?= $_SESSION['initials'] ?>';
+			messageElement.querySelector(".message-icon").textContent = '<?= isset($_SESSION['initials']) ? $_SESSION['initials']: $_SESSION['username'] ?>';
 			messageElement.querySelector(".message").classList.add("me");
 		}
 		
@@ -469,7 +483,7 @@ if (!isset($_SESSION['username'])) {
 		const inputField = document.querySelector(".userpost-field");
 		
 		let message = {};
-		message.role = '<?= $_SESSION['initials'] ?>';
+		message.role = '<?= isset($_SESSION['initials']) ? $_SESSION['initials']: $_SESSION['username'] ?>';
 		message.content = inputField.value.trim();
 		
 		fetch('userpost.php', {
