@@ -156,10 +156,10 @@
 	  if ((isset($env) ? $env["Authentication"] : getenv("Authentication")) == "OIDC") {
 		  // Open ID Connect
 		  $login_available = true;
-		  $oic_login = isset($env) ? $env["OIC_LOGIN_BUTTON"] ??'Login' : getenv("OIC_LOGIN_BUTTON"); // Option for changing login button
+		  $oidc_login = isset($env) ? $env["OIDC_LOGIN_BUTTON"] ??'Login' : getenv("OIDC_LOGIN_BUTTON"); // Option for changing login button
 		  echo
-		  "<form action='oic_login.php' class='column' method='post'>
-			<button>$oic_login</button>
+		  "<form action='oidc_login.php' class='column' method='post'>
+			<button>$oidc_login</button>
 		  </form>";
 	  }
 	  if ((isset($env) ? $env["Authentication"] : getenv("Authentication")) == "LDAP") {

@@ -12,9 +12,9 @@ if (file_exists(".env")){
 // Create OpenID connect client
 
 $oidc = new OpenIDConnectClient(
-    isset($env) ? $env["OIC_IDP"] : getenv("OIC_IDP"),
-    isset($env) ? $env["OIC_CLIENT_ID"] : getenv("OIC_CLIENT_ID"),
-    isset($env) ? $env["OIC_CLIENT_SECRET"] : getenv("OIC_CLIENT_SECRET")
+    isset($env) ? $env["OIDC_IDP"] : getenv("OIDC_IDP"),
+    isset($env) ? $env["OIDC_CLIENT_ID"] : getenv("OIDC_CLIENT_ID"),
+    isset($env) ? $env["OIDC_CLIENT_SECRET"] : getenv("OIDC_CLIENT_SECRET")
 );
 
 # Demo is dealing with HTTP rather than HTTPS
