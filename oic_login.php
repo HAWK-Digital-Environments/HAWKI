@@ -13,8 +13,8 @@ if (file_exists(".env")){
 
 $oidc = new OpenIDConnectClient(
     isset($env) ? $env["OIC_IDP"] : getenv("OIC_IDP"),
-    isset($env) ? $env["LDAP_HOST"] : getenv("OIC_CLIENT_ID"),
-    isset($env) ? $env["LDAP_HOST"] : getenv("OIC_CLIENT_SECRET")
+    isset($env) ? $env["OIC_CLIENT_ID"] : getenv("OIC_CLIENT_ID"),
+    isset($env) ? $env["OIC_CLIENT_SECRET"] : getenv("OIC_CLIENT_SECRET")
 );
 
 # Demo is dealing with HTTP rather than HTTPS
@@ -25,8 +25,6 @@ if ($testuser) {
 
 $oidc->addScope('profile','email');
 $oidc->authenticate();
-
-$_SESSION['oidcClient'] = $oidc;
 
 // Set session variable username
 $firstname = $oidc->requestUserInfo('given_name');
