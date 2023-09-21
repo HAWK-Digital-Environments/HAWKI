@@ -117,7 +117,7 @@ if (!isset($_SESSION['username'])) {
 			$env = parse_ini_file('.env');
 		}
 		if ((isset($env) ? $env["Authentication"] : getenv("Authentication")) == "OIDC"){
-		echo "logout_oidc.php";
+		echo "oidc_logout.php";
 		} else echo "logout.php" ?>>Abmelden (<?php echo $_SESSION['username']?>)</a>
 	  <br>
 	  <a href="/datenschutz" target="_blank" >Datenschutz</a>
