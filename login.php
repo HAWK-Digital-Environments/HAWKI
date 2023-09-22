@@ -158,7 +158,7 @@
 		  $login_available = true;
 		  $oidc_login = isset($env) ? $env["OIDC_LOGIN_BUTTON"] ??'Login' : getenv("OIDC_LOGIN_BUTTON"); // Option for changing login button
 		  echo
-		  "<form action='oidc_login.php' class='column' method='post'>
+		  "<form action='oic_login.php' class='column' method='post'>
 			<button>$oidc_login</button>
 		  </form>";
 	  }
