@@ -8,7 +8,7 @@ if (!isset($_SESSION['username'])) {
 
 ?>
 <head>
-	<title>HAWKI</title>
+	<title>HM-KI</title>
 	<?php 
   if (file_exists(".env")){
 	$env = parse_ini_file('.env');

@@ -127,7 +127,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HAWKI</title>
+  <title>HM-KI</title>
   <?php 
   if (file_exists(".env")){
 	$env = parse_ini_file('.env');
