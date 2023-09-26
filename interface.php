@@ -111,7 +111,7 @@ if (!isset($_SESSION['username'])) {
 	</div>
 	<div class="info">
 	  <a href="#" onclick="load(this, 'about.htm')">Über HM-KI</a>
-	  <a href="#" id="feedback" onclick="load(this, 'userpost.php')">Feedback</a>
+	  <!-- <a href="#" id="feedback" onclick="load(this, 'userpost.php')">Feedback</a> -->
 	  <a href=<?php 
 	  	if (file_exists(".env")){
 			$env = parse_ini_file('.env');
