@@ -187,10 +187,10 @@
 	  <label for="newsletter">E-Mail-Adresse</label>
 	  <input type="email" name="newsletter" id="newsletter">
 	  <button>Senden</button>
-	</form>
+	</form>-->
 	<a href="/datenschutz" target="_blank">Datenschutzerklärung</a>
 	<a href="/impressum" target="_blank">Impressum</a>
-	-->
+	
   </aside>
   
   <main>
