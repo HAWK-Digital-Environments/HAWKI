@@ -467,17 +467,12 @@ if (!isset($_SESSION['username'])) {
 		resize(document.querySelector(".input-field"));
 	}
 	
-	if("<?php 
-		if(isset($_SESSION['data_protection-banner'])){
-			echo($_SESSION['data_protection-banner']);
-		}else echo false;
-		?>"){
+	if(localStorage.getItem("data-protection")){
 		document.querySelector("#data-protection").remove();
 	}
 	
 	function modalClick(element){
-		//localStorage.setItem(element.id, "true")
-		"<?php $_SESSION['data_protection-banner'] = true; ?>";
+		localStorage.setItem(element.id, "true")
 		element.remove();
 	}
 	
