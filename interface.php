@@ -266,7 +266,7 @@ if (!isset($_SESSION['username'])) {
 				  message.contentEditable = true;
 			  })
 			  */
-			  if(localStorage.getItem("truth")){
+			  if(sessionStorage.getItem("truth")){
 				  document.querySelector("#truth")?.remove();
 			  }
 			  
@@ -467,12 +467,12 @@ if (!isset($_SESSION['username'])) {
 		resize(document.querySelector(".input-field"));
 	}
 	
-	if(localStorage.getItem("data-protection")){
+	if(sessionStorage.getItem("data-protection")){
 		document.querySelector("#data-protection").remove();
 	}
 	
 	function modalClick(element){
-		localStorage.setItem(element.id, "true")
+		sessionStorage.setItem(element.id, "true")
 		element.remove();
 	}
 	
