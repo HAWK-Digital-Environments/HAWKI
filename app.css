@@ -13,7 +13,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('/fonts/FiraSans-Regular.woff2') format('woff2'); 
+  src: url('FiraSans.woff2') format('woff2'); 
 }
 
 *{
