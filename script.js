@@ -33,7 +33,7 @@ var observer = new IntersectionObserver(handleIntersection);
 
 // Observe the container element
 observer.observe(container);
-
+/*
 document.getElementById('newsletterForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent form submission
 
@@ -51,3 +51,4 @@ document.getElementById('newsletterForm').addEventListener('submit', function(ev
     };
     xhr.send('newsletter=' + encodeURIComponent(email));
 });
+*/
