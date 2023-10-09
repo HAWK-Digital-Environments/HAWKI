@@ -262,7 +262,7 @@ li{
   background: #d1b8eb;
 }
 .image_preview {
-  background-image: url("https://ai.hawk.de/background.png");
+  background-image: url("background.png");
   width: 1200px;
   height: 1200px;
   position: absolute;
