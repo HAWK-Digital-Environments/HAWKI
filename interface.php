@@ -228,7 +228,7 @@ if (!isset($_SESSION['username'])) {
 <div class="modal" onclick="modalClick(this)" id="data-protection"> 
 	<div class="modal-content">
 		<h2>Nutzungshinweis</h2>
-		<p>HM-KI verwendet die API von OpenAI. Das bedeutet, dass die eingegeben Informationen an OpenAI übermittelt werden. Wir bitten Sie daher keine Daten mit Personenbezug, also Angaben, die auf eine Person unmittelbar oder zumindest mittelbar abstellen, einzugeben, um Verstöße gegen geltenden Recht zu vermeiden. </p>
+		<p>HM-KI verwendet die API von OpenAI. Das bedeutet, dass die eingegeben Informationen an OpenAI übermittelt werden. Wir bitten daher keine Daten mit Personenbezug, also Angaben, die auf eine Person unmittelbar oder zumindest mittelbar abstellen sowie Inhalte die durch das <a href="https://dejure.org/gesetze/UrhG"> Urhebergesetz</a> geschützt sind einzugeben, um Verstöße gegen geltendes Recht und die Nutzungsbedingungen von <a href="https://openai.com/policies/terms-of-use"> OpenAI </a> zu vermeiden. </p>
 		<button>Bestätigen</button>
 	</div>
 </div>
