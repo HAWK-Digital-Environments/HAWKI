@@ -127,7 +127,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HAWKI</title>
+  <title>HM-KI</title>
   <?php 
   if (file_exists(".env")){
 	$env = parse_ini_file('.env');
@@ -181,15 +181,16 @@
 	  }
 
 	  ?>
-	<h2 class="top-auto">Interesse?</h2>
+	<!--<h2 class="top-auto">Interesse?</h2>
 	<p>Wenn Sie das Interface für Ihre Hochschule ausprobieren möchten, hinterlassen Sie bitte hier Ihre E-Mail-Adresse.</p>
 	<form action="<?php echo $_SERVER['PHP_SELF']; ?>" class="column" method="post" id="newsletterForm">
 	  <label for="newsletter">E-Mail-Adresse</label>
 	  <input type="email" name="newsletter" id="newsletter">
 	  <button>Senden</button>
-	</form>
+	</form>-->
 	<a href="/datenschutz" target="_blank">Datenschutzerklärung</a>
 	<a href="/impressum" target="_blank">Impressum</a>
+	
   </aside>
   
   <main>

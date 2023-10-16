@@ -8,7 +8,7 @@ if (!isset($_SESSION['username'])) {
 
 ?>
 <head>
-	<title>HAWKI</title>
+	<title>HM-KI</title>
 	<?php 
   if (file_exists(".env")){
 	$env = parse_ini_file('.env');
@@ -108,8 +108,8 @@ if (!isset($_SESSION['username'])) {
 		
 	</div>
 	<div class="info">
-	  <a href="#" onclick="load(this, 'about.htm')">Über HAWKI</a>
-	  <a href="#" id="feedback" onclick="load(this, 'userpost.php')">Feedback</a>
+	  <a href="#" onclick="load(this, 'about.htm')">Über HM-KI</a>
+	  <!-- <a href="#" id="feedback" onclick="load(this, 'userpost.php')">Feedback</a> -->
 	  <a href=<?php 
 	  	if (file_exists(".env")){
 			$env = parse_ini_file('.env');
@@ -226,7 +226,7 @@ if (!isset($_SESSION['username'])) {
 <div class="modal" onclick="modalClick(this)" id="data-protection"> 
 	<div class="modal-content">
 		<h2>Nutzungshinweis</h2>
-		<p>Bitte geben Sie keine personenbezogenen Daten ein. Wir verwenden die API von OpenAI. Das bedeutet, dass die von Ihnen eingegebenen Daten direkt an OpenAI gesendet werden. Es besteht die Möglichkeit, dass OpenAI diese Daten weiterverwendet.</p>
+		<p>HM-KI verwendet die API von OpenAI. Das bedeutet, dass die eingegeben Informationen an OpenAI übermittelt werden. Wir bitten daher keine Daten mit Personenbezug, also Angaben, die auf eine Person unmittelbar oder zumindest mittelbar abstellen sowie Inhalte die durch das <a href="https://dejure.org/gesetze/UrhG"> Urhebergesetz</a> geschützt sind einzugeben, um Verstöße gegen geltendes Recht und die Nutzungsbedingungen von <a href="https://openai.com/policies/terms-of-use"> OpenAI </a> zu vermeiden. </p>
 		<button>Bestätigen</button>
 	</div>
 </div>
@@ -264,7 +264,7 @@ if (!isset($_SESSION['username'])) {
 				  message.contentEditable = true;
 			  })
 			  */
-			  if(localStorage.getItem("truth")){
+			  if(sessionStorage.getItem("truth")){
 				  document.querySelector("#truth")?.remove();
 			  }
 			  
@@ -330,7 +330,7 @@ if (!isset($_SESSION['username'])) {
 		document.querySelector('.limitations')?.remove();
 		
 		const requestObject = {};
-		requestObject.model = 'gpt-3.5-turbo-0301';
+		requestObject.model = 'gpt-4';
 		requestObject.stream = true;
 		requestObject.messages = [];
 		const messageElements = messagesElement.querySelectorAll(".message");
@@ -465,12 +465,12 @@ if (!isset($_SESSION['username'])) {
 		resize(document.querySelector(".input-field"));
 	}
 	
-	if(localStorage.getItem("data-protection")){
+	if(sessionStorage.getItem("data-protection")){
 		document.querySelector("#data-protection").remove();
 	}
 	
 	function modalClick(element){
-		localStorage.setItem(element.id, "true")
+		sessionStorage.setItem(element.id, "true")
 		element.remove();
 	}
 	

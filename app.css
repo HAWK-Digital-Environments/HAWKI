@@ -3,7 +3,7 @@
   --main-bg-color: rgb(35,48,176);
 }
 
-/* Size of logo on interface page */
+/* Size of logo on interface page */ 
 .logo img{
   width: 150px;
 }
@@ -13,7 +13,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url(FiraSans.woff2) format('woff2');
+  src: url('FiraSans.woff2') format('woff2'); 
 }
 
 *{
