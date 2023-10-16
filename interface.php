@@ -46,6 +46,12 @@ if (!isset($_SESSION['username'])) {
 			<input type="radio" name="model" onchange="localStorage.setItem('model', 'gpt-4')"/>
 			<p>GPT 4</p>
 		</label>
+		<script>var radios= document.getElementsByName("model");
+				var val = localStorage.getItem('model');
+				if (val == 'gpt-4' ) {
+					radios[1].checked=true;
+				}
+			</script>
 		</div>
 		<details>
 			<summary>
