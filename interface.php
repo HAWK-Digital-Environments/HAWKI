@@ -28,9 +28,25 @@ if (!isset($_SESSION['username'])) {
 <div class="wrapper">
   <div class="sidebar">
 	<div class="logo" onclick="load(this, 'chat.htm')">
-	 <img src="/img/logo.svg" alt="Logo">
+	 <img src="/img/hawki.svg" alt="HAWK Logo" width="150px">
 	</div>
 	<div class="menu">
+		<details>
+			<summary>
+				<h3>Modell ⓘ</h3>
+			</summary>
+			Wähle eines der KI Modelle.
+		</details>
+		<div class="radiogroup">
+		<label>
+			<input type="radio" name="model" onchange="localStorage.setItem('model', 'gpt-3.5-turbo')" checked="checked"/>
+			<p>GPT 3.5 Turbo</p>
+		</label>
+		<label>
+			<input type="radio" name="model" onchange="localStorage.setItem('model', 'gpt-4')"/>
+			<p>GPT 4</p>
+		</label>
+		</div>
 		<details>
 			<summary>
 				<h3>Konversation ⓘ</h3>
@@ -118,7 +134,7 @@ if (!isset($_SESSION['username'])) {
 		echo "oidc_logout.php";
 		} else echo "logout.php" ?>>Abmelden (<?php echo $_SESSION['username']?>)</a>
 	  <br>
-	  <a href="/datenschutz" target="_blank" >Datenschutz</a>
+	  <a href="#" onclick="load(this, 'datenschutz.htm')">Datenschutz</a>
 	  <a href="/impressum" target="_blank">Impressum</a>
 	</div>
   </div>
@@ -207,8 +223,6 @@ if (!isset($_SESSION['username'])) {
 	  
   </div>
   
-  
-  
   <template id="message">
 		 <div class="message">
 			 <div class="message-content">
@@ -227,6 +241,26 @@ if (!isset($_SESSION['username'])) {
 	<div class="modal-content">
 		<h2>Nutzungshinweis</h2>
 		<p>HM-KI verwendet die API von OpenAI. Das bedeutet, dass die eingegeben Informationen an OpenAI übermittelt werden. Wir bitten daher keine Daten mit Personenbezug, also Angaben, die auf eine Person unmittelbar oder zumindest mittelbar abstellen sowie Inhalte die durch das <a href="https://dejure.org/gesetze/UrhG"> Urhebergesetz</a> geschützt sind einzugeben, um Verstöße gegen geltendes Recht und die Nutzungsbedingungen von <a href="https://openai.com/policies/terms-of-use"> OpenAI </a> zu vermeiden. </p>
+		<button>Bestätigen</button>
+	</div>
+</div>
+
+<div class="modal" onclick="modalClick(this)" id="gpt4"> 
+	<div class="modal-content">
+		<h2>Upgrade auf GPT4</h2>
+		<p>Die Hochschule stellt Ihnen jetzt GPT4 zur Verfügung. 
+			Komplexere Eingaben können nun besser verstanden und verarbeitet werden.
+			Sie sollten nun präzisere Antworten erhalten. Die Wartezeit auf eine Antwort kann sich geringfügig verlängern.</p>
+		<button>Bestätigen</button>
+	</div>
+</div>
+
+<div class="modal" onclick="modalClick(this)" id="gpt4"> 
+	<div class="modal-content">
+		<h2>Upgrade auf GPT4</h2>
+		<p>Die Hochschule stellt Ihnen jetzt GPT4 zur Verfügung. 
+			Komplexere Eingaben können nun besser verstanden und verarbeitet werden.
+			Sie sollten nun präzisere Antworten erhalten. Die Wartezeit auf eine Antwort kann sich geringfügig verlängern.</p>
 		<button>Bestätigen</button>
 	</div>
 </div>
@@ -330,7 +364,7 @@ if (!isset($_SESSION['username'])) {
 		document.querySelector('.limitations')?.remove();
 		
 		const requestObject = {};
-		requestObject.model = 'gpt-4';
+		requestObject.model = localStorage.getItem("model") || 'gpt-3.5-turbo';
 		requestObject.stream = true;
 		requestObject.messages = [];
 		const messageElements = messagesElement.querySelectorAll(".message");
@@ -383,43 +417,32 @@ if (!isset($_SESSION['username'])) {
 			}
 	
 			const decodedData = new TextDecoder().decode(value);
+			console.log(decodedData);
 			let chunks = decodedData.split("data: ");
 			chunks.forEach((chunk, index) => {
 				if(chunk.indexOf('finish_reason":"stop"') > 0) return false;
 				if(chunk.indexOf('DONE') > 0) return false;
 				if(chunk.indexOf('role') > 0) return false;
-				if(chunk.length === 0) return false;
-				// First check if chunk is valid json.
-				// Otherwise we do not see the correct error message.
-				try {
-					const json = JSON.parse(chunk);
-					if ("choices" in json) {
-						// console.log(json["choices"]);
-						// normal response
-						document.querySelector(".message:last-child").querySelector(".message-text").innerHTML +=
-							json["choices"][0]["delta"].content;
-					} else {
-						if ("error" in json) {
-							if ("message" in json.error) {
-								// console.log(json.error.message);
-								document.querySelector(".message:last-child").querySelector(".message-text").innerHTML =
-									'<em>' + json.error.message + '</em>';
-							} else {
-								console.log(json.error);
-							}
-						} else {
-							console.log(json);
-						}
-					}
-				} catch(error) {
-					console.log(chunk);
-					console.error(error.message);
-				}
+				if(chunk.length == 0) return false;
+				if(chunk != "") console.log(JSON.parse(chunk)["choices"][0]["delta"])
+				console.log(JSON.parse(chunk)["choices"][0]["delta"]);
+				document.querySelector(".message:last-child").querySelector(".message-text").innerHTML +=  escapeHTML(JSON.parse(chunk)["choices"][0]["delta"].content);
 			})
 
+			// Check if the content has code block
+			document.querySelector(".message:last-child").querySelector(".message-text").innerHTML = document.querySelector(".message:last-child").querySelector(".message-text").innerHTML.replace(/```([\s\S]+?)```/g, '<pre><code>$1</code></pre>').replace(/\*\*.*?\*\*/g, '');;
+			hljs.highlightAll();
 			scrollToLast();
 		}
 	}
+
+	function escapeHTML(str) {
+    return str.replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;')
+              .replace(/'/g, '&#039;');
+}
 
 	
 	function addMessage(message){
@@ -467,6 +490,10 @@ if (!isset($_SESSION['username'])) {
 	
 	if(sessionStorage.getItem("data-protection")){
 		document.querySelector("#data-protection").remove();
+	}
+	
+	if(localStorage.getItem("gpt4")){
+		document.querySelector("#gpt4").remove();
 	}
 	
 	function modalClick(element){
