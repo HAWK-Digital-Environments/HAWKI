@@ -34,6 +34,7 @@ if (!isset($_SESSION['username'])) {
 		<details>
 			<summary>
 				<h3>Modell ⓘ</h3>
+				<p id="GPT4-Hinweis", style="color: crimson"> GPT 4 behauptet GPT 3 zu sein.</p>
 			</summary>
 			Wähle eines der KI Modelle.
 		</details>
