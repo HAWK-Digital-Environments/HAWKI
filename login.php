@@ -17,13 +17,11 @@
 
 	  # Hostname des LDAP-Servers
 	  $host = isset($env) ? $env["LDAP_HOST"] : getenv("LDAP_HOST");
-	  # Base-DN des LDAP-Baums
-	  $base_dn = isset($env) ? $env["LDAP_BASE_DN"] : getenv("LDAP_BASE_DN");
-	  # das dazugehörige Passwort
-	  $bind_pw = isset($env) ? $env["LDAP_BIND_PW"] : getenv("LDAP_BIND_PW");
-	  # Search-DN des LDAP-Baums
-	  $search_dn = isset($env) ? $env["LDAP_SEARCH_DN"] : getenv("LDAP_SEARCH_DN");
-	  
+      # User-DN pattern
+      $pattern = isset($env) ? $env["LDAP_PATTERN"] : getenv("LDAP_PATTERN");
+      # Zusätzlicher LDAP filter für das Abrufen des Benutzereintrags
+      $filter = isset($env) ? $env["LDAP_FILTER"] : getenv("LDAP_FILTER");
+
 
 	  if (empty($username) || empty($password)) {
 		print "Fehler: keine Anmeldedaten<br>";
@@ -37,37 +35,20 @@
 	  
 	  ldap_set_option($connection, LDAP_OPT_PROTOCOL_VERSION, 3);
 
-	  if (($link = ldap_bind($connection, $base_dn, $bind_pw)) == false) {
-		print "Fehler: Bind fehlgeschlagen<br>";
-		return false;
-	  }
-
-	  $sanitizedUsername = ldap_escape($username, "", LDAP_ESCAPE_FILTER);
-
-	  $filter = "(|(uid=$sanitizedUsername)(mail=$sanitizedUsername))";
-
-	  if (($result = ldap_search($connection, $search_dn, $filter)) == false) {
-		print "Fehler: Suche im LDAP-Baum fehlgeschlagen<br>";
-		return false;
-	  }
-
-	  if (($entry_id = ldap_first_entry($connection, $result)) == false) {
-		print "Fehler: Eintrag des Suchergenisses konnte nicht abgeholt werden<br>";
-		return false;
-	  }
-
-	  if (($user_dn = ldap_get_dn($connection, $entry_id)) == false) {
-		print "Fehler: Der User-DN konnte nicht ermittelt werden<br>";
-		return false;
-	  }
-
 	  /* Authentifizierung des User */
+      $sanitizedUsername = ldap_escape($username, "", LDAP_ESCAPE_FILTER);
+	  $user_dn = str_replace("%username%", $sanitizedUsername, $pattern);
 	  if ((ldap_bind($connection, $user_dn, $password)) == false) {
 		print "Fehler: Authentifizierung fehlgeschlagen: $user_dn<br>";
 		return false;
 	  }
 
-	  $info = ldap_get_entries($connection, $result);
+	  if (($result= ldap_read($connection, $user_dn, $filter)) == false) {
+		print "Fehler: Suche im LDAP-Baum fehlgeschlagen<br>";
+		return false;
+	  }
+	  
+	$info = ldap_get_entries($connection, $result);
 	  $userinfo = $info[0];
 	  if (isset($userinfo["displayname"])) {
 		// Attribute displayname is set, expect to be comma separated names =>
