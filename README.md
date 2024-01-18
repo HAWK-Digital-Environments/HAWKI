@@ -51,22 +51,21 @@ To generate answers HAWKI uses the Open AI api. Follow the instructions on https
 
 To get started you need to add a configuration file to the project first. Copy the file ".env.example" from the root directory and rename it to ".env". Replace the example values in it with your own configuration. A detailed description of all values is listed below.
 
-| Value            | Type    | Example                                | Description                                                                                                                                        |
-| ---------------- | ------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Authentication   | string  | 'LDAP' or 'OIDC'                        | Authentication method: LDAP or OpenID Connect                                                                                                      |
-| LDAP_HOST        | string  | "ldaps://...de"                        | The URL of your LDAP server.                                                                                                                       |
-| LDAP_BIND_PW     | string  | secretpassword                         | Password of the user that is trying to bind to the LDAP Server.                                                                                    |
-| LDAP_BASE_DN     | string  | "cn=...,ou=...,dc=..."                 | Distinguised name that is used to initially bind to your LDAP server.                                                                              |
-| LDAP_SEARCH_DN   | string  | "ou=...,dc=..."                        | Distinguished name that is used for authenticating users.                                                                                          |
-| OIDC_IDP          | string  | "https://...."                         | URL of the Identity provider supporting OpenID Connect.                                                                                            |
-| OIDC_CLIENT_ID    | string  | "..."                                  | Client Id for this application in Identity provider.                                                                                               |
-| OIDC_CLIENT_SECRET | string  | "..."                                 | Secret key for OpenID Connect. 
-| OIDC_LOGOUT_URI | string  | "https://...."                                 | URL to logout from Identity provider                                                                                                                  |
-| OPENAI_API_KEY   | string  | sk-...                                 | Open AI Api key                                                                                                                                    |
-| IMPRINT_LOCATION | string  | https://your-university/imprint        | A link to your imprint. Alternatively you can replace the file index.php under /impressum with your own html/ php of your imprint.                 |
-| PRIVACY_LOCATION | string  | https://your-university/privacy-policy | A link to your privacy policy. Alternatively you can replace the file index.php under /datenschutz with your own html/ php of your privacy policy. |
-| TESTUSER         | boolean | `false`                                | Can be set to `true` for testing purposes. You can then sign in using username `tester` and password `superlangespasswort123`                      |
-| FAVICON_URI  | string  | "https://...."                                 | Link to favicon 
+| Value            | Type    | Example                                      | Description                                                                                                                                        |
+| ---------------- | ------- |----------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| Authentication   | string  | 'LDAP' or 'OIDC'                             | Authentication method: LDAP or OpenID Connect                                                                                                      |
+| LDAP_HOST        | string  | "ldaps://...de"                              | The URL of your LDAP server.                                                                                                                       |
+| LDAP_PATTERN     | string  | "uid=%username%,ou=people,dc=example,dc=com" | DN Pattern of the user entries (%username% is replaced by the login username).                                                                     |
+| LDAP_FILTER     | string  | "(objectClass=*)"                            | Additional filter to apply to the user entry to limit access to users with certain attributes.                                                     |
+| OIDC_IDP          | string  | "https://...."                               | URL of the Identity provider supporting OpenID Connect.                                                                                            |
+| OIDC_CLIENT_ID    | string  | "..."                                        | Client Id for this application in Identity provider.                                                                                               |
+| OIDC_CLIENT_SECRET | string  | "..."                                        | Secret key for OpenID Connect.                                                                                                                     
+| OIDC_LOGOUT_URI | string  | "https://...."                               | URL to logout from Identity provider                                                                                                               |
+| OPENAI_API_KEY   | string  | sk-...                                       | Open AI Api key                                                                                                                                    |
+| IMPRINT_LOCATION | string  | https://your-university/imprint              | A link to your imprint. Alternatively you can replace the file index.php under /impressum with your own html/ php of your imprint.                 |
+| PRIVACY_LOCATION | string  | https://your-university/privacy-policy       | A link to your privacy policy. Alternatively you can replace the file index.php under /datenschutz with your own html/ php of your privacy policy. |
+| TESTUSER         | boolean | `false`                                      | Can be set to `true` for testing purposes. You can then sign in using username `tester` and password `superlangespasswort123`                      |
+| FAVICON_URI  | string  | "https://...."                               | Link to favicon                                                                                                                                    
 
 ## Web Server Configuration
 
