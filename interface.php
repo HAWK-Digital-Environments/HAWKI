@@ -1,3 +1,10 @@
+<?php
+ini_set('output_buffering', 'Off');
+@ob_end_flush();
+?>
+<?php
+session_start();
+?>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
@@ -6,7 +13,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/go.min.js"></script>
 
 <?php
-session_start();
 
 if (!isset($_SESSION['username'])) {
 	header("Location: login.php");
@@ -324,7 +330,7 @@ if (!isset($_SESSION['username'])) {
 		document.querySelector('.limitations')?.remove();
 		
 		const requestObject = {};
-		requestObject.model = 'gpt-4-turbo';
+		requestObject.model = 'gpt-3.5-turbo';
 		requestObject.stream = true;
 		requestObject.messages = [];
 		const messageElements = messagesElement.querySelectorAll(".message");
