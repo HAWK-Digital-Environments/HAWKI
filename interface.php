@@ -1,10 +1,5 @@
-<?php
-ini_set('output_buffering', 'Off');
-@ob_end_flush();
-?>
-<?php
-session_start();
-?>
+<?php session_start(); ?>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
