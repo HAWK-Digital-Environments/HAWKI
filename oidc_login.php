@@ -17,6 +17,10 @@ $oidc = new OpenIDConnectClient(
     isset($env) ? $env["OIDC_CLIENT_SECRET"] : getenv("OIDC_CLIENT_SECRET")
 );
 
+if (isset($env)) {
+    $oidc->setHttpProxy($env["OIDC_PROXY"]);
+}
+
 # Demo is dealing with HTTP rather than HTTPS
 $testuser = isset($env) ? $env["TESTUSER"] : getenv("TESTUSER");
 if ($testuser) {
