@@ -23,6 +23,6 @@ jobs:
       - uses: docker/build-push-action@v4
         with:
           push: true
-          tags: ghcr.io/dwggroup/hawki:latest
-          cache-from: 'type=registry,ref=ghcr.io/dwggroup/hawki:buildcache'
-          cache-to: 'type=registry,ref=ghcr.io/dwggroup/hawki:buildcache,mode=max'
+          tags: ghcr.io/dwggroup/HAWKI:latest
+          cache-from: 'type=registry,ref=ghcr.io/dwggroup/HAWKI:buildcache'
+          cache-to: 'type=registry,ref=ghcr.io/dwggroup/HAWKI:buildcache,mode=max'
