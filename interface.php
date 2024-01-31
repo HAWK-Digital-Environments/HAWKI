@@ -417,6 +417,7 @@ if (!isset($_SESSION['username'])) {
 				let innerHTML = document.querySelector(".message:last-child").querySelector(".message-text").innerHTML
 				// innerHTML = innerHTML.replace(/```([\s\S]+?)```/g, '<pre><code>$1</code></pre>').replace(/\*\*.*?\*\*/g, '');
 				innerHTML = innerHTML.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+				innerHTML = innerHTML.replace(/```([\s\S]+?)```/g, '<pre><code>$1</code></pre>');
 				messageTextElement.innerHTML = innerHTML;
 
 				hljs.highlightAll();
