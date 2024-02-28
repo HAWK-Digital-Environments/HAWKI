@@ -121,7 +121,7 @@
 		<title>HAWKI</title>
 
 		<link rel="stylesheet" href="./style.css">
-		<link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css">
+		<link rel="stylesheet" href="vendor/sib-styles.css">
 	</head>
 	<body>
 		<!-- partial:index.partial.html -->
