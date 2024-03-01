@@ -701,6 +701,7 @@
 	function AddEventListenersToCopyButton(TargetButton){
 		
 		TargetButton.addEventListener("mouseenter", function() {
+			TargetButton.style.cursor = "pointer"; // change mouse cursor to pointer
 			setTimeout(function() {
 				TargetButton.querySelector(".tooltiptext").classList.add("active");
 			}, 1000);
@@ -710,6 +711,7 @@
 			if (TargetButton.dataset.clicked !== "true") { // Check the clicked state of this button
 				TargetButton.querySelector(".tooltiptext").classList.remove("active");
 			}
+			TargetButton.style.cursor = "default"; // change mouse cursor back to default
     	});
 
 		TargetButton.addEventListener("mousedown", function () {
