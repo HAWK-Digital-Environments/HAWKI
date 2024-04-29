@@ -90,6 +90,7 @@ To get started you need to add a configuration file to the project first. Copy t
 | OIDC_CLIENT_ID    | string  | "..."                                  | Client Id for this application in Identity provider.                                                                                               |
 | OIDC_CLIENT_SECRET | string  | "..."                                 | Secret key for OpenID Connect. 
 | OIDC_LOGOUT_URI | string  | "https://...."                                 | URL to logout from Identity provider                                                                                                                  |
+| OIDC_ATTR_USERNAME | string  | "email"                               | Attribute name containing the user name.                                                                                                                  |
 | OPENAI_API_URL   | string  | "https://api.openai.com/v1/chat/completions" | Open AI URL                                                                                                                                    |
 | OPENAI_API_KEY   | string  | sk-...                                 | Open AI Api key                                                                                                                                    |
 | IMPRINT_LOCATION | string  | https://your-university/imprint        | A link to your imprint. Alternatively you can replace the file index.php under /impressum with your own html/ php of your imprint.                 |

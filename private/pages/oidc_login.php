@@ -33,7 +33,7 @@ $initials = substr($firstname, 0, 1) . substr($surname, 0, 1);
 #
 $_SESSION['initials'] = $initials;
 
-$_SESSION['username'] = $oidc->requestUserInfo('email');
+$_SESSION['username'] = $oidc->requestUserInfo( isset($env) ? $env["OIDC_ATTR_USERNAME"] : getenv("OIDC_ATTR_USERNAME") );
 
 header("Location: /interface");
 exit();
