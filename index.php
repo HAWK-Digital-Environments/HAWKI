@@ -59,6 +59,6 @@ switch($request_path){
         exit;
 
     default:
-        header("Location: /login");
+        header("Location: login");
         exit();
 }

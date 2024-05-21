@@ -49,27 +49,27 @@
 	<title>HAWKI</title>
 
 
-	<link rel="stylesheet" href="/public/style/style.css">
-	<link rel="stylesheet" href="/public/style/interface_style.css">
-	<link rel="stylesheet" href="/public/style/settings_style.css">
+	<link rel="stylesheet" href="public/style/style.css">
+	<link rel="stylesheet" href="public/style/interface_style.css">
+	<link rel="stylesheet" href="public/style/settings_style.css">
 
 	<!-- COMMON SCRIPTS -->
-	<script src="/public/js/scripts.js"></script>
-	<script src="/public/js/interface_functions.js"></script>
-	<script src="/public/js/syntax_modifier.js"></script>
+	<script src="public/js/scripts.js"></script>
+	<script src="public/js/interface_functions.js"></script>
+	<script src="public/js/syntax_modifier.js"></script>
 
 	<!-- HLJS -->
-	<link id="hljsTheme" type="text/css" rel="stylesheet" href="/public/assets/highlightJS/hljsLight.css">
-	<script src="/public/assets/highlightJS/highlight.min.js"></script>
-	<script src="/public/assets/highlightJS/go.min.js"></script>
+	<link id="hljsTheme" type="text/css" rel="stylesheet" href="public/assets/highlightJS/hljsLight.css">
+	<script src="public/assets/highlightJS/highlight.min.js"></script>
+	<script src="public/assets/highlightJS/go.min.js"></script>
 
 	<!-- KaTex detects and renders math formulas -->
-	<link rel="stylesheet" href="/public/assets/katex/katex.min.css">
-	<script defer src="/public/assets/katex/katex.min.js"></script>
-	<script defer src="/public/assets/katex/contrib/auto-render.min.js"></script>
+	<link rel="stylesheet" href="public/assets/katex/katex.min.css">
+	<script defer src="public/assets/katex/katex.min.js"></script>
+	<script defer src="public/assets/katex/contrib/auto-render.min.js"></script>
 
 	<!-- Jquery v3.7.1 -->
-	<script src="/public/assets/jquery/jquery.min.js"></script>
+	<script src="public/assets/jquery/jquery.min.js"></script>
 
 
 	<!-- TO PREVENT FOUC WHEN RELOADING THE PAGE IN DARK MODE
@@ -85,7 +85,7 @@
 <div class="wrapper">
   	<div class="sidebar">
 		<div class="logo">
-			<img id="HAWK_logo" src="/public/img/logo.svg" alt="">
+			<img id="HAWK_logo" src="public/img/logo.svg" alt="">
 		</div>
 		<div class="menu">
 			<details>
