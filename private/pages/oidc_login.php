@@ -23,6 +23,11 @@ if ($testuser) {
     $oidc->setHttpUpgradeInsecureRequests(false);
 }
 
+$redirectUri = isset($env) ? $env["OIDC_REDIRECT_URI"] : getenv("OIDC_REDIRECT_URI");
+if ($redirectUri) {
+    $oidc->setRedirectURL( $redirectUri );
+}
+
 $oidc->addScope('profile','email');
 $oidc->authenticate();
 
