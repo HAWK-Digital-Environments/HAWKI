@@ -387,7 +387,7 @@
 		})
 
 		
-		const streamAPI = "/api/stream-api";
+		const streamAPI = "api/stream-api";
 		postData(streamAPI, requestObject)
 		.then(stream => processStream(stream))
 		.catch(error => console.error('Error:', error));
@@ -667,7 +667,7 @@
 		message.content = inputField.value.trim();
 
 		// const feedback_send = "../private/app/php/feedback_send.php";
-		const feedback_send = "/api/feedback_send"
+		const feedback_send = "api/feedback_send"
 		const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
 		fetch(feedback_send, {
@@ -698,7 +698,7 @@
 
 		const pureId = element.dataset.id.replace('.json', ''); // assuming all IDs end with '.json'
 		const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-		const submit_vote = "/api/submit_vote";
+		const submit_vote = "api/submit_vote";
 
 		fetch(submit_vote, {
 			method: 'POST',
