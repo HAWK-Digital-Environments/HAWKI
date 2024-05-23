@@ -123,8 +123,8 @@
 					</div>
 
 					<div class="impressumPanel">
-						<a href="/dataprotection" target="_blank"><?php echo $translation["dataProtection"]; ?></a>
-						<a href="/impressum" target="_blank"><?php echo $translation["imprint"]; ?></a>
+						<a href="dataprotection" target="_blank"><?php echo $translation["dataProtection"]; ?></a>
+						<a href="impressum" target="_blank"><?php echo $translation["imprint"]; ?></a>
 					</div>
 				</div>
 			</div>

@@ -183,8 +183,8 @@
 			<br>
 			<!-- CHANGE THIS PART TO ONCLICK EVENT TO LOAD THE PAGE IN MESSAGES PANEL.
 				 DON'T FORGET TO ADD A PROPER PAGE IN VIEWS FOLDER. -->
-			<a href="/dataprotection"><?php echo $translation["DataSecurity"]; ?></a>
-			<a href="/impressum" target="_blank"><?php echo $translation["Impressum"]; ?></a>
+			<a href="dataprotection"><?php echo $translation["DataSecurity"]; ?></a>
+			<a href="impressum" target="_blank"><?php echo $translation["Impressum"]; ?></a>
 		</div>
 
 	</div>
