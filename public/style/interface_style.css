@@ -707,7 +707,7 @@ details svg{
 }
 #system-prompt-panel{
   position: absolute;
-  bottom: 100%;
+  bottom: 130%;
   left: 0;
   right: 0;
   margin-bottom: 1rem;
@@ -727,7 +727,7 @@ details svg{
 }
 #system-prompt-title{
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   column-gap: .75rem;
   align-items: center;
   margin-top: 1rem;
@@ -748,6 +748,15 @@ details svg{
   padding: 0 1rem;
   margin-top: 0.5rem;
 }
+#system-prompt-editButton{
+  display: block;
+}
+#system-prompt-edit-control{
+  display: none;
+  grid-template-columns: 1rem 1rem;
+  column-gap: 1rem;
+}
+
 
 
 label {
