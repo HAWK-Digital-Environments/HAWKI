@@ -21,6 +21,9 @@ function load(element, filename){
         if(filename == "feedback_loader.php"){
             voteHover();
         }
+        if(filename == "chat.php"){
+            loadMessagesFromLocalStorage();
+        }
     });
 
   
