@@ -1,5 +1,7 @@
 {
     "AI_Icon": "KI",
+    "AI_Model_Selection": "KI Modell",
+    "AI_Model_Selection_Info": " Wähle ein KI Modell.",
     "AboutHAWKI": "Über HAWKI",
     "AboutHAWKI_ArianInfo": " | Wissenschaftlicher Mitarbeiter | HAWKI",
     "AboutHAWKI_Info": "Das Angebot wurde im Interaction Design Lab der HAWK entwickelt, um allen Hochschulangehörigen die Möglichkeit zu geben, künstliche Intelligenz in die Arbeitsprozesse zu integrieren und einen Begegnungsraum zu haben, damit sich eventuell neue Arbeitsweisen ergeben und eine hochschulinterne Diskussion über den Einsatz von K.I. entstehen kann. Dieses Angebot möchte auch didaktisch unterstützen, ein Verständnis für die Wirkungsweise eines solchen Sprachmodells zu entwickeln und gibt daher in den verschiedenen Bereichen auch Hinweise auf gut funktionierende Prompts (Texteingaben). Wir freuen uns über konstruktives Feedback, um dieses Angebot entsprechend Ihren Bedürfnissen und Erkenntnissen weiterzuentwickeln.",

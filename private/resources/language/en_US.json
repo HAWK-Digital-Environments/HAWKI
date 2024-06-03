@@ -1,5 +1,7 @@
 {
     "AI_Icon": "AI",
+    "AI_Model_Selection": "AI Model",
+    "AI_Model_Selection_Info": "Choose an AI model.",
     "AboutHAWKI": "About HAWKI",
     "AboutHAWKI_ArianInfo": " | Research Assistant | HAWKI",
     "AboutHAWKI_Info": "This service was developed in the Interaction Design Lab of HAWK to give all university members the opportunity to integrate artificial intelligence into their work processes and to have a space for encounter so that new working methods might emerge and an internal university discussion on the use of AI can take place. This offer also aims to support didactically, to develop an understanding of how such a language model works and therefore gives hints on well-functioning prompts (text inputs) in various areas. We welcome constructive feedback to further develop this offer according to your needs and findings.",
