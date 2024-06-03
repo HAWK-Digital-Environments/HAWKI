@@ -709,12 +709,23 @@ details svg{
   right: 0;
   bottom: 100%;
 
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
   align-items: center;
   margin-bottom: .5rem;
   min-height: 2rem;
   background-color: transparent;
+}
+#model-selector{  
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  min-width: 10rem;
+  max-width: 13rem;
+  min-height: 2rem;
+  border: none;
+  border-radius: 6px;
+  padding: .5rem;
+  box-shadow: 0 0 2rem rgba(0, 0, 0, 0.1);
 }
 
 #delete-chat-confirm{
@@ -732,11 +743,12 @@ details svg{
 
 
 #system-prompt-btn{
-  margin-left: 1rem;
+  margin-right: 1rem;
   width: 1.1rem;
   fill: #999;
   cursor: pointer;
 }
+
 #system-prompt-btn:hover{
   fill: white;
 }
