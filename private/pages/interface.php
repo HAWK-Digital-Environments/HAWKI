@@ -88,6 +88,39 @@
 			<img id="HAWK_logo" src="/public/img/logo.svg" alt="">
 		</div>
 		<div class="menu">
+			<?php 
+			if (file_exists(ENV_FILE_PATH)){
+				$env = parse_ini_file(ENV_FILE_PATH);
+			}
+			if (((isset($env) ? strtolower($env["MULTIPLE_GPT_MODELS"]) : strtolower(getenv("MULTIPLE_GPT_MODELS"))) === "true") &&
+				(isset($env) ? ($env["GPT_MODEL0"]??false) : getenv("GPT_MODEL0"))){
+
+			 
+			$dropdown = '<details>
+				<summary>
+					<h3>' . $translation["AI_Model_Selection"] .
+					'<svg viewBox="0 0 50 50"><path d="M 25 2 C 12.309295 2 2 12.309295 2 25 C 2 37.690705 12.309295 48 25 48 C 37.690705 48 48 37.690705 48 25 C 48 12.309295 37.690705 2 25 2 z M 25 4 C 36.609824 4 46 13.390176 46 25 C 46 36.609824 36.609824 46 25 46 C 13.390176 46 4 36.609824 4 25 C 4 13.390176 13.390176 4 25 4 z M 25 11 A 3 3 0 0 0 22 14 A 3 3 0 0 0 25 17 A 3 3 0 0 0 28 14 A 3 3 0 0 0 25 11 z M 21 21 L 21 23 L 22 23 L 23 23 L 23 36 L 22 36 L 21 36 L 21 38 L 22 38 L 23 38 L 27 38 L 28 38 L 29 38 L 29 36 L 28 36 L 27 36 L 27 21 L 26 21 L 22 21 L 21 21 z"/></svg>
+				</h3>
+				</summary>'
+				. $translation["AI_Model_Selection_Info"] .
+			'</details>
+			<select id = "GPT-Model">';
+				
+					$options ="";
+					for($X = 0;;$X++){
+						$gpt_model=isset($env) ? ($env["GPT_MODEL$X"]??false) : getenv("GPT_MODEL$X");
+						if(!$gpt_model){
+							break;
+							}
+						$value =  explode(',', $gpt_model);
+						$options = $options . '<option value="' . $value[0] . '"token_limit="' . $value[1] . '">' . $value[2] . '</option>';
+						}
+					echo $dropdown;
+					echo $options;
+				
+			echo "</select>";
+					}			
+			?>
 			<details>
 				<summary>
 					<h3><?php echo $translation["Conversation"]; ?>
@@ -375,7 +408,7 @@
 		document.querySelector('.limitations')?.remove();
 
 		const requestObject = {};
-		requestObject.model = 'gpt-4-turbo-preview';
+		requestObject.model = document.getElementById("GPT-Model")?.value || 'gpt-4-turbo-preview';
 		requestObject.stream = true;
 		requestObject.messages = [];
 		const messageElements = messagesElement.querySelectorAll(".message");
@@ -386,7 +419,7 @@
 			requestObject.messages.push(messageObject);
 		})
 
-		
+		console.log(requestObject)
 		const streamAPI = "/api/stream-api";
 		postData(streamAPI, requestObject)
 		.then(stream => processStream(stream))
@@ -489,7 +522,7 @@
 				scrollToLast();
 			}
 		} catch (error) {
-			// Check if the error is due to aborting the request
+			// Check if the error is due to aborting the request.env
 			if (error.name == 'AbortError') {
 				console.log('Fetch aborted while reading response body stream.');
 			} else {
