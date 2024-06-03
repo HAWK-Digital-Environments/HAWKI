@@ -3,7 +3,6 @@
 
 	require_once BOOTSTRAP_PATH;
 	require_once LIBRARY_PATH . 'language_controller.php';
-	require_once LIBRARY_PATH . 'chatlog_management.php';
 
 
 	if(!isset($_SESSION['translation'])){
@@ -85,7 +84,11 @@
 		UpdateSettingsLanguage(`<?php echo $_SESSION['language'] ?>`);
 	</script>
 
+	<?php 
+		require_once LIBRARY_PATH . 'chatlog_management.php';
+	?>
 </head>
+	<body>
 
 <div class="wrapper">
   	<div class="sidebar">
@@ -333,6 +336,8 @@
 	include( VIEWS_PATH . 'guidelines.php');
 ?>
 
+	</body>
+</html>
 <script>
 
 	visualViewport.addEventListener("resize", update);
@@ -485,9 +490,12 @@
 
 		// Throws error if the read operation on the response body stream is aborted while the reader.read() operation is still active.
 		// Try Catch block will handle the error.
+		let rawMsg = "";
+		
 		try {
 			//NOTE: Niklas Wode
 			let incompleteSlice = "";
+
 			while (true) {
 				const { done, value } = await reader.read();
 
@@ -498,10 +506,10 @@
 					isReceivingData = false;
 					sendicon.setAttribute('d', startIcon)
 
+					const msg = document.querySelector(".message:last-child").querySelector(".message-text");
+					msg.setAttribute('rawContent', rawMsg);
+					saveMessagesToLocalStorage();
 					ShowCopyButton();
-
-					saveMessagesToLocalStorage()
-
 					break;
 				}
 
@@ -530,13 +538,13 @@
 					if(chunk.indexOf('DONE') > 0) return false;
 					if(chunk.indexOf('role') > 0) return false;
 					if(chunk.length == 0) return false;
-
+					
+					rawMsg += JSON.parse(chunk)["choices"][0]["delta"].content;
 					document.querySelector(".message:last-child").querySelector(".message-text").innerHTML =  FormatChunk(JSON.parse(chunk)["choices"][0]["delta"].content);
 
 				})
 
 				FormatMathFormulas();
-
 				hljs.highlightAll();
 				scrollToLast();
 			}
@@ -544,12 +552,17 @@
 			// Check if the error is due to aborting the request
 			if (error.name == 'AbortError') {
 				console.log('Fetch aborted while reading response body stream.');
+				const msg = document.querySelector(".message:last-child").querySelector(".message-text");
+				msg.setAttribute('rawContent', rawMsg);
+
 			} else {
 				console.error('Error:', error);
 			}
 			isReceivingData = false;
 			sendicon.setAttribute('d', startIcon);
 			ShowCopyButton();
+			saveMessagesToLocalStorage();
+
 		}
 	}
 

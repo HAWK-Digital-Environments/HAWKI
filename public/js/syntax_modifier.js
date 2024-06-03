@@ -166,4 +166,12 @@
 			return false;
 		}
 	}
+
+	function FormatWholeMessage(message){
+		const codeBlockRegex = /```(.*?)```/gs;
+		const html = message.replace(codeBlockRegex, (match, p1) => {
+		  return `<pre><code ignore_Format>${p1}</code></pre>`;
+		});
+		return ReplaceMarkdownSyntax(html);
+	}
 //#endregion

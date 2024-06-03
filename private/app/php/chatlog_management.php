@@ -11,17 +11,25 @@ $userSpecificSalt = $encryptionSalt . $_SESSION['username'];
         const username = '<?= htmlspecialchars($_SESSION['username']) ?>'; // Use the PHP variable
         const messagesElement = document.querySelector(".messages");
         const messageElements = messagesElement.querySelectorAll(".message");
-        let requestObject = { messages: [] };
+        
+        let archiveObject = { messages: [] };
 
         messageElements.forEach(messageElement => {
             let messageObject = {};
             messageObject.role = messageElement.dataset.role;
-            messageObject.content = messageElement.querySelector(".message-text").textContent;
-            requestObject.messages.push(messageObject);
+
+            if(messageElement.dataset.role === 'assistant'){
+                messageObject.content = messageElement.querySelector(".message-text").getAttribute('rawContent');
+                console.log(messageObject.content);
+            }else{
+                messageObject.content = messageElement.querySelector(".message-text").textContent;
+            }
+
+            archiveObject.messages.push(messageObject);
         });
 
         // Convert messages to string
-        const messageString = JSON.stringify(requestObject.messages);
+        const messageString = JSON.stringify(archiveObject.messages);
         const compressedMessages = LZString.compressToUTF16(messageString);
 
         const salt = '<?= htmlspecialchars($userSpecificSalt) ?>';
@@ -69,18 +77,40 @@ $userSpecificSalt = $encryptionSalt . $_SESSION['username'];
                 // Decrypt the messages
                 const decrypted = CryptoJS.AES.decrypt(encryptedData, key.toString());
                 const decryptedString = decrypted.toString(CryptoJS.enc.Utf8);
-
+                // Decompress the messages
                 const decompressedString = LZString.decompressFromUTF16(decryptedString)
                 const messages = JSON.parse(decompressedString);
-                
                 
                 if(messages != null){
                     document.querySelector('.limitations')?.remove();
                 }
 
-
                 messages.forEach(message => {
-                    addMessage(message);
+
+                    const messagesElement = document.querySelector(".messages");
+                    const messageTemplate = document.querySelector('#message');
+                    const messageElement = messageTemplate.content.cloneNode(true);
+
+                    messageElement.querySelector(".message").dataset.role = message.role;
+
+                    if(message.role == "assistant"){
+                        messageElement.querySelector(".message-icon").textContent = "AI";
+                        messageElement.querySelector(".message-text").setAttribute('rawContent', message.content);
+                        //FORMAT RAW TEXT AGAIN
+                        const formattedContent = FormatWholeMessage(message.content);
+                        messageElement.querySelector(".message-text").innerHTML = formattedContent;
+
+                    } else{
+                        messageElement.querySelector(".message-text").innerHTML = message.content;
+                        messageElement.querySelector(".message-icon").textContent = '<?= htmlspecialchars($_SESSION['username']) ?>';
+                        messageElement.querySelector(".message").classList.add("me");
+                    }
+
+                    messagesElement.appendChild(messageElement);
+                    hljs.highlightAll();
+                    FormatMathFormulas();
+                    scrollToLast(true);
+
                 });
             } catch (error) {
                 console.error("Failed to decrypt or parse messages:", error);
