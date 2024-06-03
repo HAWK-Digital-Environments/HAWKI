@@ -419,7 +419,6 @@
 			requestObject.messages.push(messageObject);
 		})
 
-		console.log(requestObject)
 		const streamAPI = "/api/stream-api";
 		postData(streamAPI, requestObject)
 		.then(stream => processStream(stream))
@@ -522,7 +521,7 @@
 				scrollToLast();
 			}
 		} catch (error) {
-			// Check if the error is due to aborting the request.env
+			// Check if the error is due to aborting the request
 			if (error.name == 'AbortError') {
 				console.log('Fetch aborted while reading response body stream.');
 			} else {
