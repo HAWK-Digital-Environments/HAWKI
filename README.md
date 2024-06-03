@@ -99,6 +99,9 @@ To get started you need to add a configuration file to the project first. Copy t
 | TESTPASSWORD         | string | "superlangespasswort123"  | Set value for testing purposes. Leave TESTUSER and TESTPASSWORD empty or comment them out to disable test user.                           |
 | FAVICON_URI  | string  | "https://...."                                 | Link to favicon |
 | DEFAULT_LANGUAGE  | string  | "de_DE"/ "en_US"/ "es_ES"/ "fr_FR"/ "it_IT"               | Default website language. Only applicable if the user has not previously changed the language or their browser language is not one of the supported languages. Current supported languages: 'de_DE', 'en_US', 'es_ES', 'fr_FR', 'it_IT'  |
+| MULTIPLE_GPT_MODELS| string| true/false | This variable enables or disables the dropdown menu for selecting multiple GPT models. If set to `true`, you must define at least one GPT model using `GPT_MODEL0`.|
+|GPT_MODEL[x] | string | [gpt model],[displayed name]| This variable sets which GPT models are available. Replace `x` with 0, 1, 2, etc., to define multiple models. For example:- `GPT_MODEL0="gpt-4o,GPT 4 o"`- `GPT_MODEL1="gpt-3.5-turbo,GPT 3.5 Turbo"`
+
 ## Web Server Configuration
 
 There are a few things to keep in mind when publishing your HAWKI instance on a webserver.
