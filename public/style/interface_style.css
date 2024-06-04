@@ -325,6 +325,7 @@
 
 .input-container {
   padding: 2rem;
+  padding-top: 3rem;
   position: relative;
   background-color: var(--background-color);
 }
@@ -949,5 +950,6 @@ pre{
     }
     .input-container {
       padding: 2rem 1rem;
+      padding-top: 3rem;
     }
 }

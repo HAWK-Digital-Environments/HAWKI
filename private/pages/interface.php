@@ -104,7 +104,7 @@
 				</summary>
 				<?php echo $translation["Conversation_Info"]; ?>
 			</details>
-			<div class="menu-item" id="chatMenuButton" onclick="load(this, 'chat.php')">
+			<div class="menu-item" id="chat_MenuButton" onclick="load(this, 'chat.php')">
 				<svg viewBox="0 0 24 24"><path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2M20 16H5.2L4 17.2V4H20V16Z" /></svg>
 				<?php echo $translation["Chat"]; ?>
 			</div>
@@ -122,12 +122,12 @@
 				Team
 			</div>
 			<div class="submenu">
-				<div class="submenu-item" onclick="load(this, 'finance.php')"><?php echo $translation["Finance"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'science.php')"><?php echo $translation["Research"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'marketing.php')"><?php echo $translation["Marketing"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'programming.php')"><?php echo $translation["Programming"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'law.php')"><?php echo $translation["LegalConsultation"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'socialmedia.php')"><?php echo $translation["SocialMedia"]; ?></div>
+				<div class="submenu-item" id="finance_MenuButton" onclick="load(this, 'finance.php')"><?php echo $translation["Finance"]; ?></div>
+				<div class="submenu-item" id="science_MenuButton" onclick="load(this, 'science.php')"><?php echo $translation["Research"]; ?></div>
+				<div class="submenu-item" id="marketing_MenuButton" onclick="load(this, 'marketing.php')"><?php echo $translation["Marketing"]; ?></div>
+				<div class="submenu-item" id="programming_MenuButton" onclick="load(this, 'programming.php')"><?php echo $translation["Programming"]; ?></div>
+				<div class="submenu-item" id="law_MenuButton" onclick="load(this, 'law.php')"><?php echo $translation["LegalConsultation"]; ?></div>
+				<div class="submenu-item" id="socialmedia_MenuButton" onclick="load(this, 'socialmedia.php')"><?php echo $translation["SocialMedia"]; ?></div>
 			</div>
 
 			<details>
@@ -143,12 +143,12 @@
 				<?php echo $translation["ResearchWork"]; ?>
 			</div>
 			<div class="submenu">
-				<div class="submenu-item" onclick="load(this, 'datascience.php')"><?php echo $translation["DataAnalysis"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'feedback.php')"><?php echo $translation["FeedBack"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'methodologie.php')"><?php echo $translation["Methodology"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'literature.php')"><?php echo $translation["LiteratureSearch"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'research.php')"><?php echo $translation["ResearchSupport"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'writing.php')"><?php echo $translation["WritingHelp"]; ?></div>
+				<div class="submenu-item" id="datascience_MenuButton" onclick="load(this, 'datascience.php')"><?php echo $translation["DataAnalysis"]; ?></div>
+				<div class="submenu-item" id="feedback_MenuButton" onclick="load(this, 'feedback.php')"><?php echo $translation["FeedBack"]; ?></div>
+				<div class="submenu-item" id="methodologie_MenuButton" onclick="load(this, 'methodologie.php')"><?php echo $translation["Methodology"]; ?></div>
+				<div class="submenu-item" id="literature_MenuButton" onclick="load(this, 'literature.php')"><?php echo $translation["LiteratureSearch"]; ?></div>
+				<div class="submenu-item" id="research_MenuButton" onclick="load(this, 'research.php')"><?php echo $translation["ResearchSupport"]; ?></div>
+				<div class="submenu-item" id="writing_MenuButton" onclick="load(this, 'writing.php')"><?php echo $translation["WritingHelp"]; ?></div>
 			</div>
 
 			<div class="menu-item" onclick="submenu(this)">
@@ -156,12 +156,12 @@
 				<?php echo $translation["Organization"]; ?>
 			</div>
 			<div class="submenu">
-				<div class="submenu-item" onclick="load(this, 'eventmanagement.php')"><?php echo $translation["EventManagement"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'learning.php')"><?php echo $translation["LearnStrategy"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'motivation.php')"><?php echo $translation["Motivation"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'stressmanagement.php')"><?php echo $translation["StressManagement"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'tables.php')"><?php echo $translation["Tables"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'timemanagement.php')"><?php echo $translation["TimeManagement"]; ?></div>
+				<div class="submenu-item" id="eventmanagement_MenuButton" onclick="load(this, 'eventmanagement.php')"><?php echo $translation["EventManagement"]; ?></div>
+				<div class="submenu-item" id="learning_MenuButton" onclick="load(this, 'learning.php')"><?php echo $translation["LearnStrategy"]; ?></div>
+				<div class="submenu-item" id="motivation_MenuButton" onclick="load(this, 'motivation.php')"><?php echo $translation["Motivation"]; ?></div>
+				<div class="submenu-item" id="stressmanagement_MenuButton" onclick="load(this, 'stressmanagement.php')"><?php echo $translation["StressManagement"]; ?></div>
+				<div class="submenu-item" id="tables_MenuButton" onclick="load(this, 'tables.php')"><?php echo $translation["Tables"]; ?></div>
+				<div class="submenu-item" id="timemanagement_MenuButton" onclick="load(this, 'timemanagement.php')"><?php echo $translation["TimeManagement"]; ?></div>
 			</div>
 
 			<div class="menu-item" onclick="submenu(this)">
@@ -169,12 +169,12 @@
 				<?php echo $translation["Creativity"]; ?>
 			</div>
 			<div class="submenu">
-				<div class="submenu-item" onclick="load(this, 'copywriting.php')"><?php echo $translation["Copywriting"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'designthinking.php')"><?php echo $translation["DesignThinking"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'gamification.php')"><?php echo $translation["Gamification"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'ideageneration.php')"><?php echo $translation["BrainStorming"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'interview.php')"><?php echo $translation["InterviewQuestions"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'prototyping.php')"><?php echo $translation["Prototyping"]; ?></div>
+				<div class="submenu-item" id="copywriting_MenuButton" onclick="load(this, 'copywriting.php')"><?php echo $translation["Copywriting"]; ?></div>
+				<div class="submenu-item" id="designthinking_MenuButton" onclick="load(this, 'designthinking.php')"><?php echo $translation["DesignThinking"]; ?></div>
+				<div class="submenu-item" id="gamification_MenuButton" onclick="load(this, 'gamification.php')"><?php echo $translation["Gamification"]; ?></div>
+				<div class="submenu-item" id="ideageneration_MenuButton" onclick="load(this, 'ideageneration.php')"><?php echo $translation["BrainStorming"]; ?></div>
+				<div class="submenu-item" id="interview_MenuButton" onclick="load(this, 'interview.php')"><?php echo $translation["InterviewQuestions"]; ?></div>
+				<div class="submenu-item" id="prototyping_MenuButton" onclick="load(this, 'prototyping.php')"><?php echo $translation["Prototyping"]; ?></div>
 			</div>
 
 		</div>
@@ -330,6 +330,25 @@
 			</div>
 		</div>
 	</template>
+
+
+
+	<div class="modal" id="delete-chat-confirm">
+		<div class="modal-panel">
+			<div class="modal-content">
+				<h3>
+					<?php echo $translation["deleteChat"]; ?>
+				</h3>
+				<div class="modal-buttons-bar">
+					<button onclick="closeDeletePanel()"><?php echo $translation["cancel"]; ?></button>
+					<button onclick="deleteChatLog()"><?php echo $translation["delete"]; ?></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
 </div>
 
 <?php
@@ -356,7 +375,7 @@
 
 	//Load chat by default when the page is loaded.
 	window.addEventListener('DOMContentLoaded', (event) => {
-		const chatBtn = document.querySelector("#chatMenuButton");
+		const chatBtn = document.querySelector("#chat_MenuButton");
 		load(chatBtn ,'chat.php');
     });
 	window.addEventListener('DOMContentLoaded', cleanupStoredLogs());
