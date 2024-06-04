@@ -110,6 +110,9 @@ $userSpecificSalt = $encryptionSalt . $_SESSION['username'];
                     hljs.highlightAll();
                     FormatMathFormulas();
                     scrollToLast(true);
+                    if(!document.querySelector(".message:last-child").classList.contains('me')){
+                        ShowCopyButton();
+                    }
 
                 });
             } catch (error) {
