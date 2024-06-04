@@ -1,5 +1,7 @@
 {
     "AI_Icon": "IA",
+    "AI_Model_Selection": "AI Model",
+    "AI_Model_Selection_Info": "Choose an AI model.",
     "AboutHAWKI": "Riguardo HAWKI",
     "AboutHAWKI_ArianInfo": " | Assistente di Ricerca | HAWKI",
     "AboutHAWKI_Info": "L'offerta è stata sviluppata nel Laboratorio di Design Interattivo della HAWK per dare a tutti i membri dell'università la possibilità di integrare l'intelligenza artificiale nei processi di lavoro e avere uno spazio di incontro in modo che possano emergere nuovi metodi di lavoro e possa nascere una discussione interna all'università sull'uso dell'IA. Questa offerta vuole anche supportare didatticamente, sviluppando una comprensione del funzionamento di tale modello linguistico e fornisce quindi in varie aree anche suggerimenti su prompt (input testuali) che funzionano bene. Accogliamo con favore un feedback costruttivo per sviluppare ulteriormente questa offerta in base alle vostre esigenze e conoscenze.",

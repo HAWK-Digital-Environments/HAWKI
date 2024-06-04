@@ -1,5 +1,7 @@
 {
     "AI_Icon": "IA",
+    "AI_Model_Selection": "AI Model",
+    "AI_Model_Selection_Info": "Choose an AI model.",
     "AboutHAWKI": "Acerca de HAWKI",
     "AboutHAWKI_ArianInfo": " | sistente de Investigación | HAWKI",
     "AboutHAWKI_Info": "La oferta fue desarrollada en el Interaction Design Lab de HAWK, para dar a todos los miembros de la universidad la oportunidad de integrar la inteligencia artificial en los procesos de trabajo y tener un espacio de encuentro para que puedan surgir nuevas formas de trabajo y discusión interna en la universidad sobre el uso de IA. Esta oferta también busca brindar apoyo didáctico para desarrollar una comprensión del funcionamiento de un modelo de lenguaje y, por lo tanto, también proporciona consejos sobre prompts (entradas de texto) bien funcionales en las distintas áreas. Esperamos su retroalimentación constructiva para desarrollar esta oferta de acuerdo con sus necesidades y conocimientos.",
