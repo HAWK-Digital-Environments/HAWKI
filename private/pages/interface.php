@@ -113,7 +113,7 @@
 							break;
 							}
 						$value =  explode(',', $gpt_model);
-						$options = $options . '<option value="' . $value[0] . '"token_limit="' . $value[1] . '">' . $value[2] . '</option>';
+						$options = $options . '<option value="' . $value[0] . '">' . $value[1] . '</option>';
 						}
 					echo $dropdown;
 					echo $options;
