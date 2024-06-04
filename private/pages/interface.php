@@ -527,6 +527,7 @@
 
 					const msg = document.querySelector(".message:last-child").querySelector(".message-text");
 					msg.setAttribute('rawContent', rawMsg);
+					console.log(rawMsg);
 					saveMessagesToLocalStorage();
 					ShowCopyButton();
 					break;

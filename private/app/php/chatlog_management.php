@@ -32,20 +32,17 @@ $userSpecificSalt = $encryptionSalt . $_SESSION['username'];
             let messageObject = {};
             messageObject = messageElement.dataset;
 
-            if (messageElement.dataset === 'assistant') {
+            if (messageElement.dataset.role === 'assistant') {
                 messageObject.content = messageElement.querySelector(".message-text").getAttribute('rawContent');
-                console.log(messageObject.content);
             } else {
                 messageObject.content = messageElement.querySelector(".message-text").textContent;
             }
-
             newMessages.push(messageObject);
         });
 
-        // Komprimieren und Verschlüsseln der neuen Nachrichten
-        const messageString = JSON.stringify(newMessages);
+        // Stringify the message objects with pretty printing to preserve newlines
+        const messageString = JSON.stringify(newMessages, null, 2);
         const compressedMessages = LZString.compressToUTF16(messageString);
-
         const salt = '<?= htmlspecialchars($userSpecificSalt) ?>';
 
         // Ableitung eines Schlüssels aus dem Benutzernamen
@@ -69,8 +66,6 @@ $userSpecificSalt = $encryptionSalt . $_SESSION['username'];
     }
 
     function loadMessagesFromLocalStorage() {
-        console.log(ActiveRoomID);
-
         const username = '<?= htmlspecialchars($_SESSION['username']) ?>'; // Use the PHP variable
         const storedData = localStorage.getItem('chatLog_' + username);
         if(storedData === null){
@@ -99,23 +94,26 @@ $userSpecificSalt = $encryptionSalt . $_SESSION['username'];
                 // Decompress the messages
                 const decompressedString = LZString.decompressFromUTF16(decryptedString)
                 const messages = JSON.parse(decompressedString);
-                console.log(decompressedString);
 
-                if(messages != null){
-                    document.querySelector('.limitations')?.remove();
+                if(messages == null){
+                    return;
                 }
 
-                messages.forEach(message => {
+                document.querySelector('.limitations')?.remove();
+                const systemMessage = document.querySelector('.message[data-role="system"]');
+                document.querySelector('.messages').removeChild(systemMessage);
 
+                messages.forEach(message => {
                     const messagesElement = document.querySelector(".messages");
                     const messageTemplate = document.querySelector('#message');
                     const messageElement = messageTemplate.content.cloneNode(true);
 
                     messageElement.querySelector(".message").dataset.role = message.role;
 
-                    if(message.role == "assistant"){
+                    if(message.role === "assistant"){
                         messageElement.querySelector(".message-icon").textContent = "AI";
                         messageElement.querySelector(".message-text").setAttribute('rawContent', message.content);
+
                         //FORMAT RAW TEXT AGAIN
                         const formattedContent = FormatWholeMessage(message.content);
                         messageElement.querySelector(".message-text").innerHTML = formattedContent;
@@ -130,6 +128,7 @@ $userSpecificSalt = $encryptionSalt . $_SESSION['username'];
                     hljs.highlightAll();
                     FormatMathFormulas();
                     scrollToLast(true);
+
                     if(!document.querySelector(".message:last-child").classList.contains('me')){
                         ShowCopyButton();
                     }
