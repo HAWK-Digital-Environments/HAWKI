@@ -334,7 +334,7 @@
 
 
 	<div class="modal" id="delete-chat-confirm">
-		<div class="modal-panel">
+		<div class="modal-panel" style="max-width:30rem">
 			<div class="modal-content">
 				<h3>
 					<?php echo $translation["deleteChat"]; ?>
