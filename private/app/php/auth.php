@@ -31,7 +31,7 @@
                 exit;
             }
             else{
-                echo 'Shibbolet authentication not defined.';
+                echo 'Shibboleth authentication not defined.';
             }
         }
     }
