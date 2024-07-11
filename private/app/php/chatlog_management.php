@@ -111,7 +111,7 @@ $userSpecificSalt = $encryptionSalt . $_SESSION['username'];
                     messageElement.querySelector(".message").dataset.role = message.role;
 
                     if(message.role === "assistant"){
-                        messageElement.querySelector(".message-icon").textContent = "AI";
+                        messageElement.querySelector(".message-icon").textContent = '<?php echo $translation["AI_Icon"]; ?>'; // sets assistant icon after loading text from local storage
                         messageElement.querySelector(".message-text").setAttribute('rawContent', message.content);
 
                         //FORMAT RAW TEXT AGAIN
