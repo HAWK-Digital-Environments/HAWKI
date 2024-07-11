@@ -4,6 +4,7 @@
 	require_once BOOTSTRAP_PATH;
 	require_once LIBRARY_PATH . 'language_controller.php';
 
+
 	if(!isset($_SESSION['translation'])){
 		setLanguage();
 	}
@@ -71,6 +72,9 @@
 	<!-- Jquery v3.7.1 -->
 	<script src="/public/assets/jquery/jquery.min.js"></script>
 
+	<script src="/public/assets/lz-string.min.js"></script>
+	<script src="/public/assets/crypto-js.min.js"></script>
+
 
 	<!-- TO PREVENT FOUC WHEN RELOADING THE PAGE IN DARK MODE
 		 THE SETTINGS AND IT'S START FUNCTIONS SHOULD BE INCLUDED IN THE HEADER BEFORE THE PAGE IS LOADED -->
@@ -80,7 +84,11 @@
 		UpdateSettingsLanguage(`<?php echo $_SESSION['language'] ?>`);
 	</script>
 
+	<?php 
+		require_once LIBRARY_PATH . 'chatlog_management.php';
+	?>
 </head>
+	<body>
 
 <div class="wrapper">
   	<div class="sidebar">
@@ -96,7 +104,7 @@
 				</summary>
 				<?php echo $translation["Conversation_Info"]; ?>
 			</details>
-			<div class="menu-item" id="chatMenuButton" onclick="load(this, 'chat.php')">
+			<div class="menu-item" id="chat_MenuButton" onclick="load(this, 'chat.php')">
 				<svg viewBox="0 0 24 24"><path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2M20 16H5.2L4 17.2V4H20V16Z" /></svg>
 				<?php echo $translation["Chat"]; ?>
 			</div>
@@ -114,12 +122,12 @@
 				Team
 			</div>
 			<div class="submenu">
-				<div class="submenu-item" onclick="load(this, 'finance.php')"><?php echo $translation["Finance"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'science.php')"><?php echo $translation["Research"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'marketing.php')"><?php echo $translation["Marketing"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'programming.php')"><?php echo $translation["Programming"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'law.php')"><?php echo $translation["LegalConsultation"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'socialmedia.php')"><?php echo $translation["SocialMedia"]; ?></div>
+				<div class="submenu-item" id="finance_MenuButton" onclick="load(this, 'finance.php')"><?php echo $translation["Finance"]; ?></div>
+				<div class="submenu-item" id="science_MenuButton" onclick="load(this, 'science.php')"><?php echo $translation["Research"]; ?></div>
+				<div class="submenu-item" id="marketing_MenuButton" onclick="load(this, 'marketing.php')"><?php echo $translation["Marketing"]; ?></div>
+				<div class="submenu-item" id="programming_MenuButton" onclick="load(this, 'programming.php')"><?php echo $translation["Programming"]; ?></div>
+				<div class="submenu-item" id="law_MenuButton" onclick="load(this, 'law.php')"><?php echo $translation["LegalConsultation"]; ?></div>
+				<div class="submenu-item" id="socialmedia_MenuButton" onclick="load(this, 'socialmedia.php')"><?php echo $translation["SocialMedia"]; ?></div>
 			</div>
 
 			<details>
@@ -135,12 +143,12 @@
 				<?php echo $translation["ResearchWork"]; ?>
 			</div>
 			<div class="submenu">
-				<div class="submenu-item" onclick="load(this, 'datascience.php')"><?php echo $translation["DataAnalysis"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'feedback.php')"><?php echo $translation["FeedBack"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'methodologie.php')"><?php echo $translation["Methodology"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'literature.php')"><?php echo $translation["LiteratureSearch"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'research.php')"><?php echo $translation["ResearchSupport"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'writing.php')"><?php echo $translation["WritingHelp"]; ?></div>
+				<div class="submenu-item" id="datascience_MenuButton" onclick="load(this, 'datascience.php')"><?php echo $translation["DataAnalysis"]; ?></div>
+				<div class="submenu-item" id="feedback_MenuButton" onclick="load(this, 'feedback.php')"><?php echo $translation["FeedBack"]; ?></div>
+				<div class="submenu-item" id="methodologie_MenuButton" onclick="load(this, 'methodologie.php')"><?php echo $translation["Methodology"]; ?></div>
+				<div class="submenu-item" id="literature_MenuButton" onclick="load(this, 'literature.php')"><?php echo $translation["LiteratureSearch"]; ?></div>
+				<div class="submenu-item" id="research_MenuButton" onclick="load(this, 'research.php')"><?php echo $translation["ResearchSupport"]; ?></div>
+				<div class="submenu-item" id="writing_MenuButton" onclick="load(this, 'writing.php')"><?php echo $translation["WritingHelp"]; ?></div>
 			</div>
 
 			<div class="menu-item" onclick="submenu(this)">
@@ -148,12 +156,12 @@
 				<?php echo $translation["Organization"]; ?>
 			</div>
 			<div class="submenu">
-				<div class="submenu-item" onclick="load(this, 'eventmanagement.php')"><?php echo $translation["EventManagement"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'learning.php')"><?php echo $translation["LearnStrategy"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'motivation.php')"><?php echo $translation["Motivation"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'stressmanagement.php')"><?php echo $translation["StressManagement"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'tables.php')"><?php echo $translation["Tables"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'timemanagement.php')"><?php echo $translation["TimeManagement"]; ?></div>
+				<div class="submenu-item" id="eventmanagement_MenuButton" onclick="load(this, 'eventmanagement.php')"><?php echo $translation["EventManagement"]; ?></div>
+				<div class="submenu-item" id="learning_MenuButton" onclick="load(this, 'learning.php')"><?php echo $translation["LearnStrategy"]; ?></div>
+				<div class="submenu-item" id="motivation_MenuButton" onclick="load(this, 'motivation.php')"><?php echo $translation["Motivation"]; ?></div>
+				<div class="submenu-item" id="stressmanagement_MenuButton" onclick="load(this, 'stressmanagement.php')"><?php echo $translation["StressManagement"]; ?></div>
+				<div class="submenu-item" id="tables_MenuButton" onclick="load(this, 'tables.php')"><?php echo $translation["Tables"]; ?></div>
+				<div class="submenu-item" id="timemanagement_MenuButton" onclick="load(this, 'timemanagement.php')"><?php echo $translation["TimeManagement"]; ?></div>
 			</div>
 
 			<div class="menu-item" onclick="submenu(this)">
@@ -161,12 +169,12 @@
 				<?php echo $translation["Creativity"]; ?>
 			</div>
 			<div class="submenu">
-				<div class="submenu-item" onclick="load(this, 'copywriting.php')"><?php echo $translation["Copywriting"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'designthinking.php')"><?php echo $translation["DesignThinking"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'gamification.php')"><?php echo $translation["Gamification"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'ideageneration.php')"><?php echo $translation["BrainStorming"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'interview.php')"><?php echo $translation["InterviewQuestions"]; ?></div>
-				<div class="submenu-item" onclick="load(this, 'prototyping.php')"><?php echo $translation["Prototyping"]; ?></div>
+				<div class="submenu-item" id="copywriting_MenuButton" onclick="load(this, 'copywriting.php')"><?php echo $translation["Copywriting"]; ?></div>
+				<div class="submenu-item" id="designthinking_MenuButton" onclick="load(this, 'designthinking.php')"><?php echo $translation["DesignThinking"]; ?></div>
+				<div class="submenu-item" id="gamification_MenuButton" onclick="load(this, 'gamification.php')"><?php echo $translation["Gamification"]; ?></div>
+				<div class="submenu-item" id="ideageneration_MenuButton" onclick="load(this, 'ideageneration.php')"><?php echo $translation["BrainStorming"]; ?></div>
+				<div class="submenu-item" id="interview_MenuButton" onclick="load(this, 'interview.php')"><?php echo $translation["InterviewQuestions"]; ?></div>
+				<div class="submenu-item" id="prototyping_MenuButton" onclick="load(this, 'prototyping.php')"><?php echo $translation["Prototyping"]; ?></div>
 			</div>
 
 		</div>
@@ -199,6 +207,21 @@
 	<!-- TOGGLES BETWEEN INPUT_CONTAINER AND USERPOST-CONTAINER FOR USERS FEEDBACK MODULE -->
 	<div class="input-container">
 		<div class="input">
+
+			<div class="input-controlbar">
+
+				<div id="system-prompt-btn" onclick="ToggleSystemPrompt(true)">
+					<svg viewBox="0 0 50 50"><path d="M 25 2 C 12.309295 2 2 12.309295 2 25 C 2 37.690705 12.309295 48 25 48 C 37.690705 48 48 37.690705 48 25 C 48 12.309295 37.690705 2 25 2 z M 25 4 C 36.609824 4 46 13.390176 46 25 C 46 36.609824 36.609824 46 25 46 C 13.390176 46 4 36.609824 4 25 C 4 13.390176 13.390176 4 25 4 z M 25 11 A 3 3 0 0 0 22 14 A 3 3 0 0 0 25 17 A 3 3 0 0 0 28 14 A 3 3 0 0 0 25 11 z M 21 21 L 21 23 L 22 23 L 23 23 L 23 36 L 22 36 L 21 36 L 21 38 L 22 38 L 23 38 L 27 38 L 28 38 L 29 38 L 29 36 L 28 36 L 27 36 L 27 21 L 26 21 L 22 21 L 21 21 z"/></svg>
+				</div>
+
+				<div id="delete-chat-btn" onclick="openDeletePanel()">	
+						<svg  viewBox="0 0 50 50"><path d="M 21 2 C 19.354545 2 18 3.3545455 18 5 L 18 7 L 10.154297 7 A 1.0001 1.0001 0 0 0 9.984375 6.9863281 A 1.0001 1.0001 0 0 0 9.8398438 7 L 8 7 A 1.0001 1.0001 0 1 0 8 9 L 9 9 L 9 45 C 9 46.645455 10.354545 48 12 48 L 38 48 C 39.645455 48 41 46.645455 41 45 L 41 9 L 42 9 A 1.0001 1.0001 0 1 0 42 7 L 40.167969 7 A 1.0001 1.0001 0 0 0 39.841797 7 L 32 7 L 32 5 C 32 3.3545455 30.645455 2 29 2 L 21 2 z M 21 4 L 29 4 C 29.554545 4 30 4.4454545 30 5 L 30 7 L 20 7 L 20 5 C 20 4.4454545 20.445455 4 21 4 z M 11 9 L 18.832031 9 A 1.0001 1.0001 0 0 0 19.158203 9 L 30.832031 9 A 1.0001 1.0001 0 0 0 31.158203 9 L 39 9 L 39 45 C 39 45.554545 38.554545 46 38 46 L 12 46 C 11.445455 46 11 45.554545 11 45 L 11 9 z M 18.984375 13.986328 A 1.0001 1.0001 0 0 0 18 15 L 18 40 A 1.0001 1.0001 0 1 0 20 40 L 20 15 A 1.0001 1.0001 0 0 0 18.984375 13.986328 z M 24.984375 13.986328 A 1.0001 1.0001 0 0 0 24 15 L 24 40 A 1.0001 1.0001 0 1 0 26 40 L 26 15 A 1.0001 1.0001 0 0 0 24.984375 13.986328 z M 30.984375 13.986328 A 1.0001 1.0001 0 0 0 30 15 L 30 40 A 1.0001 1.0001 0 1 0 32 40 L 32 15 A 1.0001 1.0001 0 0 0 30.984375 13.986328 z"/></svg>
+				</div>
+			</div>	
+
+
+
+
 			<div class="input-wrapper">
 				<textarea class="input-field" type="text" placeholder="<?php echo $translation["InputField_Placeholder"]; ?>" oninput="resize(this),resize(document.getElementsByClassName('input-wrapper')[0])" onkeypress="handleKeydown(event)"></textarea>
 			</div>
@@ -211,9 +234,6 @@
 				</svg>
 			</div>
 
-			<div id="system-prompt-btn" onclick="ToggleSystemPrompt(true)">
-				<svg viewBox="0 0 50 50"><path d="M 25 2 C 12.309295 2 2 12.309295 2 25 C 2 37.690705 12.309295 48 25 48 C 37.690705 48 48 37.690705 48 25 C 48 12.309295 37.690705 2 25 2 z M 25 4 C 36.609824 4 46 13.390176 46 25 C 46 36.609824 36.609824 46 25 46 C 13.390176 46 4 36.609824 4 25 C 4 13.390176 13.390176 4 25 4 z M 25 11 A 3 3 0 0 0 22 14 A 3 3 0 0 0 25 17 A 3 3 0 0 0 28 14 A 3 3 0 0 0 25 11 z M 21 21 L 21 23 L 22 23 L 23 23 L 23 36 L 22 36 L 21 36 L 21 38 L 22 38 L 23 38 L 27 38 L 28 38 L 29 38 L 29 36 L 28 36 L 27 36 L 27 21 L 26 21 L 22 21 L 21 21 z"/></svg>
-			</div>
 			<div id="system-prompt-panel">
 				<div>
 					<div id="system-prompt-title">
@@ -223,17 +243,45 @@
 								<path  d="M16 0c-8.836 0-16 7.163-16 16s7.163 16 16 16c8.837 0 16.001-7.163 16.001-16s-7.163-16-16.001-16zM16 30.032c-7.72 0-14-6.312-14-14.032s6.28-14 14-14 14.001 6.28 14.001 14-6.281 14.032-14.001 14.032zM14.53 25.015h2.516v-2.539h-2.516zM15.97 6.985c-1.465 0-2.672 0.395-3.62 1.184s-1.409 2.37-1.386 3.68l0.037 0.073h2.295c0-0.781 0.261-1.904 0.781-2.308s1.152-0.604 1.893-0.604c0.854 0 1.511 0.232 1.971 0.696s0.689 1.127 0.689 1.989c0 0.725-0.17 1.343-0.512 1.855-0.343 0.512-0.916 1.245-1.721 2.198-0.831 0.749-1.344 1.351-1.538 1.806s-0.297 1.274-0.305 2.454h2.405c0-0.74 0.047-1.285 0.14-1.636s0.36-0.744 0.799-1.184c0.945-0.911 1.703-1.802 2.277-2.674 0.573-0.87 0.86-1.831 0.86-2.881 0-1.465-0.443-2.607-1.331-3.424s-2.134-1.226-3.736-1.226z"></path>
 							</svg>
 						</div>
-					</div>
+						
+						<div id="system-prompt-editBar">
+							<div id="system-prompt-editButton" onclick="toggleSystemPromptEdit()">
+								<svg viewBox="0 0 383.26 383.54">
+									<path class="button-path-fill-color" class="cls-1" d="M35.18,383.54c-2.47-.74-4.98-1.39-7.41-2.24C10.88,375.35.02,360.14.02,342.26,0,262.41-.01,182.56.02,102.71c.01-22.87,18.22-41.08,41.06-41.1,54.51-.04,109.02-.02,163.53-.01,7.6,0,12.5,4.47,12.45,11.32-.05,6.78-4.97,11.12-12.68,11.12-53.51,0-107.03,0-160.54,0-13.93,0-21.41,7.52-21.41,21.53,0,77.98,0,155.96,0,233.94,0,14.01,7.49,21.57,21.39,21.57,78.09,0,156.17,0,234.26,0,13.72,0,21.33-7.58,21.33-21.25,0-53.77,0-107.55,0-161.32,0-9.29,8.5-14.96,16.33-10.89,4.27,2.22,6.14,5.88,6.13,10.71-.05,23.46-.02,46.91-.02,70.37,0,30.57-.39,61.14.13,91.7.39,23.45-16.96,40.26-34.38,42.57-.33.04-.62.38-.93.57H35.18Z"/>
+									<path class="button-path-fill-color" class="cls-1" d="M383.26,52.61c-2.18,8.17-7.82,13.85-13.58,19.6-53.49,53.39-106.93,106.83-160.27,160.36-3.79,3.8-7.92,6.11-13.13,7.1-16.11,3.07-32.19,6.36-48.28,9.54-8.47,1.67-15.37-5.3-13.68-13.78,3.41-17.07,6.71-34.16,10.34-51.18.59-2.75,2.13-5.71,4.11-7.7,55.98-56.19,112.05-112.29,168.18-168.33,11.1-11.08,26.89-10.9,38.07.1,5.15,5.07,10.12,10.35,15.38,15.3,5.79,5.45,10.91,11.26,12.86,19.23v9.73ZM303.37,52.69c-.88,1.24-1.6,2.61-2.65,3.66-43.28,43.35-86.57,86.69-129.96,129.93-3.05,3.04-4.98,6.16-5.61,10.47-.94,6.39-2.46,12.69-3.73,19.04-.49,2.47-.96,4.94-1.54,7.92,10.46-2.07,20.11-3.86,29.7-5.97,2.02-.44,4.16-1.67,5.63-3.14,44.17-44.05,88.26-88.17,132.36-132.29.94-.94,1.84-1.92,2.64-2.77-8.82-8.82-17.37-17.37-26.84-26.84ZM346.95,63.16c4.05-4.14,8.05-8.24,12.06-12.32,1.95-1.98,2.47-4,.31-6.16-6.86-6.87-13.73-13.74-20.6-20.6-1.66-1.65-3.57-1.99-5.29-.31-4.44,4.32-8.75,8.77-12.91,12.97,8.82,8.82,17.43,17.42,26.43,26.42Z"/>
+								</svg>
+							</div>
+							<div id="system-prompt-edit-control">
+								<div id="system-prompt-confrimBtn" onclick="confirmSystemPromptEdit()">
+									<svg  class="button-path-fill-color" viewBox="0 0 50 50" width="100px" height="100px">
+										<path class="button-path-fill-color" d="M 41.9375 8.625 C 41.273438 8.648438 40.664063 9 40.3125 9.5625 L 21.5 38.34375 L 9.3125 27.8125 C 8.789063 27.269531 8.003906 27.066406 7.28125 27.292969 C 6.5625 27.515625 6.027344 28.125 5.902344 28.867188 C 5.777344 29.613281 6.078125 30.363281 6.6875 30.8125 L 20.625 42.875 C 21.0625 43.246094 21.640625 43.410156 22.207031 43.328125 C 22.777344 43.242188 23.28125 42.917969 23.59375 42.4375 L 43.6875 11.75 C 44.117188 11.121094 44.152344 10.308594 43.78125 9.644531 C 43.410156 8.984375 42.695313 8.589844 41.9375 8.625 Z"/>
+									</svg>
+								</div>
+								<div id="system-prompt-abortBtn" onclick="abortSystemPromptEdit()" >
+									<svg viewBox="0 0 100 100">
+										<path class="button-path-fill-color" d="M 19.52 19.52 a 6.4 6.4 90 0 1 9.0496 0 L 51.2 42.1504 L 73.8304 19.52 a 6.4 6.4 90 0 1 9.0496 9.0496 L 60.2496 51.2 L 82.88 73.8304 a 6.4 6.4 90 0 1 -9.0496 9.0496 L 51.2 60.2496 L 28.5696 82.88 a 6.4 6.4 90 0 1 -9.0496 -9.0496 L 42.1504 51.2 L 19.52 28.5696 a 6.4 6.4 90 0 1 0 -9.0496 z"/>
+									</svg>
+								</div>
+							</div>
 
+						</div>
+						
+
+					</div>
+		
 					<p id="system-prompt-info" style="display: none">
-						<?php echo $translation["SystemPromptInfo"]; ?>
+						<?php echo $translation["SystemPromptInfo"]; ?> 
 					</p>
 				</div>
 
 
-				<p id="system-prompt"></p>
+				<p >
+					<span>&Prime;</span>
+					<span contenteditable="true" id="system-prompt"></span>
+					<span>&rdquo;</span>
+				</p>
 			</div>
-
+			
 		</div>
 		<div class="betaMessage">
 			<?php echo $translation["BetaMessage"]; ?>
@@ -282,12 +330,33 @@
 			</div>
 		</div>
 	</template>
+
+
+
+	<div class="modal" id="delete-chat-confirm">
+		<div class="modal-panel" style="max-width:30rem">
+			<div class="modal-content">
+				<h3>
+					<?php echo $translation["deleteChat"]; ?>
+				</h3>
+				<div class="modal-buttons-bar">
+					<button onclick="closeDeletePanel()"><?php echo $translation["cancel"]; ?></button>
+					<button onclick="deleteChatLog()"><?php echo $translation["delete"]; ?></button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
 </div>
 
 <?php
 	include( VIEWS_PATH . 'guidelines.php');
 ?>
 
+	</body>
+</html>
 <script>
 
 	visualViewport.addEventListener("resize", update);
@@ -306,9 +375,13 @@
 
 	//Load chat by default when the page is loaded.
 	window.addEventListener('DOMContentLoaded', (event) => {
-		const chatBtn = document.querySelector("#chatMenuButton");
+		const chatBtn = document.querySelector("#chat_MenuButton");
 		load(chatBtn ,'chat.php');
     });
+	window.addEventListener('DOMContentLoaded', cleanupStoredLogs());
+
+
+
 
 	document.querySelector('.messages').addEventListener('scroll', function() {
     	isScrolling = true;
@@ -436,9 +509,12 @@
 
 		// Throws error if the read operation on the response body stream is aborted while the reader.read() operation is still active.
 		// Try Catch block will handle the error.
+		let rawMsg = "";
+		
 		try {
 			//NOTE: Niklas Wode
 			let incompleteSlice = "";
+
 			while (true) {
 				const { done, value } = await reader.read();
 
@@ -449,6 +525,10 @@
 					isReceivingData = false;
 					sendicon.setAttribute('d', startIcon)
 
+					const msg = document.querySelector(".message:last-child").querySelector(".message-text");
+					msg.setAttribute('rawContent', rawMsg);
+					console.log(rawMsg);
+					saveMessagesToLocalStorage();
 					ShowCopyButton();
 					break;
 				}
@@ -478,13 +558,13 @@
 					if(chunk.indexOf('DONE') > 0) return false;
 					if(chunk.indexOf('role') > 0) return false;
 					if(chunk.length == 0) return false;
-
+					
+					rawMsg += JSON.parse(chunk)["choices"][0]["delta"].content;
 					document.querySelector(".message:last-child").querySelector(".message-text").innerHTML =  FormatChunk(JSON.parse(chunk)["choices"][0]["delta"].content);
 
 				})
 
 				FormatMathFormulas();
-
 				hljs.highlightAll();
 				scrollToLast();
 			}
@@ -492,12 +572,17 @@
 			// Check if the error is due to aborting the request
 			if (error.name == 'AbortError') {
 				console.log('Fetch aborted while reading response body stream.');
+				const msg = document.querySelector(".message:last-child").querySelector(".message-text");
+				msg.setAttribute('rawContent', rawMsg);
+
 			} else {
 				console.error('Error:', error);
 			}
 			isReceivingData = false;
 			sendicon.setAttribute('d', startIcon);
 			ShowCopyButton();
+			saveMessagesToLocalStorage();
+
 		}
 	}
 
@@ -512,7 +597,7 @@
 		messageElement.querySelector(".message").dataset.role = message.role;
 
 		if(message.role == "assistant"){
-			messageElement.querySelector(".message-icon").textContent = "AI";
+			messageElement.querySelector(".message-icon").textContent = '<?php echo $translation["AI_Icon"]; ?>';
 		}else{
 			messageElement.querySelector(".message-icon").textContent = '<?= htmlspecialchars($_SESSION['username']) ?>';
 			messageElement.querySelector(".message").classList.add("me");
