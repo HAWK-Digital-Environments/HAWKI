@@ -597,7 +597,7 @@
 		messageElement.querySelector(".message").dataset.role = message.role;
 
 		if(message.role == "assistant"){
-			messageElement.querySelector(".message-icon").textContent = "AI";
+			messageElement.querySelector(".message-icon").textContent = '<?php echo $translation["AI_Icon"]; ?>';
 		}else{
 			messageElement.querySelector(".message-icon").textContent = '<?= htmlspecialchars($_SESSION['username']) ?>';
 			messageElement.querySelector(".message").classList.add("me");
