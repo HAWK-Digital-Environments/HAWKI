@@ -5,6 +5,23 @@
     require_once BOOTSTRAP_PATH;
     require_once  LIBRARY_PATH . 'csrf.php';
     
+    function activeLanguages() {
+
+        if (file_exists(ENV_FILE_PATH)) {
+            $env = parse_ini_file(ENV_FILE_PATH);
+        }
+
+        $activeLanguages = isset($env) ? $env['ACTIVE_LANGUAGES'] : getenv('ACTIVE_LANGUAGES');
+        $activeLanguages = explode(' ', $activeLanguages);
+
+        if ( !count( $activeLanguages ) ) {
+             // default if no active languages are set
+            return ['de_DE', 'en_US', 'es_ES', 'fr_FR', 'it_IT'];
+        }
+
+        return $activeLanguages;
+    }
+
     function setLanguage(){
         //LANGUAGE CHANGE...
         if(isset($_SESSION['language'])){
@@ -22,7 +39,7 @@
             }
             else{
                 //hard code to german
-                $languages = ['de_DE', 'en_US', 'es_ES', 'fr_FR', 'it_IT'];
+                $languages = activeLanguages();
                 $acceptLang = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
                 $matchingLang = substr($acceptLang, 0, 2);
                 foreach ($languages as $lang) {
@@ -44,8 +61,6 @@
         $_SESSION['translation'] = $translation;
     }
 
-
-
     // Check if the request is POST
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // CSRF Protection
@@ -60,7 +75,7 @@
         }
 
         // Check if the requested language is valid
-        $languages = ['de_DE', 'en_US', 'es_ES', 'fr_FR', 'it_IT'];
+        $languages = activeLanguages();
 
         $jsonString = file_get_contents("php://input");
 

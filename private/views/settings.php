@@ -28,21 +28,13 @@
                 <div class="settings-section">
                     <h3><?php echo $translation["language"]; ?></h3>
                     <div class="language-selection">
-                        <a class="language-btn" onclick="changeLanguage('de_DE')" id="de_DE_btn">
-                            DE
-                        </a>
-                        <a class="language-btn" onclick="changeLanguage('en_US')" id="en_US_btn">
-                            EN
-                        </a>
-                        <a class="language-btn" onclick="changeLanguage('es_ES')" id="es_ES_btn">
-                            ES
-                        </a>
-                        <a class="language-btn" onclick="changeLanguage('fr_FR')" id="fr_FR_btn">
-                            FR
-                        </a>
-                        <a class="language-btn" onclick="changeLanguage('it_IT')" id="it_IT_btn">
-                            IT
-                        </a>
+                        <?php
+                        $languages = activeLanguages();
+                        foreach ($languages as $lang) {
+                            $langShort = strtoupper( explode('_', $lang)[0] );
+                            echo '<a class="language-btn" onclick="changeLanguage(\'' . $lang . '\')" id="' . $lang . '_btn">' . $langShort . '</a>';
+                        }
+                        ?>
                     </div>
                 </div>
                 
