@@ -105,6 +105,14 @@
 									<button type="submit" name="submit">' . $translation['Login'] . '</button >
 								</form>';
 						}
+						if ((isset($env) ? $env["Authentication"] : getenv("Authentication")) == "external") {
+							$login_available = true;
+							if (isset($env["EXTERNAL_USERNAME_ATTRIBUTE"]) and (isset($_SERVER[$env["EXTERNAL_USERNAME_ATTRIBUTE"]]))) {
+								$_SESSION['username']=$_SERVER[$env["EXTERNAL_USERNAME_ATTRIBUTE"]];
+							} else {
+								$_SESSION['username']='Anonymous';
+							}
+                                                }
 						if (!$login_available) {
 							echo 'No authentication method defined';
 							die;
