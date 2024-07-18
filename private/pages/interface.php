@@ -210,10 +210,14 @@
 						<select id="model-selector" onchange="OnDropdownModelSelection()">
 							<option value="gpt-4o">OpenAI GPT-4o</option>
 							<option value="gpt-4-turbo-preview">OpenAI GPT-4-Turbo</option>
+							<!--
 							<option value="intel-neural-chat-7b">Intel-neural-chat-7b</option>
-							<option value="meta-llama-3-70b-instruct">meta-llama-3-70b-instruct</option>
-							<option value="mixtral-8x7b-instruct">Mixtral-8x7b-instruct</option>
 							<option value="qwen1.5-72b-chat">Qwen1.5-72b-chat</option>
+							-->
+							<option value="meta-llama-3-70b-instruct">meta-llama-3-70b-instruct</option>
+							<option value="mixtral-8x7b-instruct">mixtral-8x7b-instruct</option>
+							<option value="meta-llama-3-8b-instruct">meta-llama-3-8b-instruct</option>
+							<option value="qwen2-72b-instruct">qwen2-72b-instruct</option>
 						</select>
 
 						<div id="system-prompt-btn" onclick="ToggleSystemPrompt(true)">
@@ -404,10 +408,12 @@
 				streamAPI = "/api/stream-api";
 				break;
 
-			case('intel-neural-chat-7b'):
+			// case('intel-neural-chat-7b'):
 			case('meta-llama-3-70b-instruct'):
 			case('mixtral-8x7b-instruct'):
-			case('qwen1.5-72b-chat'):
+			case('meta-llama-3-8b-instruct'):
+			// case('qwen1.5-72b-chat'):
+			case('qwen2-72b-instruct'):
 				streamAPI = '/api/GWDG-api';
 				break;
 		}
