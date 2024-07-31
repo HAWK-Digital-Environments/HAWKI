@@ -209,11 +209,11 @@
 					<div class="input-controlbar">
 						<select id="model-selector" onchange="OnDropdownModelSelection()">
 							<option value="gpt-4o">OpenAI GPT-4o</option>
-							<option value="gpt-4-turbo-preview">OpenAI GPT-4-Turbo</option>
-							<option value="intel-neural-chat-7b">Intel-neural-chat-7b</option>
+							<option value="meta-llama-3-8b-instruct">meta-llama-3-8b-instruct</option>
 							<option value="meta-llama-3-70b-instruct">meta-llama-3-70b-instruct</option>
+							<option value="llama-3-sauerkrautlm-70b-instruct">Llama 3 70B Sauerkraut</option>
 							<option value="mixtral-8x7b-instruct">Mixtral-8x7b-instruct</option>
-							<option value="qwen1.5-72b-chat">Qwen1.5-72b-chat</option>
+							<option value="qwen2-72b-instruct">Qwen 2 72B Instruct</option>
 						</select>
 
 						<div id="system-prompt-btn" onclick="ToggleSystemPrompt(true)">
@@ -400,14 +400,15 @@
 		activeModel = model;
 		switch(activeModel){
 			case('gpt-4o'):
-			case('gpt-4-turbo-preview'):
+			// case('gpt-4-turbo-preview'):
 				streamAPI = "/api/stream-api";
 				break;
 
-			case('intel-neural-chat-7b'):
+			case('meta-llama-3-8b-instruct'):
 			case('meta-llama-3-70b-instruct'):
+			case('llama-3-sauerkrautlm-70b-instruct'):
 			case('mixtral-8x7b-instruct'):
-			case('qwen1.5-72b-chat'):
+			case('qwen2-72b-instruct'):
 				streamAPI = '/api/GWDG-api';
 				break;
 		}

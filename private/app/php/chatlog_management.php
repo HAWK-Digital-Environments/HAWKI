@@ -20,7 +20,6 @@ $userSpecificSalt = $encryptionSalt . $_SESSION['username'];
 
             if(messageElement.dataset.role === 'assistant'){
                 messageObject.content = messageElement.querySelector(".message-text").getAttribute('rawContent');
-                console.log(messageObject.content);
             }else{
                 messageObject.content = messageElement.querySelector(".message-text").textContent;
             }

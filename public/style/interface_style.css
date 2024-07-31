@@ -750,7 +750,7 @@ details svg{
 }
 
 #system-prompt-btn:hover{
-  fill: white;
+  fill: var(--text-color);
 }
 #system-prompt-panel{
   position: absolute;
