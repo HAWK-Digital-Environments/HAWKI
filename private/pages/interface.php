@@ -178,7 +178,7 @@
 			</svg>
 		</div>
 		<div class="info">
-			<a href="#" id="feedback" onclick="load(this, 'feedback_loader.php')"><?php echo $translation["FeedBack"]; ?></a>
+			<a href="<?php echo isset($env['FEEDBACK_EMAIL']) && !empty($env['FEEDBACK_EMAIL']) ? 'mailto'.$env['FEEDBACK_EMAIL'] : '#'; ?>" id="feedback" <?php echo isset($env['FEEDBACK_EMAIL']) && !empty($env['FEEDBACK_EMAIL']) ? '' : 'onclick="load(this, \'feedback_loader.php\')"'; ?>><?php echo $translation["FeedBack"]; ?></a>
 			<a href="logout"><?php echo $translation["SignOut"]; ?></a>
 			<br>
 			<!-- CHANGE THIS PART TO ONCLICK EVENT TO LOAD THE PAGE IN MESSAGES PANEL.
