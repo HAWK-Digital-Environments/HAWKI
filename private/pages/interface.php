@@ -211,6 +211,8 @@
 								echo
 									'<select id="model-selector" onchange="OnDropdownModelSelection()">
 										<option value="gpt-4o">OpenAI GPT-4o</option>
+										<option value="o1-mini">OpenAI GPT-4o1 mini</option>
+										<option value="dall-e-3">OpenAI DALL-E 3</option>
 										<option value="meta-llama-3.1-8b-instruct">meta-llama-3.1-8b-instruct</option>
 										<option value="meta-llama-3.1-70b-instruct">meta-llama-3.1-70b-instruct</option>
 										<option value="llama-3-sauerkrautlm-70b-instruct">Llama 3 70B Sauerkraut</option>
@@ -408,7 +410,15 @@
 			case('gpt-4o'):
 				streamAPI = "api/stream-api";
 				break;
-
+			case('gpt-4o-mini'):
+				streamAPI = "/api/stream-api";
+				break;
+			case('o1-mini'):
+				streamAPI = "/api/stream-api";
+				break;	
+			case('dall-e-3'):
+				streamAPI= "/api/stream-api-bild"
+				break;
 			case('meta-llama-3.1-8b-instruct'):
 			case('meta-llama-3.1-70b-instruct'):
 			case('llama-3-sauerkrautlm-70b-instruct'):
@@ -464,6 +474,7 @@
 		sendicon.style.color = "red";
 
 		let message = {};
+		bild_prompt = message.content;
 		message.role = "user";
 		//prevent html input to be rendered as html elements.
 		message.content = escapeHTML(inputField.value.trim());
@@ -476,17 +487,40 @@
 
 		const requestObject = {};
 		requestObject.model = activeModel;
-		requestObject.stream = true;
-		requestObject.messages = [];
 		const messageElements = messagesElement.querySelectorAll(".message");
-		messageElements.forEach(messageElement => {
-			let messageObject = {};
-			messageObject.role = messageElement.dataset.role;
-			messageObject.content = messageElement.querySelector(".message-text").textContent;
-			requestObject.messages.push(messageObject);
-		})
 
-		
+
+		switch(activeModel) {
+    		case "dall-e-3":
+       		 	requestObject.prompt = bild_prompt;
+        		requestObject.n = 1;
+        		requestObject.size = "1024x1024";
+        		break;
+			case "o1-mini":
+				requestObject.stream = false;
+				requestObject.messages = [];
+        		messageElements.forEach(messageElement => {
+        		    let messageObject = {};
+        		    messageObject.role = messageElement.dataset.role;
+        		    
+					if (messageObject.role === 'system') {
+						messageObject.role = 'user';
+            }
+					messageObject.content = messageElement.querySelector(".message-text").textContent;
+        		    requestObject.messages.push(messageObject);
+        		});
+        		break;	
+    		default:
+				requestObject.stream = true;
+				requestObject.messages = [];
+				messageElements.forEach(messageElement => {
+					let messageObject = {};
+					messageObject.role = messageElement.dataset.role;
+					messageObject.content = messageElement.querySelector(".message-text").textContent;
+					requestObject.messages.push(messageObject);
+				});
+        		break;
+		}		
 
 		postData(streamAPI, requestObject)
 		.then(stream => processStream(stream))
@@ -561,6 +595,7 @@
 				//Parsing error from json "Chunks" corrected
 				let decodedData = new TextDecoder().decode(value);
 				decodedData = incompleteSlice + decodedData;
+				console.log(decodedData);
 
 				const delimiter = '\n\n';
 				const delimiterPosition = decodedData.lastIndexOf(delimiter);
