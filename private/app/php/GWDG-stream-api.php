@@ -22,8 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $_SESSION['last_activity'] = time();
 
 // API configuration
-$apiUrl = isset($env) ? $env['GWDG_API_URL'] : getenv('OPENAI_API_URL');
-$apiKey = isset($env) ? $env['GWDG_API_KEY'] : getenv('OPENAI_API_KEY');
+$apiUrl = isset($env) ? $env['GWDG_API_URL'] : getenv('GWDG_API_URL');
+$apiKey = isset($env) ? $env['GWDG_API_KEY'] : getenv('GWDG_API_KEY');
 
 $requestPayload = file_get_contents('php://input');
 // Decode the JSON payload into an associative array

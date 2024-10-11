@@ -210,7 +210,6 @@
 							if(isset($env) ? array_key_exists("MODEL_SELECTOR_ACTIVATION", $env) && $env["MODEL_SELECTOR_ACTIVATION"] === "true" : strtolower(getenv("MODEL_SELECTOR_ACTIVATION")) === "true"){
 								echo
 									'<select id="model-selector" onchange="OnDropdownModelSelection()">
-										<option value="gpt-4o">OpenAI GPT-4o</option>
 										<option value="meta-llama-3.1-8b-instruct">meta-llama-3.1-8b-instruct</option>
 										<option value="meta-llama-3.1-70b-instruct">meta-llama-3.1-70b-instruct</option>
 										<option value="llama-3-sauerkrautlm-70b-instruct">Llama 3 70B Sauerkraut</option>
@@ -384,14 +383,14 @@
 
 
 
-	let activeModel = "gpt-4o";
+	let activeModel = "meta-llama-3.1-8b-instruct"; //"gpt-4o";
 	let streamAPI = "";
 	window.addEventListener('DOMContentLoaded', (event) => {
 		if(localStorage.getItem("definedModel")){
 			SwitchModel(localStorage.getItem("definedModel"));
 		}
 		else{
-			SwitchModel("gpt-4o");
+			SwitchModel("meta-llama-3.1-8b-instruct");//SwitchModel("gpt-4o");
 		}
 		document.getElementById("model-selector").value = activeModel;
     });
@@ -404,19 +403,9 @@
 
 	function SwitchModel(model){
 		activeModel = model;
-		switch(activeModel){
-			case('gpt-4o'):
-				streamAPI = "api/stream-api";
-				break;
-
-			case('meta-llama-3.1-8b-instruct'):
-			case('meta-llama-3.1-70b-instruct'):
-			case('llama-3-sauerkrautlm-70b-instruct'):
-			case('mixtral-8x7b-instruct'):
-			case('qwen2-72b-instruct'):
-				streamAPI = 'api/GWDG-api';
-				break;
-		}
+		
+		// no more open ai. always gwdg.
+		streamAPI = 'api/GWDG-api';
 	}
 
 

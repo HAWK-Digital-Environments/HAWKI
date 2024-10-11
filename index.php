@@ -52,11 +52,6 @@ switch($request_path){
         }
         exit;
 
-    case('/api/stream-api'):
-        if($_SERVER["REQUEST_METHOD"] == "POST"){
-            include_once( LIBRARY_PATH . "stream-api.php");
-        }
-        exit;
     case('/api/GWDG-api'):
         if($_SERVER["REQUEST_METHOD"] == "POST"){
             include_once( LIBRARY_PATH . "GWDG-stream-api.php");
