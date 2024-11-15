@@ -213,8 +213,8 @@
 										<option value="meta-llama-3.1-8b-instruct">meta-llama-3.1-8b-instruct</option>
 										<option value="meta-llama-3.1-70b-instruct">meta-llama-3.1-70b-instruct</option>
 										<option value="llama-3-sauerkrautlm-70b-instruct">Llama 3 70B Sauerkraut</option>
-										<option value="mixtral-8x7b-instruct">Mixtral-8x7b-instruct</option>
-										<option value="qwen2-72b-instruct">Qwen 2 72B Instruct</option>
+										<option value="mistral-large-instruct">Mistral Large Instruct</option>
+										<option value="qwen2.5-72b-instruct">Qwen 2.5 72B Instruct</option>
 									</select>';
 							}
 							else{
@@ -403,7 +403,6 @@
 
 	function SwitchModel(model){
 		activeModel = model;
-		
 		// no more open ai. always gwdg.
 		streamAPI = 'api/GWDG-api';
 	}
@@ -471,6 +470,11 @@
 		messageElements.forEach(messageElement => {
 			let messageObject = {};
 			messageObject.role = messageElement.dataset.role;
+			
+			if(activeModel === 'mistral-large-instruct' && messageObject.role === 'system'){
+				messageObject.role = 'user';
+			}
+
 			messageObject.content = messageElement.querySelector(".message-text").textContent;
 			requestObject.messages.push(messageObject);
 		})
