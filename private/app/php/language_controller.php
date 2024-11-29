@@ -38,6 +38,8 @@
             }
         }
         $_SESSION['language'] = $language;
+        setcookie('cachedFileLastModified_c', filemtime(LANGUAGE_PATH . $language . '.json'), 0, '/', '', true, true); // saves the last modified date of the language file in user cache
+
         $languageSanitized = preg_replace('~[^a-zA-Z_]~', '', $language);
         $langFile = file_get_contents(LANGUAGE_PATH . $languageSanitized . '.json');
         $translation = json_decode($langFile, true);
@@ -78,6 +80,7 @@
         $_SESSION['translation'] = $translation;
 
         setcookie('lastLanguage_cookie', $_SESSION['language'], strtotime('2038-01-01'), '/', '', true, true);
+        setcookie('cachedFileLastModified_c', filemtime(LANGUAGE_PATH . $_SESSION['language'] . '.json'), 0, '/', '', true, true); // saves the last modified date of the language file in user cache after language change by user
 
         // Prepare the JSON response
         $response = array(

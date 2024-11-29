@@ -26,6 +26,19 @@
 	if(!isset($_SESSION['translation'])){
 		setLanguage();
 	}
+	$lastModified = filemtime(LANGUAGE_PATH . $_SESSION['language'] . '.json'); // Get the last modified date of the language file on the server
+	$cachedFileLastModified = isset($_COOKIE['cachedFileLastModified_c']) ? $_COOKIE['cachedFileLastModified_c'] : 0; // Get the last modified date of the language file in the user's cache
+	
+	if ($cachedFileLastModified === 0 || $cachedFileLastModified === null || $cachedFileLastModified > $lastModified) {
+		$chacheStatus = 'Language file not in cache. Loaded a new language file';
+	} elseif ($cachedFileLastModified == $lastModified) {
+		$chacheStatus = 'Language file on server is the same as the cached file.';
+	} else {
+		$chacheStatus = 'Language file on server is newer than the cached file. Reloading ...';
+		setLanguage();
+	}
+
+
 	$translation = $_SESSION['translation'];
 
 	// Check if the user is already logged in
@@ -188,4 +201,8 @@
 			console.error(error);
 		});
 	}
+	// Debugging
+	console.log("Cached Language File was modified on: " + "<?php echo $cachedFileLastModified; ?> " + "<?php echo date("Y-m-d H:i:s", $cachedFileLastModified); ?>");
+	console.log("Language File was modified on: " + "<?php echo $lastModified; ?> " + "<?php echo date("Y-m-d H:i:s", $lastModified); ?>");
+	console.log("Cache Status: " + "<?php echo $chacheStatus; ?>");
 </script>
