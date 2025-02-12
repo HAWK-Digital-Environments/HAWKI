@@ -213,11 +213,17 @@
 										<option value="gpt-4o">OpenAI GPT-4o</option>
 										<option value="gpt-4o-mini">OpenAI GPT-4o Mini</option>
 										
-										<option value="meta-llama-3.1-8b-instruct">meta-llama-3.1-8b-instruct</option>
-										<option value="meta-llama-3.1-70b-instruct">meta-llama-3.1-70b-instruct</option>
-										<option value="llama-3-sauerkrautlm-70b-instruct">Llama 3 70B Sauerkraut</option>
+										<option value="meta-llama-3.1-8b-instruct">Meta Llama 3.1 8B Instruct</option>
+										<option value="llama-3.3-70b-instruct">Meta Llama 3.3 70B Instruct</option>
+										<option value="deepseek-r1">DeepSeek R1</option>
+										<option value="deepseek-r1-distill-llama-70b">DeepSeek R1 Distill Llama 70B</option>
+										<option value="llama-3.1-nemotron-70b-instruct">Llama 3.1 Nemotron 70B Instruct</option>
+										<option value="llama-3.1-sauerkrautlm-70b-instruct">Llama 3.1 SauerkrautLM 70B Instruct</option>
+										<option value="codestral-22b">Codestral 22B</option>
+										<option value="internvl2.5-8b">InternVL2.5 8B MPO</option>
 										<option value="mistral-large-instruct">Mistral Large Instruct</option>
 										<option value="qwen2.5-72b-instruct">Qwen 2.5 72B Instruct</option>
+										<option value="qwen2.5-coder-32b-instruct">Qwen 2.5 Coder 32B Instruct</option>
 									</select>';
 							}
 							else{
@@ -412,11 +418,7 @@
 				streamAPI = "api/stream-api";
 				break;
 
-			case('meta-llama-3.1-8b-instruct'):
-			case('meta-llama-3.1-70b-instruct'):
-			case('llama-3-sauerkrautlm-70b-instruct'):
-			case('mistral-large-instruct'):
-			case('qwen2.5-72b-instruct'):
+			default:
 				streamAPI = 'api/GWDG-api';
 				break;
 		}
