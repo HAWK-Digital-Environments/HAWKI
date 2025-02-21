@@ -590,6 +590,8 @@
 					}
 					const jsonChunk = JSON.parse(chunk);
 					if(jsonChunk["choices"][0]["finish_reason"] != null) return false;
+					// Required for models with empty content on first response (e.g. meta-llama-3.1-8b-instruct)
+					if(!jsonChunk["choices"][0]["delta"].content) return false;
 					
 					rawMsg += jsonChunk["choices"][0]["delta"].content;
 					document.querySelector(".message:last-child").querySelector(".message-text").innerHTML =  FormatChunk(jsonChunk["choices"][0]["delta"].content);
