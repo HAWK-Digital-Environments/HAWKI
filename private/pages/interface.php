@@ -589,6 +589,9 @@
 						return;
 					}
 					const jsonChunk = JSON.parse(chunk);
+					// Check required for Azure OpenAI
+					if(!jsonChunk["choices"].length) return false;
+					// Check required for all models
 					if(jsonChunk["choices"][0]["finish_reason"] != null) return false;
 					
 					rawMsg += jsonChunk["choices"][0]["delta"].content;
