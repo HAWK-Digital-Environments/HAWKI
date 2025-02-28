@@ -109,7 +109,7 @@ class AuthenticationController extends Controller
     public function shibbolethLogin(Request $request)
     {
         try {
-            $authenticatedUserInfo = $this->shibbolethService->authenticate();
+            $authenticatedUserInfo = $this->shibbolethService->authenticate($request);
     
             if (!$authenticatedUserInfo) {
                 return response()->json(['error' => 'Login Failed!'], 401);
@@ -140,7 +140,7 @@ class AuthenticationController extends Controller
     public function openIDLogin(Request $request)
     {
         try {
-            $authenticatedUserInfo = $this->oidcService->authenticate();
+            $authenticatedUserInfo = $this->oidcService->authenticate($request);
     
             if (!$authenticatedUserInfo) {
                 return response()->json(['error' => 'Login Failed!'], 401);

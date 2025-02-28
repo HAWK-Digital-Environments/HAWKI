@@ -92,8 +92,8 @@ Route::middleware('prevent_back')->group(function () {
         Route::middleware('roomAdmin')->group(function () {
             Route::post('/req/room/addMember', [RoomController::class, 'addMember']);
             Route::post('/req/room/updateInfo/{slug}', [RoomController::class, 'updateInfo']);
-            Route::delete('/req/room/removeRoom/{slug}', [RoomController::class, 'removeRoom']);;
-            Route::delete('/req/room/removeMember/{slug}', [RoomController::class, 'removeMember']);;
+            Route::delete('/req/room/removeRoom/{slug}', [RoomController::class, 'removeRoom']);
+            Route::delete('/req/room/removeMember/{slug}', [RoomController::class, 'removeMember']);
         });
     
         

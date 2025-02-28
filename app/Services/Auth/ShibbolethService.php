@@ -37,7 +37,7 @@ class ShibbolethService
                     'username' => $_SERVER['REMOTE_USER'],
                     'name' => $_SERVER[$nameVar],
                     'email' => $_SERVER[$mailVar],
-                    'employeetype' => $_SERVER[$employeetypeVar],
+                    'employeetype' => $_SERVER[$employeetypeVar]
                 ];
             } else {
                 // Error handling if attributes are missing
