@@ -172,13 +172,21 @@ class StreamController extends Controller
 
         // Send a full request to the AI model and get the response
         $provider = $this->utilities->getProvider($formattedPayload['model']);
-        if($provider['id'] === 'google'){
-            $response = $this->modelConnection->requestToGoogle($formattedPayload);
-            [$content, $usage] = $this->responseFormatter->formatGoogleResponse($response);
-        }
-        else{
-            $response = $this->modelConnection->requestToAiModel($formattedPayload);
-            [$content, $usage] = $this->responseFormatter->formatDefaultResponse($response);
+        switch ($provider['id']) {
+            case 'google':
+                $response = $this->modelConnection->requestToGoogle($formattedPayload);
+                [$content, $usage] = $this->responseFormatter->formatGoogleResponse($response);
+                break;
+
+            case 'openwebui':
+                $response = $this->modelConnection->requestToAiModel($formattedPayload);
+                [$content, $usage] = $this->responseFormatter->formatOpenWebUiResponse($response);
+                break;
+            
+            default:
+                $response = $this->modelConnection->requestToAiModel($formattedPayload);
+                [$content, $usage] = $this->responseFormatter->formatDefaultResponse($response);
+                break;
         }
         $this->usageAnalyzer->submitUsageRecord($usage, 'group', $formattedPayload['model'], $room->id);
 

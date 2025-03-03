@@ -23,14 +23,17 @@ class AiPayloadFormatterService
     {
         $provider = $this->utilities->getProviderId($payload['model']);
 
+        if (empty($provider)) {
+            throw new \Exception("No provider defined");
+        }
+
         switch ($provider) {
-            case 'openai':
-            case 'gwdg':
-                return $this->formatForOpenAi($payload, $provider);
             case 'google':
                 return $this->formatForGoogle($payload);
             default:
-                throw new \Exception("Unsupported provider");
+                // tested with OpenAI, GWDG and Open WebUI 
+                // define an exception for your provider if neccessary
+                return $this->formatForOpenAi($payload, $provider);
         }
     }
 
