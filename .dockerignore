@@ -1,0 +1,12 @@
+.git
+.github
+node_modules
+vendor
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+.env
+*.log
+.DS_Store
+Thumbs.db

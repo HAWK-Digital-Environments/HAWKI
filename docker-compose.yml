@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hawki-app
+    restart: unless-stopped
+    volumes:
+      - ./storage:/var/www/html/storage
+      - ./config/model_providers.php:/var/www/html/config/model_providers.php
+      - ./.env:/var/www/html/
+    ports:
+      - "80:80"
+      - "8080:8080"
+    networks:
+      - hawki-network
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: hawki-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - hawki-db-data:/var/lib/mysql
+    networks:
+      - hawki-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: hawki-phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - hawki-network
+    depends_on:
+      - db
+
+networks:
+  hawki-network:
+    driver: bridge
+
+volumes:
+  hawki-db-data:
+    driver: local
