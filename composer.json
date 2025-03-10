@@ -6,6 +6,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "blade-ui-kit/blade-icons": "^1.8",
+        "blade-ui-kit/blade-ui-kit": "^0.7.0",
         "jumbojett/openid-connect-php": "^1.0",
         "laravel/framework": "^11.0",
         "laravel/reverb": "^1.1",
