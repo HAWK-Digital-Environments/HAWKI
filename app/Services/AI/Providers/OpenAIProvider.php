@@ -173,6 +173,10 @@ class OpenAIProvider extends BaseAIModelProvider
     {
         // Ensure stream is set to true
         $payload['stream'] = true;
+        // Enable usage reporting
+        $payload['stream_options'] = [
+            'include_usage' => true,
+        ];
         
         set_time_limit(120);
         
