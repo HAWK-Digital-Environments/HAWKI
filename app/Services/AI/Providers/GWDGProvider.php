@@ -22,7 +22,61 @@ class GWDGProvider extends OpenAIProvider
         
         return $payload;
     }
-    
+
+/**
+     * Format a single chunk from a streaming response
+     *
+     * @param string $chunk
+     * @return array
+     */
+     public function formatStreamChunk(string $chunk): array
+    {
+        $jsonChunk = json_decode($chunk, true);
+        $content = '';
+        $isDone = false;
+        $usage = null;
+        
+        // Check for the finish_reason flag
+        if (isset($jsonChunk['choices'][0]['finish_reason']) && $jsonChunk['choices'][0]['finish_reason'] === 'stop') {
+            $isDone = true;
+        }
+        
+        // Extract usage data if available
+        // Mistral Fix: Additional check for empty choices array
+        if (!empty($jsonChunk['usage']) && empty($jsonChunk['choices'])) {
+            $usage = $this->extractUsage($jsonChunk);
+            Log::info('GWDG', ['model' => $jsonChunk['model'], 'usage' => $usage]);
+
+        }
+        
+        // Extract content if available
+        if (isset($jsonChunk['choices'][0]['delta']['content'])) {
+            $content = $jsonChunk['choices'][0]['delta']['content'];
+        }
+        
+        return [
+            'content' => $content,
+            'isDone' => $isDone,
+            'usage' => $usage
+        ];
+    }
+    /**
+     * Extract usage information from OpenAI response
+     *
+     * @param array $data
+     * @return array|null
+     */
+     protected function extractUsage(array $data): ?array
+    {
+        if (empty($data['usage'])) {
+            return null;
+        }
+        //Log::info($data['usage']);
+        return [
+            'prompt_tokens' => $data['usage']['prompt_tokens'],
+            'completion_tokens' => $data['usage']['completion_tokens'],
+        ];    
+    }
     /**
      * Handle special formatting requirements for specific GWDG models
      *
