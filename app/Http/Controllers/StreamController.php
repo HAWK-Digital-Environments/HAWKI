@@ -178,6 +178,35 @@ class StreamController extends Controller
 
         // Create a callback function to process streaming chunks
         $onData = function ($data) use ($user, $avatar_url, $payload) {
+            Log::info($data);
+            // the problem here is that google has a different return object structure:
+
+        /*  [{
+              "candidates": [
+                {
+                  "content": {
+                    "parts": [
+                      {
+                        "text": "Ich"
+                      }
+                    ],
+                    "role": "model"
+                  }
+                }
+              ],
+              "usageMetadata": {
+                "promptTokenCount": 431,
+                "totalTokenCount": 431,
+                "promptTokensDetails": [
+                  {
+                    "modality": "TEXT",
+                    "tokenCount": 431
+                  }
+                ]
+              },
+              "modelVersion": "gemini-1.5-flash"
+            }
+        */
             // Skip non-JSON or empty chunks
             $chunks = explode("data: ", $data);
             foreach ($chunks as $chunk) {
