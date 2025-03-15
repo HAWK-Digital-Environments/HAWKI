@@ -80,7 +80,6 @@ class GoogleProvider extends BaseAIModelProvider
      */
     public function formatResponse($response): array
     {
-        Log::info('Single Response');
 
         $responseContent = $response->getContent();
         $jsonContent = json_decode($responseContent, true);        
@@ -102,7 +101,7 @@ class GoogleProvider extends BaseAIModelProvider
      */
     public function formatStreamChunk(string $chunk): array
     {
-        Log::info('Streaming Response');
+        Log::info($chunk);
 
         $jsonChunk = json_decode($chunk, true);
      
@@ -142,15 +141,17 @@ class GoogleProvider extends BaseAIModelProvider
     protected function extractUsage(array $data): ?array
     {
         //Log::info($data);
-
         if (empty($data['usageMetadata'])) {
             return null;
         }
-        
-        return [
-            'prompt_tokens' => $data['usageMetadata']['promptTokenCount'] ?? 0,
-            'completion_tokens' => $data['usageMetadata']['candidatesTokenCount'] ?? 0,
-        ];
+        // fix duplicate usage log entries
+        if (!empty($data['candidates'][0]['finishReason']) && $data['candidates'][0]['finishReason'] === "STOP") {
+            return [
+                'prompt_tokens' => $data['usageMetadata']['promptTokenCount'] ?? 0,
+                'completion_tokens' => $data['usageMetadata']['candidatesTokenCount'] ?? 0,
+            ];
+        }
+        return null;
     }
     
     /**
