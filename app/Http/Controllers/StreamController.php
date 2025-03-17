@@ -9,11 +9,10 @@ use App\Models\Room;
 use App\Models\Message;
 use App\Models\Member;
 
-use App\Services\AI\AiPayloadFormatterService;
-use App\Services\AI\AiResponseFormatterService;
-use App\Services\AI\ModelUtilityService;
-use App\Services\AI\ModelConnectionService;
+
 use App\Services\AI\UsageAnalyzerService;
+use App\Services\AI\AIConnectionService;
+use App\Services\AI\AIProviderFactory;
 
 use App\Jobs\SendMessage;
 use App\Events\RoomMessageEvent;
@@ -28,18 +27,15 @@ use Illuminate\Validation\ValidationException;
 class StreamController extends Controller
 {
 
-    protected $aiFormatter;
+    protected $usageAnalyzer;
+    protected $aiConnectionService;
 
-    public function __construct(AiPayloadFormatterService $payloadFormatter, 
-                                AiResponseFormatterService $responseFormatter, 
-                                ModelUtilityService $utilities,
-                                ModelConnectionService $modelConnection,
-                                UsageAnalyzerService $usageAnalyzer){
-        $this->payloadFormatter = $payloadFormatter;
-        $this->responseFormatter = $responseFormatter;
-        $this->utilities = $utilities;
-        $this->modelConnection = $modelConnection;
+    public function __construct(
+        UsageAnalyzerService $usageAnalyzer,
+        AIConnectionService $aiConnectionService
+    ){
         $this->usageAnalyzer = $usageAnalyzer;
+        $this->aiConnectionService = $aiConnectionService;
     }
 
 
@@ -105,8 +101,12 @@ class StreamController extends Controller
 
 
 
+    /**
+     * Handle AI connection requests using the new architecture
+     */
     public function handleAiConnectionRequest(Request $request)
     {
+        //validate payload
         $validatedData = $request->validate([
             'payload.model' => 'required|string',
             'payload.stream' => 'required|boolean',
@@ -123,73 +123,169 @@ class StreamController extends Controller
             'key' => 'nullable|string',
         ]);
 
-        $formattedPayload = $this->payloadFormatter->formatPayload($validatedData['payload']);
 
         if ($validatedData['broadcast']) {
-            $this->handleGroupChatRequest($validatedData, $formattedPayload);
-        }
-        else{
-            //find the target model from config.
-            $models = $this->utilities->getModels()['models'];
-
-            // search and find defined model based on the requested id.
-            $targetID = $formattedPayload['model'];
-            $filteredModels = array_filter($models, function($model) use ($targetID) {
-                return $model['id'] === $targetID;
-            });
-            $model = current($filteredModels);
-
-            if($formattedPayload['stream'] && $model['streamable']){
-                $formattedPayload['stream_options'] = [
-                    "include_usage"=> true,
-                ];
-                $this->createStream($formattedPayload);
-            }
-            else{
-                $data = $this->createRequest($formattedPayload);
-                return response()->json($data);
-
+            $this->handleGroupChatRequestNew($validatedData);
+        } else {
+            $user = User::find(1); // HAWKI user 
+            $avatar_url = $user->avatar_id !== '' ? Storage::disk('public')->url('profile_avatars/' . $user->avatar_id) : null;
+            
+            if ($validatedData['payload']['stream']) {
+                // Handle streaming response
+                $this->handleStreamingRequest($validatedData['payload'], $user, $avatar_url);
+            } else {
+                // Handle standard response
+                $result = $this->aiConnectionService->processRequest(
+                    $validatedData['payload'],
+                    false
+                );
+                
+                // Record usage
+                if (isset($result['usage'])) {
+                    $this->usageAnalyzer->submitUsageRecord(
+                        $result['usage'], 
+                        'private', 
+                        $validatedData['payload']['model']
+                    );
+                }
+                
+                // Return response to client
+                return response()->json([
+                    'author' => [
+                        'username' => $user->username,
+                        'name' => $user->name,
+                        'avatar_url' => $avatar_url,
+                    ],
+                    'model' => $validatedData['payload']['model'],
+                    'isDone' => true,
+                    'content' => $result['content'],
+                ]);
             }
         }
     }
     
-    private function handleGroupChatRequest($data, $formattedPayload){
+    /**
+     * Handle streaming request with the new architecture
+     */
+    private function handleStreamingRequest(array $payload, User $user, ?string $avatar_url)
+    {
+        // Set headers for SSE
+        header('Content-Type: text/event-stream');
+        header('Cache-Control: no-cache');
+        header('Connection: keep-alive');
+        header('Access-Control-Allow-Origin: *');
+        
 
+        // Create a callback function to process streaming chunks
+        $onData = function ($data) use ($user, $avatar_url, $payload) {
+
+            // Use helper function to translate curl response from google to openai format
+            $data = $this->normalizeDataChunk($data);
+            //Log::info($data);
+        
+            // Skip non-JSON or empty chunks
+            $chunks = explode("data: ", $data);
+            foreach ($chunks as $chunk) {
+                if (connection_aborted()) break;
+                if (!json_decode($chunk, true) || empty($chunk)) continue;
+                
+                // Get the provider for this model
+                $provider = $this->aiConnectionService->getProviderForModel($payload['model']);
+                
+                // Format the chunk
+                $formatted = $provider->formatStreamChunk($chunk);
+                
+                // Record usage if available
+                if ($formatted['usage']) {
+                    $this->usageAnalyzer->submitUsageRecord(
+                        $formatted['usage'], 
+                        'private', 
+                        $payload['model']
+                    );
+                }
+                
+                // Send the formatted response to the client
+                $messageData = [
+                    'author' => [
+                        'username' => $user->username,
+                        'name' => $user->name,
+                        'avatar_url' => $avatar_url,
+                    ],
+                    'model' => $payload['model'],
+                    'isDone' => $formatted['isDone'],
+                    'content' => $formatted['content'],
+                ];
+                
+                echo json_encode($messageData) . "\n";
+            }
+        };
+        
+        // Process the streaming request
+        $this->aiConnectionService->processRequest(
+            $payload, 
+            true, 
+            $onData
+        );
+    }
+    /*
+     * Helper function to translate curl return object from google to openai format
+     */
+    private function normalizeDataChunk(string $data): string
+    {
+
+        // Remove from the beginning of the string all characters: '[', ']' and commas along with whitespace.
+        $cleaned = preg_replace('/^[\[\],\s]+/', '', $data);
+        
+        $decoded = json_decode($cleaned, true);
+        if (is_array($decoded)) {
+            return "data: " . json_encode($decoded);
+        }
+        return "data: " . $cleaned;
+    }
+    /**
+     * Handle group chat requests with the new architecture
+     */
+    private function handleGroupChatRequestNew(array $data)
+    {
         $isUpdate = (bool) ($data['isUpdate'] ?? false);
         $room = Room::where('slug', $data['slug'])->firstOrFail();
-    
+        
         // Broadcast initial generation status
         $generationStatus = [
             'type' => 'aiGenerationStatus',
             'messageData' => [
                 'room_id' => $room->id,
-                'isGenerating' => true, // Set to true while still generating
-                'model' => $formattedPayload['model']
+                'isGenerating' => true,
+                'model' => $data['payload']['model']
             ]
         ];
         broadcast(new RoomMessageEvent($generationStatus));
-    
-
-        // Send a full request to the AI model and get the response
-        $provider = $this->utilities->getProvider($formattedPayload['model']);
-        if($provider['id'] === 'google'){
-            $response = $this->modelConnection->requestToGoogle($formattedPayload);
-            [$content, $usage] = $this->responseFormatter->formatGoogleResponse($response);
+        
+        // Process the request
+        $result = $this->aiConnectionService->processRequest(
+            $data['payload'],
+            false
+        );
+        
+        // Record usage
+        if (isset($result['usage'])) {
+            $this->usageAnalyzer->submitUsageRecord(
+                $result['usage'], 
+                'group', 
+                $data['payload']['model'],
+                $room->id
+            );
         }
-        else{
-            $response = $this->modelConnection->requestToAiModel($formattedPayload);
-            [$content, $usage] = $this->responseFormatter->formatDefaultResponse($response);
-        }
-        $this->usageAnalyzer->submitUsageRecord($usage, 'group', $formattedPayload['model'], $room->id);
-
-
-        $roomController = new RoomController();
-        $member = $room->members()->where('user_id', 1)->firstOrFail();
-
+        
+        // Encrypt content for storage
         $cryptoController = new EncryptionController();
         $encKey = base64_decode($data['key']);
-        $encryptiedData = $cryptoController->encryptWithSymKey($encKey, $content, false);
-
+        $encryptiedData = $cryptoController->encryptWithSymKey($encKey, $result['content'], false);
+        
+        // Store message
+        $roomController = new RoomController();
+        $member = $room->members()->where('user_id', 1)->firstOrFail();
+        
         if ($isUpdate) {
             $message = $room->messages->where('message_id', $data['messageId'])->first();
             $message->update([
@@ -197,111 +293,33 @@ class StreamController extends Controller
                 'tag' => $encryptiedData['tag'],
                 'content' => $encryptiedData['ciphertext'],
             ]);
-        } 
-        else {
+        } else {
             $nextMessageId = $roomController->generateMessageID($room, $data['threadIndex']);
             $message = Message::create([
                 'room_id' => $room->id,
                 'member_id' => $member->id,
                 'message_id' => $nextMessageId,
                 'message_role' => 'assistant',
-                'model' => $formattedPayload['model'],
+                'model' => $data['payload']['model'],
                 'iv' => $encryptiedData['iv'],
                 'tag' => $encryptiedData['tag'],
                 'content' => $encryptiedData['ciphertext'],
             ]);
         }
-
+        
+        // Queue message for broadcast
         SendMessage::dispatch($message, $isUpdate)->onQueue('message_broadcast');
-
+        
         // Update and broadcast final generation status
         $generationStatus = [
             'type' => 'aiGenerationStatus',
             'messageData' => [
                 'room_id' => $room->id,
-                'isGenerating' => false, // Set to false after generation completes
-                'model' => $formattedPayload['model']
+                'isGenerating' => false,
+                'model' => $data['payload']['model']
             ]
         ];
         broadcast(new RoomMessageEvent($generationStatus));
-
-
     }
-
     
-    private function createRequest($formattedPayload) {
-        $user = User::find(1);
-        $avatar_url = $user->avatar_id !== '' ? Storage::disk('public')->url('profile_avatars/' . $user->avatar_id) : null;
-
-        try {
-            // Start the streaming process
-            $provider = $this->utilities->getProvider($formattedPayload['model']);
-            if($provider['id'] === 'google'){
-                $response = $this->modelConnection->requestToGoogle($formattedPayload);
-                [$content, $usage] = $this->responseFormatter->formatGoogleResponse($response);
-            }
-            else{
-                $response = $this->modelConnection->requestToAiModel($formattedPayload);
-                [$content, $usage] = $this->responseFormatter->formatDefaultResponse($response);
-            }
-
-            $this->usageAnalyzer->submitUsageRecord($usage, 'private', $formattedPayload['model']);
-
-
-            $messageData = [
-                'author' => [
-                    'username' => $user->username,
-                    'name' => $user->name,
-                    'avatar_url' => $avatar_url,
-                ],
-                'model' => $formattedPayload['model'],
-                'isDone' => true,
-                'content' => $content,
-            ];
-            return $messageData;
-
-        } catch (\Exception $e) {
-            Log::error('Error processing request: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'An error occurred'], 500);
-        }
-    }
-
-
-    private function createStream($formattedPayload){
-        $user = User::find(1);
-        $avatar_url = $user->avatar_id !== '' ? Storage::disk('public')->url('profile_avatars/' . $user->avatar_id) : null;
-        $firstData = false;
-        $onData = function ($data) use ($user, $avatar_url, $formattedPayload) {
-
-            // Decode the JSON chunk
-            $chunks = explode("data: ", $data);
-            foreach ($chunks as $chunk) {
-                // Check if the client has disconnected, and break if true
-                if (connection_aborted()) break;
-                // Skip any non-JSON or empty chunks
-                if (!json_decode($chunk, true) || empty($chunk)) continue;
-
-                [$chunk, $isDone, $usage] = $this->responseFormatter->formatDefaultChunk($chunk);
-
-                if($usage){
-                    $this->usageAnalyzer->submitUsageRecord($usage, 'private', $formattedPayload['model']);
-                }
-
-                $messageData = [
-                    'author' => [
-                        'username' => $user->username,
-                        'name' => $user->name,
-                        'avatar_url' => $avatar_url,
-                    ],
-                    'model' => $formattedPayload['model'],
-                    'isDone' => $isDone,
-                    'content' => $chunk,
-                ];
-                // Directly send the chunk to the client
-                echo json_encode($messageData). "\n";
-            }
-        };
-
-        $this->modelConnection->streamToAiModel($formattedPayload, $onData);        
-    }
 }

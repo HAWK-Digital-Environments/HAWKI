@@ -73,19 +73,39 @@ return [
             'active' => true,
             'api_key' => '',
             'api_url' => 'https://generativelanguage.googleapis.com/v1beta/models/',
+            'streaming_url' => 'https://generativelanguage.googleapis.com/v1beta/models/',
             'ping_url' => '',
             'models' => [
                 [
                     'id' => 'gemini-1.5-flash',
                     'label' => 'Google Gemini 1.5 Flash',
-                    'streamable' => false,
+                    'streamable' => true,
                 ],
                 [
                     'id' => 'gemini-2.0-flash-exp',
                     'label' => 'Google Gemini 2.0 Flash Exp',
-                    'streamable' => false,
+                    'streamable' => true,
                 ],
                 
+            ]
+        ],
+        'ollama' => [
+            'id' => 'ollama',
+            'active' => true,
+            'api_key' => '',
+            'api_url' => 'http://localhost:11434/api/chat',
+            'ping_url' => '',
+            'models' => [
+                [
+                    'id' => 'llama3.2',
+                    'label' => 'Ollama Llama3.2',
+                    'streamable' => true,
+                ],
+                [
+                    'id' => 'llava',
+                    'label' => 'Ollama Llava',
+                    'streamable' => true,
+                ]
             ]
         ]
     ]
