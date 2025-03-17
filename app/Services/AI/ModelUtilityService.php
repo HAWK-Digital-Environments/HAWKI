@@ -21,7 +21,7 @@ class ModelUtilityService
         return [
             'models' => $models,
             'defaultModel' => config('model_providers')['defaultModel'],
-            'titleGenerationModel' => config('model_providers')['titleGenerationModel']
+            'systemModels' => config('model_providers')['system_models']
 
         ];
     }

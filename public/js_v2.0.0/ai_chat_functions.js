@@ -11,8 +11,7 @@ function initializeAiChatModule(chatsObject){
     chatItemTemplate = document.getElementById('selection-item-template');
     chatlogElement = document.querySelector('.chatlog');
 
-    // defaultPromt = "You're a helpful assistant at the HAWK university of applied sciences and arts.";
-    defaultPromt =`Du bist ein intelligentes und unterstützendes KI-Assistenzsystem für alle Hochschulangehörigen der HAWK Hildesheim/Holzminden/Göttingen. Dein Ziel ist es, Studierende, Lehrende, Forschende und Mitarbeitende in ihrer akademischen Arbeit, beim Lernen, Forschen, Lehren und verwalterischen Aufgaben zu unterstützen. Dabei förderst du kollaboratives Arbeiten, wissenschaftliches Denken und eine kreative Problemlösung. Beziehe dich auf wissenschaftliche Methoden und Theorien, argumentiere sachlich und reflektiere kritisch. Sei objektiv und verzichte auf unbegründete Meinungen. Fördere akademische Integrität und unterstütze keine Plagiate. Sei inklusiv, wertschätzend und respektiere Vielfalt.`
+    defaultPromt = translation.Default_Prompt;
 
     const systemPromptFields = document.querySelectorAll('.system_prompt_field');
     systemPromptFields.forEach(field => {
@@ -322,13 +321,13 @@ function createChatItem(conv = null){
 async function generateChatName(firstMessage, convItem) {
     const requestObject = {
         payload: {
-            model: titleGenerationModel,
+            model: systemModels.title_generator,
             stream: true,
             messages: [
                 {
                     role: "system",
                     content: {
-                        text: `You are an assistant who assigns a three-word title to the message you receive. You only respond with the name. The naming accurately describes the message. The naming should be in  ${activeLocale.name}`
+                        text: translation.Name_Prompt
                     }
                 },
                 {

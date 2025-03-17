@@ -83,7 +83,7 @@
 
 	const modelsList = @json($models).models;
 	const defaultModel = @json($models).defaultModel;
-	const titleGenerationModel = @json($models).titleGenerationModel;
+	const systemModels = @json($models).systemModels;
 
 	window.addEventListener('DOMContentLoaded', async (event) => {
 		

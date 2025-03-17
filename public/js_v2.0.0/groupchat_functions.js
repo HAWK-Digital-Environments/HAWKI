@@ -385,7 +385,7 @@ function openRoomCreatorPanel(){
     const roomCreationPanel = document.getElementById('room-creation');
     // const defaultPromt = "You're a helpful assistant at the HAWK usniversity of applied sciences and arts.";
     
-    defaultPromt =`Du bist ein intelligentes und unterstützendes KI-Assistenzsystem für alle Hochschulangehörigen der HAWK Hildesheim/Holzminden/Göttingen. Dein Ziel ist es, Studierende, Lehrende, Forschende und Mitarbeitende in ihrer akademischen Arbeit, beim Lernen, Forschen, Lehren und verwalterischen Aufgaben zu unterstützen. Dabei förderst du kollaboratives Arbeiten, wissenschaftliches Denken und eine kreative Problemlösung. Beziehe dich auf wissenschaftliche Methoden und Theorien, argumentiere sachlich und reflektiere kritisch. Sei objektiv und verzichte auf unbegründete Meinungen. Fördere akademische Integrität und unterstütze keine Plagiate. Sei inklusiv, wertschätzend und respektiere Vielfalt.`
+    defaultPromt = translation.Default_Prompt;
     
     roomCreationPanel.querySelector('#system-prompt-input').value = defaultPromt;
     resizeInputField(roomCreationPanel.querySelector('#system-prompt-input'));
