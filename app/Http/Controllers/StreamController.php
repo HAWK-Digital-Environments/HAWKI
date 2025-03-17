@@ -178,6 +178,11 @@ class StreamController extends Controller
 
         // Create a callback function to process streaming chunks
         $onData = function ($data) use ($user, $avatar_url, $payload) {
+
+            // Use helper function to translate curl response from google to openai format
+            $data = $this->normalizeDataChunk($data);
+            //Log::info($data);
+        
             // Skip non-JSON or empty chunks
             $chunks = explode("data: ", $data);
             foreach ($chunks as $chunk) {
@@ -222,7 +227,21 @@ class StreamController extends Controller
             $onData
         );
     }
-    
+    /*
+     * Helper function to translate curl return object from google to openai format
+     */
+    private function normalizeDataChunk(string $data): string
+    {
+
+        // Remove from the beginning of the string all characters: '[', ']' and commas along with whitespace.
+        $cleaned = preg_replace('/^[\[\],\s]+/', '', $data);
+        
+        $decoded = json_decode($cleaned, true);
+        if (is_array($decoded)) {
+            return "data: " . json_encode($decoded);
+        }
+        return "data: " . $cleaned;
+    }
     /**
      * Handle group chat requests with the new architecture
      */

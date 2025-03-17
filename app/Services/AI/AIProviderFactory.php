@@ -7,6 +7,8 @@ use App\Services\AI\Providers\OpenAIProvider;
 use App\Services\AI\Providers\GWDGProvider;
 use App\Services\AI\Providers\GoogleProvider;
 use App\Services\AI\Providers\OllamaProvider;
+use App\Services\AI\Providers\OpenWebUIProvider;
+
 
 class AIProviderFactory
 {
