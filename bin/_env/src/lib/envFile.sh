@@ -72,6 +72,11 @@ setupEnvFile() {
       enableFirstCommentedLine "TEST_USER_LOGIN"
       replaceLineStartingWith "TEST_USER_LOGIN" "TEST_USER_LOGIN=true"
     fi
+    if [[ "${ini[APP_URL]}" = "${defaultIni[APP_URL]}" ]]; then
+        echo "Setting APP_URL to 'http://localhost'..." > /dev/tty
+        enableFirstCommentedLine "APP_URL"
+        replaceLineStartingWith "APP_URL" "APP_URL=http://localhost"
+    fi
 
     # DATABASE
     if ! [[ ${ini[DB_HOST]} ]]; then

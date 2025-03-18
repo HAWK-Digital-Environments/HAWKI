@@ -85,6 +85,7 @@ services:
             - ./docker/nginx/config/ssl:/etc/nginx/certs
             - ./docker/nginx/config/nginx.dev.conf:/etc/nginx/nginx.conf:ro
             - ./public:/var/www/html/public
+            - ./storage/app/public:/var/www/html/storage
         ports:
             - ${DOCKER_PROJECT_IP:-127.0.0.1}:80:80
             - ${DOCKER_PROJECT_IP:-127.0.0.1}:443:443
