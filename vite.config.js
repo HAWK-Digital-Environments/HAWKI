@@ -8,4 +8,11 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        cors: true,
+        port: 8000,
+        origin: 'http://localhost:8000',
+        host: true,
+        strictPort: false
+    }
 });
