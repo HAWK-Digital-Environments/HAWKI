@@ -102,6 +102,7 @@ async function processStream(stream, onData) {
             
             // Append the latest chunk to the buffer
             buffer += textDecoder.decode(value, { stream: true });
+            console.log(buffer);
             // Split the buffer string on newline characters
             const parts = buffer.split("\n");
             // The last part might be incomplete, keep it in the buffer
@@ -202,6 +203,8 @@ function createMessageLogForAI(regenerationElement = null){
 function createMsgObject(msg){
     const role = msg.dataset.role === 'assistant' ? 'assistant' : 'user';
     const msgTxt = msg.querySelector(".message-text").textContent;
+    // ToDo: insert search results
+    // I'm not sure if the data from processStream() lands before getting plotted
     const filteredText = detectMentioning(msgTxt).filteredText;
 
     messageObject = {
