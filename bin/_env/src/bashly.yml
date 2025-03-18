@@ -87,5 +87,9 @@ commands:
   - name: npm
     help: runs a certain npm command for the project
     catch_all: true
-  - name: worker
-    help: starts the laravel worker and runs it in the current shell
+  - name: queue
+    help: starts the laravel queue and runs it in the current shell
+  - name: websocket
+    help: starts the laravel websocket server (through reverb) and runs it in the current shell
+  - name: dev
+    help: starts both the queue and the websocket server in the current shell

@@ -40,7 +40,9 @@ env_usage() {
   printf "  %s   runs a certain composer command for the project\n" "composer   "
   printf "  %s   runs a certain artisan command for the project\n" "artisan    "
   printf "  %s   runs a certain npm command for the project\n" "npm        "
-  printf "  %s   starts the laravel worker and runs it in the current shell\n" "worker     "
+  printf "  %s   starts the laravel queue and runs it in the current shell\n" "queue      "
+  printf "  %s   starts the laravel websocket server (through reverb) and runs it in the current shell\n" "websocket  "
+  printf "  %s   starts both the queue and the websocket server in the current shell\n" "dev        "
   echo
 
   # :command.long_usage
@@ -489,12 +491,54 @@ env_npm_usage() {
 }
 
 # :command.usage
-env_worker_usage() {
-  printf "env worker - starts the laravel worker and runs it in the current shell\n\n"
+env_queue_usage() {
+  printf "env queue - starts the laravel queue and runs it in the current shell\n\n"
 
   printf "%s\n" "Usage:"
-  printf "  env worker\n"
-  printf "  env worker --help | -h\n"
+  printf "  env queue\n"
+  printf "  env queue --help | -h\n"
+  echo
+
+  # :command.long_usage
+  if [[ -n "$long_usage" ]]; then
+    printf "%s\n" "Options:"
+
+    # :command.usage_fixed_flags
+    printf "  %s\n" "--help, -h"
+    printf "    Show this help\n"
+    echo
+
+  fi
+}
+
+# :command.usage
+env_websocket_usage() {
+  printf "env websocket - starts the laravel websocket server (through reverb) and runs it in the current shell\n\n"
+
+  printf "%s\n" "Usage:"
+  printf "  env websocket\n"
+  printf "  env websocket --help | -h\n"
+  echo
+
+  # :command.long_usage
+  if [[ -n "$long_usage" ]]; then
+    printf "%s\n" "Options:"
+
+    # :command.usage_fixed_flags
+    printf "  %s\n" "--help, -h"
+    printf "    Show this help\n"
+    echo
+
+  fi
+}
+
+# :command.usage
+env_dev_usage() {
+  printf "env dev - starts both the queue and the websocket server in the current shell\n\n"
+
+  printf "%s\n" "Usage:"
+  printf "  env dev\n"
+  printf "  env dev --help | -h\n"
   echo
 
   # :command.long_usage
@@ -842,6 +886,11 @@ setupEnvFile() {
       replaceLineStartingWith "AUTHENTICATION_METHOD" "AUTHENTICATION_METHOD=TestAuth"
       enableFirstCommentedLine "TEST_USER_LOGIN"
       replaceLineStartingWith "TEST_USER_LOGIN" "TEST_USER_LOGIN=true"
+    fi
+    if [[ "${ini[APP_URL]}" = "${defaultIni[APP_URL]}" ]]; then
+        echo "Setting APP_URL to 'http://localhost'..." > /dev/tty
+        enableFirstCommentedLine "APP_URL"
+        replaceLineStartingWith "APP_URL" "APP_URL=http://localhost"
     fi
 
     # DATABASE
@@ -1748,10 +1797,29 @@ env_npm_command() {
 }
 
 # :command.function
-env_worker_command() {
+env_queue_command() {
 
-  # _env/src/worker_command.sh
+  # _env/src/queue_command.sh
   dockerSsh ${DEFAULT_SERVICE_NAME} "php artisan queue:work --queue=mails,message_broadcast"
+
+}
+
+# :command.function
+env_websocket_command() {
+
+  # _env/src/websocket_command.sh
+  dockerSsh ${DEFAULT_SERVICE_NAME} "php artisan reverb:start"
+
+}
+
+# :command.function
+env_dev_command() {
+
+  # _env/src/dev_command.sh
+  (trap 'kill 0' SIGINT; \
+  dockerSsh ${DEFAULT_SERVICE_NAME} "php artisan queue:work --queue=mails,message_broadcast" & \
+  dockerSsh ${DEFAULT_SERVICE_NAME} "php artisan reverb:start" \
+  )
 
 }
 
@@ -1883,10 +1951,24 @@ parse_requirements() {
       shift $#
       ;;
 
-    worker)
-      action="worker"
+    queue)
+      action="queue"
       shift
-      env_worker_parse_requirements "$@"
+      env_queue_parse_requirements "$@"
+      shift $#
+      ;;
+
+    websocket)
+      action="websocket"
+      shift
+      env_websocket_parse_requirements "$@"
+      shift $#
+      ;;
+
+    dev)
+      action="dev"
+      shift
+      env_dev_parse_requirements "$@"
       shift $#
       ;;
 
@@ -2857,14 +2939,14 @@ env_npm_parse_requirements() {
 }
 
 # :command.parse_requirements
-env_worker_parse_requirements() {
+env_queue_parse_requirements() {
   # :command.fixed_flags_filter
   while [[ $# -gt 0 ]]; do
     key="$1"
     case "$key" in
       --help | -h)
         long_usage=yes
-        env_worker_usage
+        env_queue_usage
         exit
         ;;
 
@@ -2876,7 +2958,97 @@ env_worker_parse_requirements() {
   done
 
   # :command.command_filter
-  action="worker"
+  action="queue"
+
+  # :command.parse_requirements_while
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+
+      -?*)
+        printf "invalid option: %s\n" "$key" >&2
+        exit 1
+        ;;
+
+      *)
+        # :command.parse_requirements_case
+        # :command.parse_requirements_case_simple
+        printf "invalid argument: %s\n" "$key" >&2
+        exit 1
+
+        ;;
+
+    esac
+  done
+
+}
+
+# :command.parse_requirements
+env_websocket_parse_requirements() {
+  # :command.fixed_flags_filter
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      --help | -h)
+        long_usage=yes
+        env_websocket_usage
+        exit
+        ;;
+
+      *)
+        break
+        ;;
+
+    esac
+  done
+
+  # :command.command_filter
+  action="websocket"
+
+  # :command.parse_requirements_while
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+
+      -?*)
+        printf "invalid option: %s\n" "$key" >&2
+        exit 1
+        ;;
+
+      *)
+        # :command.parse_requirements_case
+        # :command.parse_requirements_case_simple
+        printf "invalid argument: %s\n" "$key" >&2
+        exit 1
+
+        ;;
+
+    esac
+  done
+
+}
+
+# :command.parse_requirements
+env_dev_parse_requirements() {
+  # :command.fixed_flags_filter
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      --help | -h)
+        long_usage=yes
+        env_dev_usage
+        exit
+        ;;
+
+      *)
+        break
+        ;;
+
+    esac
+  done
+
+  # :command.command_filter
+  action="dev"
 
   # :command.parse_requirements_while
   while [[ $# -gt 0 ]]; do
@@ -2966,7 +3138,9 @@ run() {
     "composer") env_composer_command ;;
     "artisan") env_artisan_command ;;
     "npm") env_npm_command ;;
-    "worker") env_worker_command ;;
+    "queue") env_queue_command ;;
+    "websocket") env_websocket_command ;;
+    "dev") env_dev_command ;;
   esac
 }
 
