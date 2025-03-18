@@ -404,3 +404,34 @@ async function redirectToChat(){
     await syncKeychain(serverKeychainCryptoData);
     window.location.href = '/chat'; 
 }
+
+
+async function requestProfileReset(){
+    try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        // Send the registration data to the server
+        const response = await fetch('/req/profile/reset', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-CSRF-TOKEN": csrfToken
+            },
+        });
+
+        // Handle the server response
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Server Error:', errorData.error);
+            throw new Error(`Server Error: ${errorData.error}`);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+            window.location.href = data.redirectUri;
+        }
+
+    } catch (error) {
+        console.error('Error reseting profile:', error);
+        throw error;
+    }
+}

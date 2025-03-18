@@ -75,7 +75,16 @@ function addMessageToChatlog(messageObj, isFromServer = false){
         messageElement.dataset.author = messageObj.author.username;
     }
     else{
-        messageElement.querySelector('.message-author').innerText = messageObj.author.name;
+
+        let header;
+        if(!messageObj.author.isRemoved || messageObj.author.isRemoved === 0){
+            header = messageObj.author.name
+        }
+        else{
+            header = `<span>${messageObj.author.name}</span> <span class="message-author-model">(${translation.RemovedMember})</span>`
+        }
+
+        messageElement.querySelector('.message-author').innerHTML = header;
         messageElement.dataset.author = messageObj.author.name;
     }
 

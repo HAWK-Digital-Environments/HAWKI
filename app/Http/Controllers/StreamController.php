@@ -181,13 +181,12 @@ class StreamController extends Controller
         // Create a callback function to process streaming chunks
         $onData = function ($data) use ($user, $avatar_url, $payload) {
 
-            // Only use normaliseDataChunk if the content of $data does not begin with ‘data: ’.
+          // Only use normaliseDataChunk if the content of $data does not begin with ‘data: ’.
             if (strpos(trim($data), 'data: ') !== 0) {
                 $data = $this->normalizeDataChunk($data);
                 //Log::info('google chunk detected');
             }
 
-            //Log::info('received ' . $data);
         
             // Skip non-JSON or empty chunks
             $chunks = explode("data: ", $data);
@@ -256,7 +255,7 @@ class StreamController extends Controller
         return $output;
     }
 
-    // Neue Hilfsfunktion, die dem JS extractJsonObject ähnlich arbeitet
+    // New helper function to extract only complete JSON objects from buffer
     private function extractJsonObject(string $buffer): ?array
     {
         $openBraces = 0;

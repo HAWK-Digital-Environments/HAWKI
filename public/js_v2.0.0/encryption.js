@@ -556,7 +556,7 @@ async function syncKeychain(serverKeychainData) {
         console.log("Local keychain is newer. Uploading to server.");
         const keychainString = JSON.stringify(localKeychain);
         const encKeychainData = await encryptWithSymKey(keychainEncryptor, keychainString, false);
-        backupKeychainOnServer(encKeychainData);
+        await backupKeychainOnServer(encKeychainData);
     }
 }
 

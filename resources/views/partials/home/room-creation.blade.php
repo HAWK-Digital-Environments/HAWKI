@@ -10,7 +10,7 @@
                     <div class="row zero-v-margin">
                         <div class="prop-panel-grid">
                             
-                            <div class="avatar-editable" onclick="selectRoomAvatar(this, true)">
+                            <div class="avatar-editable" onclick="selectRoomAvatar(this, false)">
                                 <img class="selectable-image" id="room-creation-avatar"   alt="">
                                 <div class="edit">
                                     <x-icon name="new"/>

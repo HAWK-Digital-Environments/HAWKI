@@ -67,6 +67,7 @@ class GoogleProvider extends BaseAIModelProvider
         ];
         
         // Google Search only works with gemini >= 2.0
+        // Search tool is context sensitive, this means the llm decides if a search is necessary for an answer
         if ($modelId === "gemini-2.0-flash-exp"){
             $payload['tools'] = $rawPayload['tools'] ?? [
                 [
@@ -74,6 +75,7 @@ class GoogleProvider extends BaseAIModelProvider
                 ]
             ];
         }
+
 
         //Log::info("Google formattedPayload", $payload);
         return $payload;
@@ -108,7 +110,6 @@ class GoogleProvider extends BaseAIModelProvider
      */
     public function formatStreamChunk(string $chunk): array
     {
-        Log::info('Unformatted Chunk:' . $chunk);
 
         $jsonChunk = json_decode($chunk, true);
      
@@ -262,6 +263,7 @@ class GoogleProvider extends BaseAIModelProvider
         if (isset($payload['tools'])) {
             $requestPayload['tools'] = $payload['tools'];
         }
+
         Log::info('Google CURL REQUESTpayload', $requestPayload);
 
         set_time_limit(120);

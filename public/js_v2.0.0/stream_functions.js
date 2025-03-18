@@ -227,13 +227,13 @@ async function requestPromptImprovement(sender) {
 
     const requestObject = {
         payload: {
-            model: 'gpt-4o',
+            model: systemModels.prompt_improver,
             stream: true,
             messages: [
                 {
                     role: "system",
                     content: {
-                        text: "You are an assistant and as you receive a prompt from the user you help to improve the prompts to get the best result from the LLM Models. Please don't make any explaination and only generate the best prompt. The generated prompt must be in the original promp language."
+                        text: translation.Improvement_Prompt
                     },
                 },
                 {
@@ -283,7 +283,7 @@ async function requestChatlogSummery(msgs = null) {
         {
             role: "system",
             content: {
-                text: `You're a helpful assistant. Your answer is always a 100 words abstract of the whole conversation without any addition explanation. The summery must be in ${activeLocale.name}`
+                text: translation.Summery_Prompt
             },
         },
         {
@@ -299,7 +299,7 @@ async function requestChatlogSummery(msgs = null) {
         threadIndex: '',
         slug: '',
         payload:{
-            model: 'gpt-4o',
+            model: systemModels.summarizer,
             stream: false,
             messages: messages
         }

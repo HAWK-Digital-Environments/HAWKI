@@ -29,6 +29,8 @@
     "Chatlog":"Verlauf",
     "Rooms": "Räume",
 
+    "RemovedMember": "nicht verfügbar",
+
     "Abort": "Abbrechen",
     "AboutHAWKI": "Über HAWKI",
     "AboutHAWKI_ArianInfo": " | Wissenschaftlicher Mitarbeiter | HAWKI",
@@ -62,7 +64,14 @@
     "HS-EnterBackupMsg": "Bitte gib deinen Backup Code ein.",
     "HS-EnterPasskeyMsg": "Bitte gib deinen PassKey ein.",
     "HS-ForgottenPasskey": "PassKey vergessen?",
+    "HS-ForgottenBackup": "Backup Code verloren?",
     "HS-PasskeyIs": "Dein Passkey ist:",
+    "HS-ResetProfile": "Profil zurücksetzen",
+    
+    "HS-LostBothT": "Hast du sowohl deinen Passkey als auch den Backup-Code verloren?",
+    "HS-LostBothB": "Leider können wir, wenn du sowohl deinen Passkey als auch den Backup-Code verloren hast, deine Profildaten nicht wiederherstellen. Um fortzufahren, müssen wir dein Profil zurücksetzen und dir einen neuen Zugang gewähren. Dadurch werden alle deine vorherigen Daten, einschließlich aller Chats und Räume, entfernt. Möchtest du fortfahren?",
+
+
     "ImgUpload": "Bild hochladen",
     "ImgUploadDesc": "Wähle ein Bild aus oder ziehe es hierher.<br>Doppelklicken, um in den Bearbeitungsmodus zu wechseln.",
     "Impressum": "Impressum",
@@ -71,6 +80,7 @@
     "Input_Placeholder_Room": "Schreibe eine Gruppennachricht oder erwähne @hawki, um die KI zu nutzen.",
     "language": "Sprache",
     "LeaveRoom": "Raum Verlassen",
+    "LeftRoom": "hat den Raum verlassen",
     "Login": "Anmelden",
     "LoginFailedMSG": "Anmelden fehlgeschlagen",
     "MarkAllRead": "Alle als gelesen markieren",

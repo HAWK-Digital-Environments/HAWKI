@@ -383,10 +383,16 @@ function openRoomCreatorPanel(){
     }
 
     const roomCreationPanel = document.getElementById('room-creation');
-    // const defaultPromt = "You're a helpful assistant at the HAWK usniversity of applied sciences and arts.";
     
-    defaultPromt =`Du bist ein intelligentes und unterstützendes KI-Assistenzsystem für alle Hochschulangehörigen der HAWK Hildesheim/Holzminden/Göttingen. Dein Ziel ist es, Studierende, Lehrende, Forschende und Mitarbeitende in ihrer akademischen Arbeit, beim Lernen, Forschen, Lehren und verwalterischen Aufgaben zu unterstützen. Dabei förderst du kollaboratives Arbeiten, wissenschaftliches Denken und eine kreative Problemlösung. Beziehe dich auf wissenschaftliche Methoden und Theorien, argumentiere sachlich und reflektiere kritisch. Sei objektiv und verzichte auf unbegründete Meinungen. Fördere akademische Integrität und unterstütze keine Plagiate. Sei inklusiv, wertschätzend und respektiere Vielfalt.`
+    defaultPromt = translation.Default_Prompt;
     
+    roomCreationPanel.querySelector('#chat-name-input').value = '';
+    roomCreationPanel.querySelector('#user-search-bar').value = '';
+    roomCreationPanel.querySelector('#room-description-input').value = '';
+    roomCreationPanel.querySelector('#room-creation-avatar').setAttribute('src', '');
+    roomCreationPanel.querySelector('#room-creation-avatar').style.display = 'none';
+
+
     roomCreationPanel.querySelector('#system-prompt-input').value = defaultPromt;
     resizeInputField(roomCreationPanel.querySelector('#system-prompt-input'));
 }
@@ -1178,43 +1184,38 @@ function confirmTextPanelEdit(btn){
 async function submitInfoField(){
 
     const roomCP = document.getElementById('room-control-panel');    
-    switch(activeModule){
-        case('chat'): 
 
-        break;
-        case('groupchat'): 
-            const chatName = roomCP.querySelector('#chat-name').textContent;
-            document.getElementById('rooms-list')
-                    .querySelector(`.selection-item[slug=${activeRoom.slug}`)
-                    .querySelector('.label').innerText = chatName;
+    
+    const chatName = roomCP.querySelector('#chat-name').textContent;
+    document.getElementById('rooms-list')
+            .querySelector(`.selection-item[slug="${activeRoom.slug}"`)
+            .querySelector('.label').innerText = chatName;
 
-            const description = roomCP.querySelector('#description-field').textContent;
-            const systemPrompt = roomCP.querySelector('#system_prompt-field').textContent;
+    const description = roomCP.querySelector('#description-field').textContent;
+    const systemPrompt = roomCP.querySelector('#system_prompt-field').textContent;
 
-            const roomKey = await keychainGet(activeRoom.slug);
+    const roomKey = await keychainGet(activeRoom.slug);
 
-            const cryptDescription = await encryptWithSymKey(roomKey, description, false);
-            const descriptionStr = JSON.stringify({
-                'ciphertext':cryptDescription.ciphertext,
-                'iv':cryptDescription.iv,
-                'tag':cryptDescription.tag,
-            });
-            const cryptSystemPrompt = await encryptWithSymKey(roomKey, systemPrompt, false);
-            const systemPromptStr = JSON.stringify({
-                'ciphertext':cryptSystemPrompt.ciphertext,
-                'iv':cryptSystemPrompt.iv,
-                'tag':cryptSystemPrompt.tag,
-            });
+    const cryptDescription = await encryptWithSymKey(roomKey, description, false);
+    const descriptionStr = JSON.stringify({
+        'ciphertext':cryptDescription.ciphertext,
+        'iv':cryptDescription.iv,
+        'tag':cryptDescription.tag,
+    });
+    const cryptSystemPrompt = await encryptWithSymKey(roomKey, systemPrompt, false);
+    const systemPromptStr = JSON.stringify({
+        'ciphertext':cryptSystemPrompt.ciphertext,
+        'iv':cryptSystemPrompt.iv,
+        'tag':cryptSystemPrompt.tag,
+    });
 
-            attributes ={
-                'name':chatName,
-                'systemPrompt':systemPromptStr,
-                'description':descriptionStr
-            }
-            updateRoomInfo(activeRoom.slug, attributes);
-
-        break;
+    attributes ={
+        'name':chatName,
+        'systemPrompt':systemPromptStr,
+        'description':descriptionStr
     }
+    updateRoomInfo(activeRoom.slug, attributes);
+
 }
 
 

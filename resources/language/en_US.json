@@ -29,6 +29,8 @@
     "Chatlog":"Chatlog",
     "Rooms": "Rooms",
 
+    "RemovedMember": "unavailable",
+
     "Abort": "Cancel",
     "AboutHAWKI": "About HAWKI",
     "AboutHAWKI_ArianInfo": " | Research Associate | HAWKI",
@@ -62,7 +64,13 @@
     "HS-EnterBackupMsg": "Please enter your backup code.",
     "HS-EnterPasskeyMsg": "Please enter your passkey.",
     "HS-ForgottenPasskey": "Forgotten Passkey?",
+    "HS-ForgottenBackup": "Lost Backup Code?",
     "HS-PasskeyIs": "Your passkey is:",
+    "HS-ResetProfile": "Reset Profile",
+
+    "HS-LostBothT": "Did you lose both your Passkey and Backup Code?",
+    "HS-LostBothB": "Unfortuately if you've lost both your passkey and backup code, we can't recover your profile data. To continue we need to reset your profile and give you a new access. This will remove all your previous data including all your chats and rooms. Do you want to continue?",
+
     "ImgUpload": "Upload Image",
     "ImgUploadDesc": "Select an image or drag it here.<br>Double-click to enter edit mode.",
     "Impressum": "Imprint",
@@ -71,6 +79,7 @@
     "Input_Placeholder_Room": "Write a group message or mention to use the AI.",
     "language": "Language",
     "LeaveRoom": "Leave Room",
+    "LeftRoom": "left room",
     "Login": "Sign in",
     "LoginFailedMSG": "Sign in failed",
     "MarkAllRead": "Mark All As Read",
