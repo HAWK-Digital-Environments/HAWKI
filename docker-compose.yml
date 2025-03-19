@@ -36,9 +36,6 @@ services:
             timeout: 5s
             retries: 3
             start_period: 30s
-        ports:
-            - ${DOCKER_PROJECT_IP:-127.0.0.1}:9000:9000
-            - ${DOCKER_PROJECT_IP:-127.0.0.1}:8080:8080
         extra_hosts:
             - host.docker.internal:host-gateway
         depends_on:

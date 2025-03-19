@@ -94,6 +94,9 @@ RUN --mount=type=cache,id=apk-cache,target=/var/cache/apk \
         redis \
         pcntl
 
+# Add additional port for reverb
+EXPOSE 8080
+
 # -----------------------------------------------------
 # APP - DEV
 # -----------------------------------------------------
