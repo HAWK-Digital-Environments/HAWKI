@@ -50,23 +50,32 @@ class GoogleProvider extends BaseAIModelProvider
             'stream' => $rawPayload['stream'] && $this->supportsStreaming($modelId),
         ];
         
-        // Add optional parameters if present in the raw payload
-        //if (isset($rawPayload['temperature'])) {
-        //    $payload['generationConfig']['temperature'] = $rawPayload['temperature'];
-        //}
-        //
-        //if (isset($rawPayload['top_p'])) {
-        //    $payload['generationConfig']['topP'] = $rawPayload['top_p'];
-        //}
-        //
-        //if (isset($rawPayload['top_k'])) {
-        //    $payload['generationConfig']['topK'] = $rawPayload['top_k'];
-        //}
-        //
-        //if (isset($rawPayload['max_output_tokens'])) {
-        //    $payload['generationConfig']['maxOutputTokens'] = $rawPayload['max_output_tokens'];
-        //}
+        // Set complete optional fields with content (default values if not present in $rawPayload)
+        $payload['safetySettings'] = $rawPayload['safetySettings'] ?? [
+            [
+                'category' => 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                'threshold' => 'BLOCK_ONLY_HIGH'
+            ]
+        ];
         
+        $payload['generationConfig'] = $rawPayload['generationConfig'] ?? [
+            // 'stopSequences' => ["Title"],
+            'temperature' => 1.0,
+            'maxOutputTokens' => 800,
+            'topP' => 0.8,
+            'topK' => 10
+        ];
+        
+        // Google Search only works with gemini >= 2.0
+        // Search tool is context sensitive, this means the llm decides if a search is necessary for an answer
+        if ($modelId === "gemini-2.0-flash-exp"){
+            $payload['tools'] = $rawPayload['tools'] ?? [
+                [
+                    "google_search" => new \stdClass()
+                ]
+            ];
+        }
+
 
         //Log::info("Google formattedPayload", $payload);
         return $payload;
@@ -101,17 +110,23 @@ class GoogleProvider extends BaseAIModelProvider
      */
     public function formatStreamChunk(string $chunk): array
     {
-        Log::info($chunk);
 
         $jsonChunk = json_decode($chunk, true);
      
         $content = '';
+        $groundingMetadata = '';
         $isDone = false;
         $usage = null;
         
         // Extract content if available
         if (isset($jsonChunk['candidates'][0]['content']['parts'][0]['text'])) {
             $content = $jsonChunk['candidates'][0]['content']['parts'][0]['text'];
+        }
+
+        // Add search results
+        if (isset($jsonChunk['candidates'][0]['groundingMetadata'])) {
+            Log::info('added search results');
+            $groundingMetadata = $jsonChunk['candidates'][0]['groundingMetadata'];
         }
         
         // Check for completion
@@ -127,6 +142,7 @@ class GoogleProvider extends BaseAIModelProvider
         
         return [
             'content' => $content,
+            'groundingMetadata' => $groundingMetadata,
             'isDone' => $isDone,
             'usage' => $usage
         ];
@@ -236,11 +252,18 @@ class GoogleProvider extends BaseAIModelProvider
             'system_instruction' => $payload['system_instruction'],
             'contents' => $payload['contents']
         ];
-
-        // Add generation config if present
+        
+        // Add aditional config parameters if present
+        if (isset($payload['safetySettings'])) {
+            $requestPayload['safetySettings'] = $payload['safetySettings'];
+        }
         if (isset($payload['generationConfig'])) {
             $requestPayload['generationConfig'] = $payload['generationConfig'];
         }
+        if (isset($payload['tools'])) {
+            $requestPayload['tools'] = $payload['tools'];
+        }
+
         Log::info('Google CURL REQUESTpayload', $requestPayload);
 
         set_time_limit(120);

@@ -29,6 +29,7 @@ class StreamController extends Controller
 
     protected $usageAnalyzer;
     protected $aiConnectionService;
+    private $jsonBuffer = '';
 
     public function __construct(
         UsageAnalyzerService $usageAnalyzer,
@@ -159,6 +160,7 @@ class StreamController extends Controller
                     'model' => $validatedData['payload']['model'],
                     'isDone' => true,
                     'content' => $result['content'],
+                    'groundingMetadata' => $result['groundingMetadata'],
                 ]);
             }
         }
@@ -179,9 +181,12 @@ class StreamController extends Controller
         // Create a callback function to process streaming chunks
         $onData = function ($data) use ($user, $avatar_url, $payload) {
 
-            // Use helper function to translate curl response from google to openai format
-            $data = $this->normalizeDataChunk($data);
-            //Log::info($data);
+          // Only use normaliseDataChunk if the content of $data does not begin with ‘data: ’.
+            if (strpos(trim($data), 'data: ') !== 0) {
+                $data = $this->normalizeDataChunk($data);
+                //Log::info('google chunk detected');
+            }
+
         
             // Skip non-JSON or empty chunks
             $chunks = explode("data: ", $data);
@@ -194,7 +199,8 @@ class StreamController extends Controller
                 
                 // Format the chunk
                 $formatted = $provider->formatStreamChunk($chunk);
-                
+                //Log::info('Formatted Chunk:' . json_encode($formatted));
+
                 // Record usage if available
                 if ($formatted['usage']) {
                     $this->usageAnalyzer->submitUsageRecord(
@@ -214,6 +220,7 @@ class StreamController extends Controller
                     'model' => $payload['model'],
                     'isDone' => $formatted['isDone'],
                     'content' => $formatted['content'],
+                    'groundingMetadata' => $formatted['groundingMetadata'] ?? [],
                 ];
                 
                 echo json_encode($messageData) . "\n";
@@ -232,15 +239,47 @@ class StreamController extends Controller
      */
     private function normalizeDataChunk(string $data): string
     {
+        $this->jsonBuffer .= $data;
 
-        // Remove from the beginning of the string all characters: '[', ']' and commas along with whitespace.
-        $cleaned = preg_replace('/^[\[\],\s]+/', '', $data);
-        
-        $decoded = json_decode($cleaned, true);
-        if (is_array($decoded)) {
-            return "data: " . json_encode($decoded);
+        if(trim($this->jsonBuffer) === "]") {
+            $this->jsonBuffer = "";
+            return "";
         }
-        return "data: " . $cleaned;
+
+        $output = "";
+        while($extracted = $this->extractJsonObject($this->jsonBuffer)) {
+            $jsonStr = $extracted['jsonStr'];
+            $this->jsonBuffer = $extracted['rest'];
+            $output .= "data: " . $jsonStr . "\n";
+        }
+        return $output;
+    }
+
+    // New helper function to extract only complete JSON objects from buffer
+    private function extractJsonObject(string $buffer): ?array
+    {
+        $openBraces = 0;
+        $startFound = false;
+        $startPos = 0;
+
+        for($i = 0; $i < strlen($buffer); $i++) {
+            $char = $buffer[$i];
+            if($char === '{') {
+                if(!$startFound) {
+                    $startFound = true;
+                    $startPos = $i;
+                }
+                $openBraces++;
+            } elseif($char === '}') {
+                $openBraces--;
+                if($openBraces === 0 && $startFound) {
+                    $jsonStr = substr($buffer, $startPos, $i - $startPos + 1);
+                    $rest = substr($buffer, $i + 1);
+                    return ['jsonStr' => $jsonStr, 'rest' => $rest];
+                }
+            }
+        }
+        return null;
     }
     /**
      * Handle group chat requests with the new architecture
