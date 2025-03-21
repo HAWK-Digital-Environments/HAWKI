@@ -53,20 +53,16 @@ USER www-data
 
 
 # -----------------------------------------------------
-# NODE - PROD
+# NODE - BUILDER
 # -----------------------------------------------------
-FROM node_root AS node_prod
+FROM node_root AS node_builder
 
 # Add the app sources
-COPY --chown=www-data:www-data ./frontend .
+COPY --chown=node:node . .
 
-# Ensure correct permissions on the binaries
-RUN find /var/www/html/bin -type f -iname "*.sh" -exec chmod +x {} \;
+USER node
 
-USER root
-
-ENTRYPOINT [ "npm", "run", "prod" ]
-
+RUN npm install && npm run build
 
 
 # =====================================================
@@ -109,7 +105,8 @@ ENV APP_ENV=dev
 # Add sudo command
 RUN --mount=type=cache,id=apk-cache,target=/var/cache/apk rm -rf /etc/apk/cache && ln -s /var/cache/apk /etc/apk/cache && \
     apk update && apk upgrade && apk add \
-    sudo
+    sudo \
+    tmux
 
 # Add Composer
 COPY --from=index.docker.io/library/composer:latest /usr/bin/composer /usr/bin/composer
@@ -124,9 +121,15 @@ RUN --mount=type=cache,id=apk-cache,target=/var/cache/apk rm -rf /etc/apk/cache 
        && (userdel -r www-data || true) \
        && (groupdel -f www-data || true) \
        && groupadd -g ${DOCKER_GID} www-data \
-       && adduser -u ${DOCKER_UID} -D -S -G www-data www-data
+       && adduser -u ${DOCKER_UID} --shell=/bin/bash -D -S -G www-data www-data \
+       && echo "www-data ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/www-data
+
+RUN curl --fail --silent --location --output /tmp/mhsendmail https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 \
+    && chmod +x /tmp/mhsendmail \
+    && mv /tmp/mhsendmail /usr/bin/mhsendmail
 
 COPY docker/php/php.entrypoint.dev.sh /user/bin/app/boot.local.sh
+COPY --chmod=+x docker/php/dev.command.sh /usr/bin/app/dev.command.sh
 
 USER www-data
 
@@ -149,6 +152,8 @@ RUN --mount=type=cache,id=composer-cache,target=/var/www/html/.composer-cache \
 
 # Add the app sources
 COPY --chown=www-data:www-data ./app .
+COPY --from=node_builder --chown=www-data:www-data /var/www/html/public/build /var/www/html/public/build
+RUN rm -rf /var/www/html/hot
 
 # Ensure correct permissions on the binaries
 RUN find /var/www/html/bin -type f -iname "*.sh" -exec chmod +x {} \;

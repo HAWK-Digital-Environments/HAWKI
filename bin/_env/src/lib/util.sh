@@ -32,6 +32,30 @@ confirmDefaultNo(){
   fi
 }
 
+askForInputWithDefault() {
+  local QUESTION=${1}
+  local DEFAULT=${2:-""}
+  local ANSWER
+
+  while true; do
+    if [[ -z "${DEFAULT}" ]]; then
+        read -r -p "${QUESTION}: " ANSWER
+    else
+        read -r -p "${QUESTION} [${DEFAULT}]: " ANSWER
+    fi
+    ANSWER=${ANSWER:-$DEFAULT}
+
+    if [[ -z "${ANSWER}" ]]; then
+      echo "Please provide a value" >&2
+      continue
+    fi
+
+    break
+  done
+
+  echo "${ANSWER}"
+}
+
 # Checks the last exit code and kills the script if it is bigger than 0
 checkLastExitCodeOrDie(){
   CODE=${1:-$?}
@@ -47,7 +71,7 @@ checkLastExitCodeOrDie(){
 determineHostType() {
   OS='unsupported';
   case "$OSTYPE" in
-    #darwin*)  OS="OSX" ;;
+    darwin*)  OS="OSX" ;;
     linux*)   OS="LINUX" ;;
     msys*)    OS="WINDOWS" ;;
     cygwin*)  OS="WINDOWS" ;;
@@ -58,7 +82,7 @@ determineHostType() {
 }
 
 determineOsPlatform() {
-  if [[ $OS_TYPE == 'LINUX' ]]; then
+  if [[ $OS_TYPE == 'LINUX' || $OS_TYPE == 'OSX' ]]; then
     echo $(uname -m)
     return
   fi

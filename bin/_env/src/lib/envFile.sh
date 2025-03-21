@@ -68,7 +68,7 @@ setupEnvFile() {
     fi
     if [[ "${ini[AUTHENTICATION_METHOD]}" = "${defaultIni[AUTHENTICATION_METHOD]}" ]]; then
       echo "Enabling test authentication provider..." > /dev/tty
-      replaceLineStartingWith "AUTHENTICATION_METHOD" "AUTHENTICATION_METHOD=TestAuth"
+      replaceLineStartingWith "AUTHENTICATION_METHOD" "AUTHENTICATION_METHOD=LDAP"
       enableFirstCommentedLine "TEST_USER_LOGIN"
       replaceLineStartingWith "TEST_USER_LOGIN" "TEST_USER_LOGIN=true"
     fi
@@ -111,11 +111,26 @@ setupEnvFile() {
     fi
     if [[ "${ini[REVERB_APP_ID]}" = "${defaultIni[REVERB_APP_ID]}" ]]; then
         echo "Generating REVERB_APP_ID..." > /dev/tty
-        replaceLineStartingWith "REVERB_APP_ID" "REVERB_APP_ID=$(makeRandomStringWithLength 32)"
+        replaceLineStartingWith "REVERB_APP_ID" "REVERB_APP_ID=hawki"
     fi
     if [[ "${ini[REVERB_APP_KEY]}" = "${defaultIni[REVERB_APP_KEY]}" ]]; then
         echo "Setting REVERB_APP_KEY..." > /dev/tty
         replaceLineStartingWith "REVERB_APP_KEY" "REVERB_APP_KEY=hawki"
+    fi
+    if [[ "${ini[VITE_REVERB_HOST]}" = "${defaultIni[VITE_REVERB_HOST]}" ]]; then
+        echo "Setting VITE_REVERB_HOST to 'localhost'..." > /dev/tty
+        replaceLineStartingWith "VITE_REVERB_HOST" "VITE_REVERB_HOST=localhost"
+    fi
+    if [[ "${ini[VITE_REVERB_PORT]}" = "${defaultIni[VITE_REVERB_PORT]}" ]]; then
+        echo "Setting VITE_REVERB_PORT to '80'..." > /dev/tty
+        replaceLineStartingWith "VITE_REVERB_PORT" "VITE_REVERB_PORT=80"
+    fi
+
+    # MAILHOG
+    if ! [[ ${ini[MAIL_MAILER]} ]]; then
+        echo "Setting MAIL_MAILER to 'sendmail' for mailhog..." > /dev/tty
+        enableFirstCommentedLine "MAIL_MAILER"
+        replaceLineStartingWith "MAIL_MAILER" "MAIL_MAILER=sendmail" "MAIL_SENDMAIL_PATH=\"/usr/bin/mhsendmail --from=test@example.org --smtp-addr=mailhog:1025 -t\""
     fi
 
     # REDIS
@@ -170,6 +185,7 @@ setupEnvFile() {
 replaceLineStartingWith() {
     local search="$1"
     local replace="$2"
+    local addAfterReplace="$3"
     local pattern="^[[:space:]]*${search}[[:space:]]*=.*"
 
     # Create a temporary file
@@ -179,6 +195,9 @@ replaceLineStartingWith() {
     while IFS= read -r line; do
         if [[ "$line" =~ $pattern ]]; then
             echo "$replace" >> "$tempfile"
+            if [[ -n "$addAfterReplace" ]]; then
+                echo "$addAfterReplace" >> "$tempfile"
+            fi
         else
             echo "$line" >> "$tempfile"
         fi

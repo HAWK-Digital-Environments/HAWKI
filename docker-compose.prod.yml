@@ -1,35 +1,16 @@
 services:
-    node:
-        container_name: ${PROJECT_NAME}-node
-        image: ${PROJECT_NAME}-node:dev
-        build:
-            context: .
-            target: node_dev
-            args:
-                - DOCKER_RUNTIME=${DOCKER_RUNTIME:-docker}
-                - DOCKER_GID=${DOCKER_GID:-1000}
-                - DOCKER_UID=${DOCKER_UID:-1000}
-        restart: no
-        volumes:
-            - ./:/var/www/html
-        extra_hosts:
-            - host.docker.internal:host-gateway
-        ports:
-            - ${DOCKER_PROJECT_IP:-127.0.0.1}:8000:8000
     app:
         container_name: ${PROJECT_NAME}-app
-        image: ${PROJECT_NAME}-app:dev
+        image: ${PROJECT_NAME}-app:prod
         build:
             context: .
-            target: app_dev
-            args:
-                - DOCKER_RUNTIME=${DOCKER_RUNTIME:-docker}
-                - DOCKER_GID=${DOCKER_GID:-1000}
-                - DOCKER_UID=${DOCKER_UID:-1000}
+            target: app_prod
         restart: no
         volumes:
             - php_socket:/var/run/php
-            - ./:/var/www/html
+            - ./storage/:/var/www/html/storage
+            - ./config/model_providers.php:/var/www/html/config/model_providers.php
+            - ./docker/nginx/config/ssl:/etc/certs
         healthcheck:
             test: cgi-fcgi -bind -connect 127.0.0.1:9000 || exit 1
             interval: 10s
@@ -81,9 +62,9 @@ services:
         container_name: ${PROJECT_NAME}-nginx
         volumes:
             - ./docker/nginx/config/ssl:/etc/nginx/certs
-            - ./docker/nginx/config/nginx.dev.conf:/etc/nginx/nginx.conf:ro
-            - ./public:/var/www/html/public
-            - ./storage/app/public:/var/www/html/storage
+            - ./docker/nginx/config/nginx.default.conf:/etc/nginx/nginx.conf:ro
+            - ./public:/var/www/html/public:ro
+            - ./storage/app/public:/var/www/html/storage:ro
         ports:
             - ${DOCKER_PROJECT_IP:-127.0.0.1}:80:80
             - ${DOCKER_PROJECT_IP:-127.0.0.1}:443:443
@@ -95,13 +76,6 @@ services:
             timeout: 3s
             retries: 3
             start_period: 10s
-    mailhog:
-        container_name: ${PROJECT_NAME}-mailhog
-        image: mailhog/mailhog:v1.0.1
-        restart: no
-        ports:
-            - ${DOCKER_PROJECT_IP:-127.0.0.1}:1025:1025
-            - ${DOCKER_PROJECT_IP:-127.0.0.1}:${MAILHOG_PORT:-8025}:8025
 volumes:
     php_socket: { }
     mysql_data:

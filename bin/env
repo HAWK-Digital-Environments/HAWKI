@@ -43,6 +43,7 @@ env_usage() {
   printf "  %s   starts the laravel queue and runs it in the current shell\n" "queue      "
   printf "  %s   starts the laravel websocket server (through reverb) and runs it in the current shell\n" "websocket  "
   printf "  %s   starts both the queue and the websocket server in the current shell\n" "dev        "
+  printf "  %s   starts the interface of the mailhog mailtrap in your browser\n" "mailhog    "
   echo
 
   # :command.long_usage
@@ -514,6 +515,8 @@ env_queue_usage() {
 # :command.usage
 env_websocket_usage() {
   printf "env websocket - starts the laravel websocket server (through reverb) and runs it in the current shell\n\n"
+  printf "Alias: reverb\n"
+  echo
 
   printf "%s\n" "Usage:"
   printf "  env websocket\n"
@@ -539,6 +542,27 @@ env_dev_usage() {
   printf "%s\n" "Usage:"
   printf "  env dev\n"
   printf "  env dev --help | -h\n"
+  echo
+
+  # :command.long_usage
+  if [[ -n "$long_usage" ]]; then
+    printf "%s\n" "Options:"
+
+    # :command.usage_fixed_flags
+    printf "  %s\n" "--help, -h"
+    printf "    Show this help\n"
+    echo
+
+  fi
+}
+
+# :command.usage
+env_mailhog_usage() {
+  printf "env mailhog - starts the interface of the mailhog mailtrap in your browser\n\n"
+
+  printf "%s\n" "Usage:"
+  printf "  env mailhog\n"
+  printf "  env mailhog --help | -h\n"
   echo
 
   # :command.long_usage
@@ -883,7 +907,7 @@ setupEnvFile() {
     fi
     if [[ "${ini[AUTHENTICATION_METHOD]}" = "${defaultIni[AUTHENTICATION_METHOD]}" ]]; then
       echo "Enabling test authentication provider..." > /dev/tty
-      replaceLineStartingWith "AUTHENTICATION_METHOD" "AUTHENTICATION_METHOD=TestAuth"
+      replaceLineStartingWith "AUTHENTICATION_METHOD" "AUTHENTICATION_METHOD=LDAP"
       enableFirstCommentedLine "TEST_USER_LOGIN"
       replaceLineStartingWith "TEST_USER_LOGIN" "TEST_USER_LOGIN=true"
     fi
@@ -926,11 +950,26 @@ setupEnvFile() {
     fi
     if [[ "${ini[REVERB_APP_ID]}" = "${defaultIni[REVERB_APP_ID]}" ]]; then
         echo "Generating REVERB_APP_ID..." > /dev/tty
-        replaceLineStartingWith "REVERB_APP_ID" "REVERB_APP_ID=$(makeRandomStringWithLength 32)"
+        replaceLineStartingWith "REVERB_APP_ID" "REVERB_APP_ID=hawki"
     fi
     if [[ "${ini[REVERB_APP_KEY]}" = "${defaultIni[REVERB_APP_KEY]}" ]]; then
         echo "Setting REVERB_APP_KEY..." > /dev/tty
         replaceLineStartingWith "REVERB_APP_KEY" "REVERB_APP_KEY=hawki"
+    fi
+    if [[ "${ini[VITE_REVERB_HOST]}" = "${defaultIni[VITE_REVERB_HOST]}" ]]; then
+        echo "Setting VITE_REVERB_HOST to 'localhost'..." > /dev/tty
+        replaceLineStartingWith "VITE_REVERB_HOST" "VITE_REVERB_HOST=localhost"
+    fi
+    if [[ "${ini[VITE_REVERB_PORT]}" = "${defaultIni[VITE_REVERB_PORT]}" ]]; then
+        echo "Setting VITE_REVERB_PORT to '80'..." > /dev/tty
+        replaceLineStartingWith "VITE_REVERB_PORT" "VITE_REVERB_PORT=80"
+    fi
+
+    # MAILHOG
+    if ! [[ ${ini[MAIL_MAILER]} ]]; then
+        echo "Setting MAIL_MAILER to 'sendmail' for mailhog..." > /dev/tty
+        enableFirstCommentedLine "MAIL_MAILER"
+        replaceLineStartingWith "MAIL_MAILER" "MAIL_MAILER=sendmail" "MAIL_SENDMAIL_PATH=\"/usr/bin/mhsendmail --from=test@example.org --smtp-addr=mailhog:1025 -t\""
     fi
 
     # REDIS
@@ -985,6 +1024,7 @@ setupEnvFile() {
 replaceLineStartingWith() {
     local search="$1"
     local replace="$2"
+    local addAfterReplace="$3"
     local pattern="^[[:space:]]*${search}[[:space:]]*=.*"
 
     # Create a temporary file
@@ -994,6 +1034,9 @@ replaceLineStartingWith() {
     while IFS= read -r line; do
         if [[ "$line" =~ $pattern ]]; then
             echo "$replace" >> "$tempfile"
+            if [[ -n "$addAfterReplace" ]]; then
+                echo "$addAfterReplace" >> "$tempfile"
+            fi
         else
             echo "$line" >> "$tempfile"
         fi
@@ -1800,7 +1843,7 @@ env_npm_command() {
 env_queue_command() {
 
   # _env/src/queue_command.sh
-  dockerSsh ${DEFAULT_SERVICE_NAME} "php artisan queue:work --queue=mails,message_broadcast"
+  dockerSsh ${DEFAULT_SERVICE_NAME} "composer run queue"
 
 }
 
@@ -1808,7 +1851,7 @@ env_queue_command() {
 env_websocket_command() {
 
   # _env/src/websocket_command.sh
-  dockerSsh ${DEFAULT_SERVICE_NAME} "php artisan reverb:start"
+  dockerSsh ${DEFAULT_SERVICE_NAME} "composer run websocket"
 
 }
 
@@ -1816,10 +1859,20 @@ env_websocket_command() {
 env_dev_command() {
 
   # _env/src/dev_command.sh
-  (trap 'kill 0' SIGINT; \
-  dockerSsh ${DEFAULT_SERVICE_NAME} "php artisan queue:work --queue=mails,message_broadcast" & \
-  dockerSsh ${DEFAULT_SERVICE_NAME} "php artisan reverb:start" \
-  )
+  trap 'exit 0' INT TERM
+
+  if confirmDefaultYes "This will open everything to run a dev environment. You can exit it by pressing Ctrl+B and then D. Do you want to continue?";
+  then
+      dockerSsh ${DEFAULT_SERVICE_NAME} "/usr/bin/app/dev.command.sh"
+  fi
+
+}
+
+# :command.function
+env_mailhog_command() {
+
+  # _env/src/mailhog_command.sh
+  open http://${DOCKER_PROJECT_DOMAIN:-${DOCKER_PROJECT_IP:-localhost}}:${MAILHOG_PORT:-8025}
 
 }
 
@@ -1958,7 +2011,7 @@ parse_requirements() {
       shift $#
       ;;
 
-    websocket)
+    websocket | reverb)
       action="websocket"
       shift
       env_websocket_parse_requirements "$@"
@@ -1969,6 +2022,13 @@ parse_requirements() {
       action="dev"
       shift
       env_dev_parse_requirements "$@"
+      shift $#
+      ;;
+
+    mailhog)
+      action="mailhog"
+      shift
+      env_mailhog_parse_requirements "$@"
       shift $#
       ;;
 
@@ -3073,6 +3133,51 @@ env_dev_parse_requirements() {
 
 }
 
+# :command.parse_requirements
+env_mailhog_parse_requirements() {
+  # :command.fixed_flags_filter
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+      --help | -h)
+        long_usage=yes
+        env_mailhog_usage
+        exit
+        ;;
+
+      *)
+        break
+        ;;
+
+    esac
+  done
+
+  # :command.command_filter
+  action="mailhog"
+
+  # :command.parse_requirements_while
+  while [[ $# -gt 0 ]]; do
+    key="$1"
+    case "$key" in
+
+      -?*)
+        printf "invalid option: %s\n" "$key" >&2
+        exit 1
+        ;;
+
+      *)
+        # :command.parse_requirements_case
+        # :command.parse_requirements_case_simple
+        printf "invalid argument: %s\n" "$key" >&2
+        exit 1
+
+        ;;
+
+    esac
+  done
+
+}
+
 # :command.initialize
 initialize() {
   declare -g version="1.0.0"
@@ -3141,6 +3246,7 @@ run() {
     "queue") env_queue_command ;;
     "websocket") env_websocket_command ;;
     "dev") env_dev_command ;;
+    "mailhog") env_mailhog_command ;;
   esac
 }
 

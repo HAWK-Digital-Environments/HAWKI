@@ -1,0 +1,1 @@
+open http://${DOCKER_PROJECT_DOMAIN:-${DOCKER_PROJECT_IP:-localhost}}:${MAILHOG_PORT:-8025}

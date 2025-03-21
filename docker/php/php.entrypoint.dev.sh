@@ -19,3 +19,4 @@ if ! [[ -f /var/www/html/storage/app/test_users.json ]]; then
 fi
 
 php artisan migrate
+php artisan db:seed

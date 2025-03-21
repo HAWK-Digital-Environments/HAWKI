@@ -90,6 +90,9 @@ commands:
   - name: queue
     help: starts the laravel queue and runs it in the current shell
   - name: websocket
+    alias: reverb
     help: starts the laravel websocket server (through reverb) and runs it in the current shell
   - name: dev
     help: starts both the queue and the websocket server in the current shell
+  - name: mailhog
+    help: starts the interface of the mailhog mailtrap in your browser

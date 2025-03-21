@@ -50,6 +50,16 @@
             "@php artisan key:generate --ansi",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
+        ],
+        "queue": [
+            "@php artisan queue:work -vv --queue=default,mails,message_broadcast"
+        ],
+        "websocket": [
+            "@php artisan reverb:start --debug"
+        ],
+        "dev": [
+            "queue",
+            "websocket"
         ]
     },
     "extra": {

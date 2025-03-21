@@ -1,1 +1,1 @@
-dockerSsh ${DEFAULT_SERVICE_NAME} "php artisan reverb:start"
+dockerSsh ${DEFAULT_SERVICE_NAME} "composer run websocket"
