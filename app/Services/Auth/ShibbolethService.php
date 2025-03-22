@@ -35,7 +35,7 @@ class ShibbolethService
                 // Return user information
                 return $userInfo = [
                     'username' => $_SERVER['REMOTE_USER'],
-                    'name' => $_SERVER[$nameVar],
+                    'name' => $_SERVER[$gnameVar].' '.$_SERVER[$snameVar],
                     'email' => $_SERVER[$mailVar],
                     'employeetype' => $_SERVER[$employeetypeVar]
                 ];
@@ -47,7 +47,7 @@ class ShibbolethService
             // Redirect to the Shibboleth login page
             $loginPath = config('shibboleth.login_path');
             if (!empty($loginPath)) {
-                return redirect($loginPath);
+                redirect($loginPath)->send();
             } else {
                 // Error handling if the login path is not set
                 return response()->json(['error' => 'Login path is not set'], 500);
