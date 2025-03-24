@@ -42,6 +42,7 @@ services:
             mysql:
                 condition: service_healthy
     redis:
+        container_name: ${PROJECT_NAME}-redis
         image: redis:latest
         restart: always
         volumes:
