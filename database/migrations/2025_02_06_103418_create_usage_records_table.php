@@ -21,6 +21,7 @@ class CreateUsageRecordsTable extends Migration
             $table->unsignedBigInteger('prompt_tokens')->default(0);
             $table->unsignedBigInteger('completion_tokens')->default(0);
 
+            // ToDo: add "system" type for title generation
             $table->enum('type', ['private', 'group']); // To differentiate chat type
 
             $table->string('model');

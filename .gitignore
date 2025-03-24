@@ -5,6 +5,7 @@
 /public/storage
 /storage/*.key
 /vendor
+/public/vendor/orchid
 .env
 .env.backup
 .env.production
