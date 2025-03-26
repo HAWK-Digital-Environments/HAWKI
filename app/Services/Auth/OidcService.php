@@ -13,28 +13,32 @@ class OidcService
 {
     protected $oidc;
 
-    public function __construct()
+    protected function _init()
     {
-        // Retrieve configuration settings
-        $idp = config('open_id_connect.oidc_idp');
-        $clientId = config('open_id_connect.oidc_client_id');
-        $clientSecret = config('open_id_connect.oidc_client_secret');
+        if(!$this->oidc ){
+            // Retrieve configuration settings
+            $idp = config('open_id_connect.oidc_idp');
+            $clientId = config('open_id_connect.oidc_client_id');
+            $clientSecret = config('open_id_connect.oidc_client_secret');
 
-        // Validate configuration settings
-        if (empty($idp) || empty($clientId) || empty($clientSecret)) {
-            throw new \InvalidArgumentException('OIDC configuration variables are not set properly.');
+            // Validate configuration settings
+            if (empty($idp) || empty($clientId) || empty($clientSecret)) {
+                throw new \InvalidArgumentException('OIDC configuration variables are not set properly.');
+            }
+
+            // Initialize the OpenID Connect client
+            $this->oidc = new OpenIDConnectClient($idp, $clientId, $clientSecret);
+
+            // Add scopes as an array
+            $scopes = config('open_id_connect.oidc_scopes');
+            $this->oidc->addScope($scopes);
         }
-
-        // Initialize the OpenID Connect client
-        $this->oidc = new OpenIDConnectClient($idp, $clientId, $clientSecret);
-
-        // Add scopes as an array
-        $scopes = config('open_id_connect.oidc_scopes');
-        $this->oidc->addScope($scopes);
     }
 
     public function authenticate()
     {
+        $this->_init();
+
         try {
             // Attempt to authenticate the user
             $this->oidc->authenticate();
