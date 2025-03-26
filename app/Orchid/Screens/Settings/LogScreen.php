@@ -3,6 +3,9 @@
 namespace App\Orchid\Screens\Settings;
 
 use Orchid\Screen\Screen;
+use Orchid\Support\Facades\Layout;
+use Orchid\Screen\Actions\Button;
+use Orchid\Support\Facades\Toast;
 
 class LogScreen extends Screen
 {
@@ -13,7 +16,14 @@ class LogScreen extends Screen
      */
     public function query(): iterable
     {
-        return [];
+        // Log-Datei laden (Pfad ggf. anpassen, falls erforderlich)
+        $log = file_exists(storage_path('logs/laravel.log'))
+            ? file_get_contents(storage_path('logs/laravel.log'))
+            : 'Log-Datei nicht gefunden.';
+			
+        return [
+            'logs' => $log,
+        ];
     }
 
     /**
@@ -23,7 +33,7 @@ class LogScreen extends Screen
      */
     public function name(): ?string
     {
-        return 'Log';
+        return 'Laravel Log';
     }
 
     /**
@@ -33,7 +43,25 @@ class LogScreen extends Screen
      */
     public function commandBar(): iterable
     {
-        return [];
+        return [
+            Button::make('Clear Log')
+                ->icon('trash')
+                ->method('clearLog'),
+        ];
+    }
+
+    /**
+     * Clear the log file.
+     */
+    public function clearLog()
+    {
+        $logFile = storage_path('logs/laravel.log');
+        if (file_exists($logFile)) {
+            file_put_contents($logFile, '');
+            Toast::success('Log cleared.');
+        } else {
+            Toast::error('Log file not found.');
+        }
     }
 
     /**
@@ -43,6 +71,9 @@ class LogScreen extends Screen
      */
     public function layout(): iterable
     {
-        return [];
+        // Layout, das die Blade-View einbindet
+        return [
+            Layout::view('orchid.settings.log'),
+        ];
     }
 }
