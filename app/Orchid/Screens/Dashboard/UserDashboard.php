@@ -1,24 +1,20 @@
 <?php
 
-namespace App\Orchid\Screens;
+namespace App\Orchid\Screens\Dashboard;
 
 use Orchid\Screen\Screen;
 
 use App\Orchid\Layouts\Charts\PieChart;
 use App\Orchid\Layouts\Charts\BarChart;
 use App\Orchid\Layouts\Charts\PercentageChart;
-//use App\Orchid\Layouts\Dashboard\UserData;
-use Orchid\Screen\Fields\Input;
 
-
-use App\Orchid\Layouts\ChartsLayout;
-
+use Orchid\Screen\Fields\DateRange;
 
 use Orchid\Support\Facades\Layout;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class Dashboard extends Screen
+class UserDashboard extends Screen
 {
     /**
      * Fetch data to be displayed on the screen.
@@ -63,12 +59,12 @@ class Dashboard extends Screen
         $percentage = round((($totalUsers > 0) ? ($newUsersThisMonth / $totalUsers) * 100 : 0), 2);
         //Log::info("Prozentsatz neuer User: " . $percentage);
 
-//    // Anzahl der User mit einem Request an einem bestimmten Tag 
-//        $activeUsersCount = DB::table('usage_records')
-//                              ->whereDate('created_at', $specificDay)
-//                              ->distinct('user_id')
-//                              ->count('user_id');
-//        Log::info("Individuelle aktive User am {$specificDay}: " . $activeUsersCount);
+    // Anzahl der User mit einem Request an einem bestimmten Tag 
+        $activeUsersCount = DB::table('usage_records')
+                              ->whereDate('created_at', $specificDay)
+                              ->distinct('user_id')
+                              ->count('user_id');
+        Log::info("Individuelle aktive User am {$specificDay}: " . $activeUsersCount);
 
 
     // Aktive User pro Tag für den ganzen Monat
@@ -88,7 +84,7 @@ class Dashboard extends Screen
                 $activeUsersPerDay[$index] = $data->activeUsers;
             }
         }
-        //Log::info("Active Users per Day Array: " . json_encode($activeUsersPerDay));
+        Log::info("Active Users per Day Array: " . json_encode($activeUsersPerDay));
 
         
         // Neue Log-Ausgabe: Daten für den aktuellen Tag
@@ -170,25 +166,6 @@ class Dashboard extends Screen
             }
         }
 
-        //$providerData = [
-        //        [
-        //            'labels' => $providers,
-        //            'name'   => 'Requests per Provider',
-        //            'values' => $totalRequestsForProvider,
-        //        ]
-        //];        
-
-        
-        // Neues ProviderData Array basierend auf der auskommentierten Struktur
-        $providerData = [
-            [
-                'labels' => array_keys($providerSummary),
-                'name'   => 'Requests per Provider',
-                'values' => array_values($providerSummary),
-            ]
-        ];
-        Log::info('Provider request summary: ' . json_encode($providerData));
-
         
         $specificModel = 'gpt-4o-mini';
         $countForSpecificDay = DB::table('usage_records')
@@ -215,9 +192,10 @@ class Dashboard extends Screen
                                         ->count();
         $requestsPerDayArray = [$requestsCountForSpecificDay];
 
-        // Neuer Code: Abfrage der Requests pro Stunde anhand der created_at-Spalte
+        // Neuer Code: Abfrage der Requests pro Stunde anhand der created_at-Spalte 
+        // zur Ermittlung der distinct active Users pro Stunde
         $rawRequestsPerHour = DB::table('usage_records')
-                                ->select(DB::raw('HOUR(created_at) as hour'), DB::raw('count(*) as count'))
+                                ->select(DB::raw('HOUR(created_at) as hour'), DB::raw('COUNT(DISTINCT user_id) as count'))
                                 ->whereDate('created_at', $specificDay)
                                 ->groupBy('hour')
                                 ->get();
@@ -226,30 +204,19 @@ class Dashboard extends Screen
             $hourIndex = (int)$data->hour;
             $requestsPerHourArray[$hourIndex] = $data->count;
         }
-
-        $requestsPerModel = [
-            [
-                'labels' => array_keys($modelSummary),
-                'name'   => 'Requests per Provider',
-                'values' => array_values($modelSummary),
-            ]
-        ];
-        // Aktualisierung der Requests per Hour Chart mit dem neuen Array
-        $requestsPerHour = [
+        
+        $usersPerHour = [
                 [
                     'labels' => $hourLabels,
-                    'name'   => 'Requests per Hour',
+                    'name'   => 'Users per Hour',
                     'values' => $requestsPerHourArray,
                 ]
             ];    
-        //Log::info('Total models: ' . count($allModels));
+        Log::info('Users per Hour today: ' . json_encode($usersPerHour));
     
         return [
             'dailyActiveUsers' => $dailyActiveUsers,
-            'requestsPerProvider' => $providerData,
-            'requestsPerHour' => $requestsPerHour,
-            'requestsPerModel' => $requestsPerModel,
-
+            'usersPerHour' => $usersPerHour,
             'metrics' => [
                 'totalUsers'=> number_format($totalUsers),
                 'newUsers'     => ['value' => number_format($newUsersThisMonth), 'diff' => $percentage],
@@ -266,7 +233,7 @@ class Dashboard extends Screen
      */
     public function name(): ?string
     {
-        return 'Dashboard';
+        return 'User Dashboard';
     }
 
     /**
@@ -286,17 +253,13 @@ class Dashboard extends Screen
      */
     public function layout(): iterable
     {
-        $dailyusersChart = ChartsLayout::make('dailyActiveUsers', 'Daily Users')
+        $dailyUsersChart = BarChart::make('dailyActiveUsers', 'Daily Users')
                 ->title('Daily Active Users')
-                ->description('Overview of Users per day, that interacted with an AI model.');
+                ->description('Overview of users per day, that interacted with an AI model.');
 
-        $requestsPerHourChart = ChartsLayout::make('requestsPerHour', 'Requests per User')
-                ->title('Requests per Hour')
-                ->description('Overview of LLM Requests per hour.');        
-
-        $requestsProviderPieChart = PieChart::make('requestsPerProvider')
-                ->title('Request per Provider')
-                ->description('Overview of Request per Provider.');
+        $usersPerHourChart = BarChart::make('usersPerHour', 'Users per hour')
+                ->title('Users per Hour')
+                ->description('Overview of active users per hour.');        
 
         $requestsModelPieChart = PieChart::make('requestsPerModel')
                 ->title('Request per Model')
@@ -312,19 +275,22 @@ class Dashboard extends Screen
                 
             ]),    
             
-            Layout::columns([
-                    //Layout::component(UserData::class),
-                    $dailyusersChart,
-                ]),
+            //Layout::rows([
+            //    DateRange::make('rangeDate')
+            //        ->title('Range date'),
+            //]),
 
             Layout::columns([
-                    //Layout::component(UserData::class),
-                    $requestsPerHourChart,
+                $dailyUsersChart,
+            ]),
+
+            Layout::columns([
+                    $usersPerHourChart,
                 ]),
     
 
             Layout::split([
-                $requestsProviderPieChart,
+                $requestsModelPieChart,
                 $requestsModelPieChart,
             ])->ratio('50/50'),
         ];

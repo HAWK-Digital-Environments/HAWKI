@@ -41,34 +41,71 @@ class PlatformProvider extends OrchidServiceProvider
             
             Menu::make('Dashboard')
                 ->icon('bs.rocket-takeoff')
-                ->title('Tools')
-                ->route('platform.dashboard.users')
-                ->active('*/dashboard/*'),
+                ->route('platform.dashboard')
+                ->list([
+                    Menu::make('Users')
+                        ->route('platform.dashboard.users')
+                        ->icon('bs.people'),
+                    Menu::make('Requests')
+                        ->route('platform.dashboard.requests')
+                        ->icon('bs.bar-chart'),
+                    ]),
 
-
-
+            Menu::make('Settings')
+                ->icon('bs.gear')
+                ->list([
+                    Menu::make('System')
+                        ->route('platform.settings.system')
+                        ->icon('bs.house-gear'),
+                    Menu::make('Logs')
+                        ->route('platform.settings.log')
+                        ->icon('bs.journal-code'),    
+                    Menu::make('Storage')
+                        ->route('platform.settings.storage')
+                        ->icon('bs.database'),     
+                    Menu::make('Styling')
+                        ->route('platform.settings.styling')
+                        ->icon('bs.paint-bucket'),       
+                    Menu::make('Texts')
+                        ->route('platform.settings.texts')
+                        ->icon('bs.info-circle'),    
+                    ]),    
+            
+            Menu::make('Models')
+                ->icon('bs.stars')
+                ->list([        
+                    Menu::make('API Providers')
+                        ->route('platform.modelsettings.providers')
+                        ->icon('bs.plug'),
+                    Menu::make('Active Models')
+                        ->route('platform.modelsettings.activemodels')
+                        ->icon('bs.toggles'),
+                    Menu::make('Utility Models')
+                        ->route('platform.modelsettings.utilitymodels')
+                        ->icon('bs.tools'),                  
+                    ]),          
 //            Menu::make('Sample Screen')
 //                ->icon('bs.collection')
-//                ->route('platform.example')
-//                ->badge(fn () => 6),
-//
-//            Menu::make('Form Elements')
-//                ->icon('bs.card-list')
-//                ->route('platform.example.fields')
-//                ->active('*/examples/form/*'),
-//
+//                ->route('platform.example'),
+                //->badge(fn () => 6),
+
+           Menu::make('Form Elements')
+               ->icon('bs.card-list')
+               ->route('platform.example.fields')
+               ->active('*/examples/form/*'),
+
 //            Menu::make('Overview Layouts')
 //                ->icon('bs.window-sidebar')
 //                ->route('platform.example.layouts'),
-//
-//            Menu::make('Grid System')
-//                ->icon('bs.columns-gap')
-//                ->route('platform.example.grid'),
-//
+
+//           Menu::make('Grid System')
+//               ->icon('bs.columns-gap')
+//               ->route('platform.example.grid'),
+
 //            Menu::make('Charts')
 //                ->icon('bs.bar-chart')
 //                ->route('platform.example.charts'),
-//
+
 //            Menu::make('Cards')
 //                ->icon('bs.card-text')
 //                ->route('platform.example.cards')

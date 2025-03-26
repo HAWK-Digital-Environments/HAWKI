@@ -6,7 +6,7 @@ namespace App\Orchid\Layouts\Charts;
 
 use Orchid\Screen\Layouts\Chart;
 
-class ChartPercentageExample extends Chart
+class PercentageChart extends Chart
 {
     /**
      * Available options:
