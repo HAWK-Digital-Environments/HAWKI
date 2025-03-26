@@ -6,7 +6,8 @@ use Orchid\Screen\Screen;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class SystemSettings extends Screen
+
+class SystemSettingsScreen extends Screen
 {
     /**
      * Fetch data to be displayed on the screen.
