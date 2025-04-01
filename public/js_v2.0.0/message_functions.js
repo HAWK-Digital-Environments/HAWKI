@@ -338,21 +338,25 @@ function setDateSpan(activeThread, msgDate, formatDay = true){
 
 
 function deconstContent(inputContent){
+    
     let messageText = '';
     let groundingMetadata = '';
     
     if(isValidJson(inputContent)){
         const json = JSON.parse(inputContent);
-        messageText = json.text;
-
         if(json.hasOwnProperty('groundingMetadata')){
             groundingMetadata = json.groundingMetadata
+        }
+        if(json.hasOwnProperty('text')){
+            messageText = json.text;
+        }
+        else{
+            messageText = inputContent;
         }
     }
     else{
         messageText = inputContent;
     }
-
 
     return {
         messageText: messageText,
