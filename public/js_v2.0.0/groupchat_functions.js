@@ -124,7 +124,7 @@ const connectWebSocket = (roomSlug) => {
         .listen('RoomMessageEvent', async (e) => {
             const data = e.data;
 
-            // console.log(`Message received in room ${roomSlug}:`, data); // Debugging
+            console.log(`Message received in room ${roomSlug}:`, data); // Debugging
 
             if(data.type === 'message'){
 

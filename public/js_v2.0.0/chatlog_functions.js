@@ -89,9 +89,8 @@ async function submitMessageToServer(requestObj, url){
 }
 
 async function requestMsgUpdate(messageObj, messageElement, url){
-
     const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    // console.log(url)
+
     try {        
         const response = await fetch(url, {
             method: "POST",

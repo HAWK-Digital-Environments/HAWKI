@@ -45,8 +45,6 @@ class GWDGProvider extends OpenAIProvider
         // Mistral Fix: Additional check for empty choices array
         if (!empty($jsonChunk['usage']) && empty($jsonChunk['choices'])) {
             $usage = $this->extractUsage($jsonChunk);
-            Log::info('GWDG', ['model' => $jsonChunk['model'], 'usage' => $usage]);
-
         }
         
         // Extract content if available

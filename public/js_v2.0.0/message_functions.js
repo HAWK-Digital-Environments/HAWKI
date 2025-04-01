@@ -618,6 +618,8 @@ async function confirmEditMessage(provider){
         'iv' : cryptoMsg.iv,
         'tag' : cryptoMsg.tag,
         'message_id': messageElement.id,
+        'model': null,
+        'completion': true
     }
 
     requestMsgUpdate(messageObj, messageElement ,url);

@@ -102,7 +102,6 @@ class OpenWebUIProvider extends BaseAIModelProvider
         // Extract usage data if available
         if (!empty($jsonChunk['usage'])) {
             $usage = $this->extractUsage($jsonChunk);
-            Log::info('OpenWebUI', ['model' => $jsonChunk['model'], 'usage' => $usage]);
         }
         
         // Extract content if available

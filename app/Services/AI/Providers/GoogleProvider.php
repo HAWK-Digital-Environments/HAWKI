@@ -84,7 +84,6 @@ class GoogleProvider extends BaseAIModelProvider
      */
     public function formatResponse($response): array
     {
-        Log::info($response);
         $responseContent = $response->getContent();
         $jsonContent = json_decode($responseContent, true);        
 
@@ -191,7 +190,6 @@ class GoogleProvider extends BaseAIModelProvider
      */
     public function makeNonStreamingRequest(array $payload)
     {
-        Log::info('payload:', $payload);
         // Ensure stream is set to false
         $payload['stream'] = false;
         
