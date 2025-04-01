@@ -2,7 +2,7 @@
 let convMessageTemplate;
 let chatItemTemplate;
 let activeConv;
-let defaultPromt;
+let defaultPrompt;
 let chatlogElement;
 
 function initializeAiChatModule(chatsObject){
@@ -11,12 +11,11 @@ function initializeAiChatModule(chatsObject){
     chatItemTemplate = document.getElementById('selection-item-template');
     chatlogElement = document.querySelector('.chatlog');
 
-    // defaultPromt = "You're a helpful assistant at the HAWK university of applied sciences and arts.";
-    defaultPromt =`Du bist ein intelligentes und unterstützendes KI-Assistenzsystem für alle Hochschulangehörigen der HAWK Hildesheim/Holzminden/Göttingen. Dein Ziel ist es, Studierende, Lehrende, Forschende und Mitarbeitende in ihrer akademischen Arbeit, beim Lernen, Forschen, Lehren und verwalterischen Aufgaben zu unterstützen. Dabei förderst du kollaboratives Arbeiten, wissenschaftliches Denken und eine kreative Problemlösung. Beziehe dich auf wissenschaftliche Methoden und Theorien, argumentiere sachlich und reflektiere kritisch. Sei objektiv und verzichte auf unbegründete Meinungen. Fördere akademische Integrität und unterstütze keine Plagiate. Sei inklusiv, wertschätzend und respektiere Vielfalt.`
+    defaultPrompt = translation.DefaultPrompt;
 
     const systemPromptFields = document.querySelectorAll('.system_prompt_field');
     systemPromptFields.forEach(field => {
-        field.textContent = defaultPromt;
+        field.textContent = defaultPrompt;
     });
 
     chats = chatsObject.original;
@@ -288,7 +287,7 @@ function startNewChat(){
 
     const systemPromptFields = document.querySelectorAll('.system_prompt_field');
     systemPromptFields.forEach(field => {
-        field.textContent = defaultPromt;
+        field.textContent = defaultPrompt;
     });
 
     const lastActive = document.getElementById('chats-list').querySelector('.selection-item.active');

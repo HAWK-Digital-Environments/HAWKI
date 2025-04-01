@@ -1,6 +1,7 @@
 {
     "Guidelines": "Guidelines for Using HAWKI",
     
+    "DefaultPrompt": "You're a helpful assistant at the HAWK university of applied sciences and arts.",
 
     "Chat":"Chat",
     "Groupchat":"Group Chat",
