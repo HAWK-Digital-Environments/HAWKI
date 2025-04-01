@@ -24,6 +24,13 @@ function switchSlide(targetIndex) {
         // Add a small delay before changing the opacity to ensure the display change has been processed
         setTimeout(() => {
             target.style.opacity = "1";
+
+            // Focus on the passkey-input field when switching to slide 1 or 5
+            if (targetIndex === 1 || targetIndex === 5) {
+                const passkeyInput = document.getElementById('passkey-input');
+                if (passkeyInput) passkeyInput.focus();
+            }
+
         }, 300);
 
         previousSlide = target;
@@ -45,10 +52,12 @@ let backupHash = '';
 async function checkPasskey(){
 
     const msg = document.querySelector('#alert-message');
-    const enteredPasskey = String(document.getElementById('passkey-input').value);
+    const passkeyField = document.getElementById('passkey-input');    
+    const enteredPasskey = String(passkeyField.value);
     // if passkey field is left empty.
     if(enteredPasskey === ''){
         msg.innerText = "Bitte gebe ein Passkey ein."
+        passkeyField.focus();  // Set focus to passkeyField        
         return;
     }
 
@@ -56,6 +65,7 @@ async function checkPasskey(){
     //Show Repeat Passkey
     if(repeatField.style.display === 'none'){
         repeatField.style.display = 'block';
+        repeatField.focus();  // Set focus to repeatField        
         return;
     }
 
@@ -63,6 +73,7 @@ async function checkPasskey(){
     //if repeat passkey is empty
     if(repeatedKey === ''){
         msg.innerText = "Bitte wiederhole das Passkey."
+        repeatField.focus();  // Set focus to repeatField
         return;
     }
     //if the inputs are not the same.
