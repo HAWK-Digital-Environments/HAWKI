@@ -126,7 +126,7 @@ class StreamController extends Controller
 
 
         if ($validatedData['broadcast']) {
-            $this->handleGroupChatRequestNew($validatedData);
+            $this->handleGroupChatRequest($validatedData);
         } else {
             $user = User::find(1); // HAWKI user 
             $avatar_url = $user->avatar_id !== '' ? Storage::disk('public')->url('profile_avatars/' . $user->avatar_id) : null;
@@ -160,7 +160,6 @@ class StreamController extends Controller
                     'model' => $validatedData['payload']['model'],
                     'isDone' => true,
                     'content' => $result['content'],
-                    'groundingMetadata' => $result['groundingMetadata'],
                 ]);
             }
         }
@@ -199,7 +198,7 @@ class StreamController extends Controller
                 
                 // Format the chunk
                 $formatted = $provider->formatStreamChunk($chunk);
-                //Log::info('Formatted Chunk:' . json_encode($formatted));
+                // Log::info('Formatted Chunk:' . json_encode($formatted));
 
                 // Record usage if available
                 if ($formatted['usage']) {
@@ -219,10 +218,8 @@ class StreamController extends Controller
                     ],
                     'model' => $payload['model'],
                     'isDone' => $formatted['isDone'],
-                    'content' => $formatted['content'],
-                    'groundingMetadata' => $formatted['groundingMetadata'] ?? [],
+                    'content' => json_encode($formatted['content']),
                 ];
-                
                 echo json_encode($messageData) . "\n";
             }
         };
@@ -284,7 +281,7 @@ class StreamController extends Controller
     /**
      * Handle group chat requests with the new architecture
      */
-    private function handleGroupChatRequestNew(array $data)
+    private function handleGroupChatRequest(array $data)
     {
         $isUpdate = (bool) ($data['isUpdate'] ?? false);
         $room = Room::where('slug', $data['slug'])->firstOrFail();
@@ -319,7 +316,7 @@ class StreamController extends Controller
         // Encrypt content for storage
         $cryptoController = new EncryptionController();
         $encKey = base64_decode($data['key']);
-        $encryptiedData = $cryptoController->encryptWithSymKey($encKey, $result['content'], false);
+        $encryptiedData = $cryptoController->encryptWithSymKey($encKey, json_encode($result['content']), false);
         
         // Store message
         $roomController = new RoomController();

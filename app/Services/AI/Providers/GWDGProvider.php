@@ -55,7 +55,9 @@ class GWDGProvider extends OpenAIProvider
         }
         
         return [
-            'content' => $content,
+            'content' => [
+                'text' => $content,
+            ],
             'isDone' => $isDone,
             'usage' => $usage
         ];

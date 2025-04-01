@@ -70,7 +70,9 @@ class OpenAIProvider extends BaseAIModelProvider
         $content = $jsonContent['choices'][0]['message']['content'] ?? '';
         
         return [
-            'content' => $content,
+            'content' => [
+                'text' => $content,
+            ],
             'usage' => $this->extractUsage($jsonContent)
         ];
     }
@@ -107,7 +109,9 @@ class OpenAIProvider extends BaseAIModelProvider
         }
         
         return [
-            'content' => $content,
+            'content' => [
+                'text' => $content,
+            ],
             'isDone' => $isDone,
             'usage' => $usage
         ];

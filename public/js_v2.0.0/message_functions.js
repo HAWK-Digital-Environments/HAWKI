@@ -1,5 +1,8 @@
 
 function addMessageToChatlog(messageObj, isFromServer = false){
+
+    const {messageText, groundingMetadata} = deconstContent(messageObj.content);
+
     /// CLONE
     // clone message element
     const messageTemp = document.getElementById('message-template')
@@ -11,7 +14,8 @@ function addMessageToChatlog(messageObj, isFromServer = false){
     /// DATASET & ID
     // set dataset attributes
     messageElement.dataset.role = messageObj.message_role;
-    messageElement.dataset.rawMsg = messageObj.content;
+    messageElement.dataset.rawMsg = messageText;
+    messageElement.dataset.groundingMetadata = JSON.stringify(groundingMetadata);
     
     //if date and time is confirmed from the server add them
     if(messageObj.created_at) messageElement.dataset.created_at = messageObj.created_at;
@@ -125,13 +129,15 @@ function addMessageToChatlog(messageObj, isFromServer = false){
     // Setup Message Content
     const msgTxtElement = messageElement.querySelector(".message-text");
 
+    
+
     if(!messageElement.classList.contains('AI')){
-        let processedContent = detectMentioning(messageObj.content).modifiedText;
+        let processedContent = detectMentioning(messageText).modifiedText;
         processedContent = convertHyperlinksToLinks(processedContent);
         msgTxtElement.innerHTML = processedContent;
     }
     else{
-        let markdownProcessed = formatMessage(messageObj.content);
+        let markdownProcessed = formatMessage(messageText);
         markdownProcessed = convertHyperlinksToLinks(markdownProcessed);
         msgTxtElement.innerHTML = markdownProcessed;
         formatMathFormulas(msgTxtElement);
@@ -196,6 +202,9 @@ function addMessageToChatlog(messageObj, isFromServer = false){
 
 function updateMessageElement(messageElement, messageObj, updateContent = false){
 
+    const {messageText, groundingMetadata} = deconstContent(messageObj.content);
+
+
     messageElement.id = messageObj.message_id;
     if(messageElement.querySelector('.thread')){
         messageElement.querySelector('.thread').id = messageObj.message_id.split('.')[0];
@@ -218,14 +227,15 @@ function updateMessageElement(messageElement, messageObj, updateContent = false)
 
     if(updateContent){
         
-        const filteredContent = detectMentioning(messageObj.content);
-        messageElement.dataset.rawMsg = messageObj.content;
+        const filteredContent = detectMentioning(messageText);
+        messageElement.dataset.rawMsg = messageText;
+        messageElement.dataset.groundingMetadata = JSON.stringify(groundingMetadata);
 
         if(!messageElement.classList.contains('AI')){
             msgTxtElement.innerHTML = filteredContent.modifiedText;
         }
         else{
-            let markdownProcessed = formatMessage(messageObj.content);
+            let markdownProcessed = formatMessage(messageText);
             msgTxtElement.innerHTML = markdownProcessed;
             formatMathFormulas(msgTxtElement);
         }
@@ -243,6 +253,29 @@ function updateMessageElement(messageElement, messageObj, updateContent = false)
         }
 
     }
+
+    if (groundingMetadata != '') {
+        if (groundingMetadata.searchEntryPoint.renderedContent) {
+
+            const render = groundingMetadata.searchEntryPoint.renderedContent;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(render, 'text/html');
+            const divElement = doc.querySelector('.container');
+
+            const chips = divElement.querySelectorAll('a');
+            chips.forEach(chip => {
+                chip.setAttribute('target', "_blank");
+            });
+
+            // Create a new span to hold the content
+            const newSpan = document.createElement('span');
+            newSpan.classList.add('google-search');
+            newSpan.innerHTML = divElement.outerHTML; 
+            // Append the new span to the target element
+            messageElement.querySelector(".message-content").appendChild(newSpan);
+        }
+    }
+
 
     //SET MESSAGE TIME AND EDIT FLAG
     const time = messageObj.created_at.split('+')[1];
@@ -318,6 +351,43 @@ function setDateSpan(activeThread, msgDate, formatDay = true){
         }
     }
 }
+
+
+
+function deconstContent(inputContent){
+    let messageText = '';
+    let groundingMetadata = '';
+    
+    if(isValidJson(inputContent)){
+        const json = JSON.parse(inputContent);
+        messageText = json.text;
+
+        if(json.hasOwnProperty('groundingMetadata')){
+            groundingMetadata = json.groundingMetadata
+        }
+    }
+    else{
+        messageText = inputContent;
+    }
+
+
+    return {
+        messageText: messageText,
+        groundingMetadata: groundingMetadata
+    }
+
+}
+
+
+function isValidJson(string) {
+    try {
+        JSON.parse(string);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
 
 /// Finds out if HAWKI is mentioned in the text.
 /// rawText = text from input field or decrypted from server.

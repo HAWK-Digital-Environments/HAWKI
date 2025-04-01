@@ -72,7 +72,9 @@ class OpenWebUIProvider extends BaseAIModelProvider
         }
                
         return [
-            'content' => $content,
+            'content' => [
+                'text' => $content,
+            ],
             'usage' => $this->extractUsage($jsonContent)
         ];
 
@@ -112,7 +114,9 @@ class OpenWebUIProvider extends BaseAIModelProvider
         }
         
         return [
-            'content' => $content,
+            'content' => [
+                'text' => $content,
+            ],
             'isDone' => $isDone,
             'usage' => $usage
         ];
