@@ -170,6 +170,21 @@ async function buildRequestObjectForAiConv(msgAttributes, messageElement = null,
             formatMathFormulas(msgTxtElement);
             formatHljs(messageElement);
 
+            if (groundingMetadata && 
+                groundingMetadata != '' && 
+                groundingMetadata.searchEntryPoint && 
+                groundingMetadata.searchEntryPoint.renderedContent) {
+    
+                addGoogleRenderedContent(messageElement, groundingMetadata);
+            }
+            else{
+                console.log(messageElement.querySelector('.google-search'))
+                if(messageElement.querySelector('.google-search')){
+                    messageElement.querySelector('.google-search').remove();
+                }
+            }
+
+
             if(messageElement.querySelector('.think')){
                 scrollPanelToLast(messageElement.querySelector('.think').querySelector('.content-container'));
             }

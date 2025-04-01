@@ -141,8 +141,17 @@ function addMessageToChatlog(messageObj, isFromServer = false){
         msgTxtElement.innerHTML = markdownProcessed;
         formatMathFormulas(msgTxtElement);
         
-        if (groundingMetadata != '' && groundingMetadata.searchEntryPoint && groundingMetadata.searchEntryPoint.renderedContent) {
+        if (groundingMetadata && 
+            groundingMetadata != '' && 
+            groundingMetadata.searchEntryPoint && 
+            groundingMetadata.searchEntryPoint.renderedContent) {
+
             addGoogleRenderedContent(messageElement, groundingMetadata);
+        }
+        else{
+            if(messageElement.querySelector('.google-search')){
+                messageElement.querySelector('.google-search').remove();
+            }
         }
     }
 
@@ -240,8 +249,17 @@ function updateMessageElement(messageElement, messageObj, updateContent = false)
             let markdownProcessed = formatMessage(messageText, groundingMetadata);
             msgTxtElement.innerHTML = markdownProcessed;
             formatMathFormulas(msgTxtElement);
-            if (groundingMetadata != '' && groundingMetadata.searchEntryPoint && groundingMetadata.searchEntryPoint.renderedContent) {
+            if (groundingMetadata && 
+                groundingMetadata != '' && 
+                groundingMetadata.searchEntryPoint && 
+                groundingMetadata.searchEntryPoint.renderedContent) {
+    
                 addGoogleRenderedContent(messageElement, groundingMetadata);
+            }
+            else{
+                if(messageElement.querySelector('.google-search')){
+                    messageElement.querySelector('.google-search').remove();
+                }
             }
         }
 
