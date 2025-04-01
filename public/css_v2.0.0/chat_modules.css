@@ -401,7 +401,10 @@
 .chatlog.start-state #start-title{
     display: block;
 }
-
+.chatlog.start-state #model-selector-burger{
+    max-height: 40vh;
+    overflow-y: scroll;
+}
 
 #start-title{
     display: none;
@@ -1361,3 +1364,17 @@ display: block;
 background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);
 }
 
+.inline-citation{
+    /* background-color:  red; */
+    background-color: var(--panel-main);
+    padding: 0.25rem !important;
+    border: var(--border-stroke-thin);
+    border-radius: 50%;
+    width: 1rem;
+    height: 1rem;
+    font-size: var(--font-xxs);
+}
+
+sup{
+    margin: 0 1rem;
+}

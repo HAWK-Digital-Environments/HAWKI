@@ -106,6 +106,7 @@ return [
             'active' => true,
             'api_key' => '',
             'api_url' => 'https://generativelanguage.googleapis.com/v1beta/models/',
+            'streaming_url' => 'https://generativelanguage.googleapis.com/v1beta/models/',
             'ping_url' => '',
             'models' => [
                 [
@@ -114,12 +115,50 @@ return [
                     'streamable' => false,
                 ],
                 [
+                    'id' => 'gemini-2.0-flash-lite',
+                    'label' => 'Google Gemini 2.0 Flash Lite',
+                    'streamable' => true,
+                    'search_tool'=> false,
+                ],
+                [
                     'id' => 'gemini-2.0-flash-exp',
                     'label' => 'Google Gemini 2.0 Flash Exp',
                     'streamable' => false,
                 ],
-                
+                [
+                    'id' => 'gemini-2.5-pro-exp-03-25',
+                    'label' => 'Gemini 2.5 Pro Experimental',
+                    'streamable' => true,
+                    'search_tool'=> true,
+                ],
             ]
-        ]
+        ],
+        'ollama'=> [
+            'id' => 'ollama',
+            'active' => false,
+            'api_url' => 'http://localhost:11434/api/generate',
+            'models' => [
+                [
+                    'id' => 'llama3.2',
+                    'label' => 'Llama3.2',
+                    'streamable' => true,
+                ]
+            ]
+        ],
+        'openWebUi' => [
+            'id' => 'openWebUi',
+            'active' => false,
+            'api_key' => '',
+            'api_url' => 'your_url/api/chat/completions',
+            'ping_url' => 'your_url/api/models',
+            'models' => [
+                [
+                    'id' => 'model-id',
+                    'label' => 'Model Name',
+                    'streamable' => true,
+                ]
+            ]
+        ],
+
     ]
 ];

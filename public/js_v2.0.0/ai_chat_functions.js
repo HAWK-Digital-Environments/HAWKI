@@ -166,7 +166,7 @@ async function buildRequestObjectForAiConv(msgAttributes, messageElement = null,
     
             const msgTxtElement = messageElement.querySelector(".message-text");
     
-            msgTxtElement.innerHTML = formatChunk(content);
+            msgTxtElement.innerHTML = formatChunk(content, groundingMetadata);
             formatMathFormulas(msgTxtElement);
             formatHljs(messageElement);
 
@@ -215,6 +215,7 @@ async function buildRequestObjectForAiConv(msgAttributes, messageElement = null,
                 submittedObj.content = cryptoContent;
                 messageElement.dataset.rawMsg = msg;
                 messageElement.dataset.groundingMetadata = metadata;
+                addGoogleRenderedContent(messageElement, metadata);
                 updateMessageElement(messageElement, submittedObj);
                 activateMessageControls(messageElement);
             }

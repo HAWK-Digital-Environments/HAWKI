@@ -137,10 +137,13 @@ function addMessageToChatlog(messageObj, isFromServer = false){
         msgTxtElement.innerHTML = processedContent;
     }
     else{
-        let markdownProcessed = formatMessage(messageText);
-        markdownProcessed = convertHyperlinksToLinks(markdownProcessed);
+        let markdownProcessed = formatMessage(messageText, groundingMetadata);
         msgTxtElement.innerHTML = markdownProcessed;
         formatMathFormulas(msgTxtElement);
+        
+        if (groundingMetadata != '' && groundingMetadata.searchEntryPoint && groundingMetadata.searchEntryPoint.renderedContent) {
+            addGoogleRenderedContent(messageElement, groundingMetadata);
+        }
     }
 
 
@@ -202,9 +205,6 @@ function addMessageToChatlog(messageObj, isFromServer = false){
 
 function updateMessageElement(messageElement, messageObj, updateContent = false){
 
-    const {messageText, groundingMetadata} = deconstContent(messageObj.content);
-
-
     messageElement.id = messageObj.message_id;
     if(messageElement.querySelector('.thread')){
         messageElement.querySelector('.thread').id = messageObj.message_id.split('.')[0];
@@ -226,6 +226,7 @@ function updateMessageElement(messageElement, messageObj, updateContent = false)
     const msgTxtElement = messageElement.querySelector(".message-text");
 
     if(updateContent){
+        const {messageText, groundingMetadata} = deconstContent(messageObj.content);
         
         const filteredContent = detectMentioning(messageText);
         messageElement.dataset.rawMsg = messageText;
@@ -235,9 +236,13 @@ function updateMessageElement(messageElement, messageObj, updateContent = false)
             msgTxtElement.innerHTML = filteredContent.modifiedText;
         }
         else{
-            let markdownProcessed = formatMessage(messageText);
+
+            let markdownProcessed = formatMessage(messageText, groundingMetadata);
             msgTxtElement.innerHTML = markdownProcessed;
             formatMathFormulas(msgTxtElement);
+            if (groundingMetadata != '' && groundingMetadata.searchEntryPoint && groundingMetadata.searchEntryPoint.renderedContent) {
+                addGoogleRenderedContent(messageElement, groundingMetadata);
+            }
         }
 
         // if the read status exists in the data
@@ -252,28 +257,6 @@ function updateMessageElement(messageElement, messageObj, updateContent = false)
             }
         }
 
-    }
-
-    if (groundingMetadata != '') {
-        if (groundingMetadata.searchEntryPoint.renderedContent) {
-
-            const render = groundingMetadata.searchEntryPoint.renderedContent;
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(render, 'text/html');
-            const divElement = doc.querySelector('.container');
-
-            const chips = divElement.querySelectorAll('a');
-            chips.forEach(chip => {
-                chip.setAttribute('target', "_blank");
-            });
-
-            // Create a new span to hold the content
-            const newSpan = document.createElement('span');
-            newSpan.classList.add('google-search');
-            newSpan.innerHTML = divElement.outerHTML; 
-            // Append the new span to the target element
-            messageElement.querySelector(".message-content").appendChild(newSpan);
-        }
     }
 
 
@@ -386,6 +369,11 @@ function isValidJson(string) {
     } catch (e) {
         return false;
     }
+}
+
+// Helper function to escape special characters in regular expressions
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 
