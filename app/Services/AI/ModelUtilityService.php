@@ -12,7 +12,7 @@ class ModelUtilityService
         $providers = config('model_providers')['providers'];
         $models = [];
         foreach ($providers as $conn) {
-            if($conn['active']){
+            if ($conn['active'] && (!isset($conn['api_key']) || !empty($conn['api_key']))) {
                 foreach($conn['models'] as $model){
                     $models[] = $model;
                 }
