@@ -15,7 +15,7 @@ function addMessageToChatlog(messageObj, isFromServer = false){
     // set dataset attributes
     messageElement.dataset.role = messageObj.message_role;
     messageElement.dataset.rawMsg = messageText;
-    messageElement.dataset.groundingMetadata = JSON.stringify(groundingMetadata);
+    // messageElement.dataset.groundingMetadata = JSON.stringify(groundingMetadata);
     
     //if date and time is confirmed from the server add them
     if(messageObj.created_at) messageElement.dataset.created_at = messageObj.created_at;
@@ -239,7 +239,7 @@ function updateMessageElement(messageElement, messageObj, updateContent = false)
         
         const filteredContent = detectMentioning(messageText);
         messageElement.dataset.rawMsg = messageText;
-        messageElement.dataset.groundingMetadata = JSON.stringify(groundingMetadata);
+        // messageElement.dataset.groundingMetadata = JSON.stringify(groundingMetadata);
 
         if(!messageElement.classList.contains('AI')){
             msgTxtElement.innerHTML = filteredContent.modifiedText;

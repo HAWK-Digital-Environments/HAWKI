@@ -226,7 +226,10 @@ function formatMathFormulas(element) {
 
 function addGoogleRenderedContent(messageElement, groundingMetadata){
     // Handle search suggestions/rendered content
-    if (groundingMetadata.searchEntryPoint && groundingMetadata.searchEntryPoint.renderedContent) {
+    if (groundingMetadata && typeof groundingMetadata === 'object' &&
+        groundingMetadata.searchEntryPoint &&
+        groundingMetadata.searchEntryPoint.renderedContent) {
+                
         const render = groundingMetadata.searchEntryPoint.renderedContent;
         // Extract the HTML Tag (Styles already defined in CSS file)
         const parser = new DOMParser();

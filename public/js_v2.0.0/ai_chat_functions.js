@@ -178,7 +178,6 @@ async function buildRequestObjectForAiConv(msgAttributes, messageElement = null,
                 addGoogleRenderedContent(messageElement, groundingMetadata);
             }
             else{
-                console.log(messageElement.querySelector('.google-search'))
                 if(messageElement.querySelector('.google-search')){
                     messageElement.querySelector('.google-search').remove();
                 }
@@ -229,7 +228,7 @@ async function buildRequestObjectForAiConv(msgAttributes, messageElement = null,
 
                 submittedObj.content = cryptoContent;
                 messageElement.dataset.rawMsg = msg;
-                messageElement.dataset.groundingMetadata = metadata;
+                // messageElement.dataset.groundingMetadata = metadata;
                 addGoogleRenderedContent(messageElement, metadata);
                 updateMessageElement(messageElement, submittedObj);
                 activateMessageControls(messageElement);

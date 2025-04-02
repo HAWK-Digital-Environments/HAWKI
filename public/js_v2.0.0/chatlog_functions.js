@@ -382,24 +382,44 @@ function scrollToLast(forceScroll, targetElement = null) {
 
     let scrollTargetPosition = msgsPanel.scrollHeight; // Default to end of chatlog
 
-    if (targetElement && targetElement.id) {
-        const isCmt = targetElement.closest('.thread').classList.contains('branch') ? true : false;
-        if(isCmt){
-            // console.log('isCmt', isCmt)
-            const thread = targetElement.closest('.branch');
-            if(thread){
-                if(!thread.classList.contains('visible')){
-                    thread.classList.add('visible');
-                }
+    if (targetElement) {
+        // Check if the message is in a branch thread
+        const thread = targetElement.closest('.thread');
+        const isBranchMessage = thread && thread.classList.contains('branch');
+        
+        if (isBranchMessage) {
+            // Ensure thread is visible
+            if (!thread.classList.contains('visible')) {
+                thread.classList.add('visible');
             }
-            const parent = targetElement.parentElement.closest('.message');
-            scrollTargetPosition = parent.offsetTop + targetElement.offsetTop ;
+            
+            // Calculate position based on parent message and the message's position in thread
+            const parentMessage = thread.closest('.message');
+            const messageTopOffset = targetElement.offsetTop;
+            const threadTopOffset = thread.offsetTop;
+            const parentTopOffset = parentMessage.offsetTop;
+            console.log(targetElement);
+            
+            // Position should include parent message position plus the position within the thread
+            scrollTargetPosition =  threadTopOffset + messageTopOffset;
+            
+            // Add some padding to ensure message is fully visible
+            // scrollTargetPosition -= 60;
+        } else {
+            // For main thread messages, just use their position
+            scrollTargetPosition = targetElement.offsetTop;
+            
+            // Add some padding to ensure message is fully visible
+            const messageHeight = targetElement.offsetHeight;
+            if (messageHeight > msgsPanel.clientHeight / 2) {
+                // For tall messages, show the top
+                scrollTargetPosition -= 10;
+            } else {
+                // For normal messages, center them better
+                scrollTargetPosition -= Math.min(100, msgsPanel.clientHeight / 4);
+            }
         }
-        else{
-            scrollTargetPosition = targetElement.offsetTop - targetElement.scrollHeight;
-        }
-
-    } 
+    }
 
     const currentScroll = msgsPanel.scrollTop + msgsPanel.clientHeight;
     const scrollDistance = scrollTargetPosition - currentScroll;
