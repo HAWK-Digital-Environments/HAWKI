@@ -38,10 +38,10 @@ class AiResponseFormatterService
 
     public function formatDefaultResponse($response){
         $responseContent = $response->getContent();
-        
+
         $jsonContent = json_decode($responseContent, true);
         $content = $jsonContent['choices'][0]['message']['content'];
-        
+
         $usage = NULL;
         if(!empty($jsonContent['usage'])){
             $usage = [
@@ -49,7 +49,7 @@ class AiResponseFormatterService
                 'completion_tokens' =>  $jsonContent['usage']['completion_tokens'],
             ];
         }
-        
+
         return [$content, $usage];
     }
 
@@ -57,9 +57,9 @@ class AiResponseFormatterService
         $responseContent = $response->getContent();
         $jsonContent = json_decode($responseContent, true);
         $content = $jsonContent['candidates'][0]['content']['parts'][0]['text'];
-        
+
         $usage = NULL;
-        if(!empty($jsonContent['usage'])){
+        if(!empty($jsonContent['usageMetadata'])){
             $usage = [
                 'prompt_tokens' => $jsonContent['usageMetadata']['promptTokenCount'],
                 'completion_tokens' =>  $jsonContent['usageMetadata']['candidatesTokenCount'],
