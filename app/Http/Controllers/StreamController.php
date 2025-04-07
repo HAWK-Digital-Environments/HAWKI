@@ -30,8 +30,8 @@ class StreamController extends Controller
 
     protected $aiFormatter;
 
-    public function __construct(AiPayloadFormatterService $payloadFormatter, 
-                                AiResponseFormatterService $responseFormatter, 
+    public function __construct(AiPayloadFormatterService $payloadFormatter,
+                                AiResponseFormatterService $responseFormatter,
                                 ModelUtilityService $utilities,
                                 ModelConnectionService $modelConnection,
                                 UsageAnalyzerService $usageAnalyzer){
@@ -101,7 +101,7 @@ class StreamController extends Controller
             return response()->json($data);
         }
     }
-    
+
 
 
 
@@ -118,10 +118,18 @@ class StreamController extends Controller
             'broadcast' => 'required|boolean',
             'isUpdate' => 'nullable|boolean',
             'messageId' => 'nullable|string',
-            'threadIndex' => 'nullable|int', 
+            'threadIndex' => 'nullable|int',
             'slug' => 'nullable|string',
             'key' => 'nullable|string',
         ]);
+
+        //fallback to default model if can not grab the provider for the requested model
+        try {
+            $this->utilities->getProviderId($validatedData['payload']['model']);
+        }
+        catch (\Exception $e) {
+            $validatedData['payload']['model'] = config('model_providers.defaultModel');
+        }
 
         $formattedPayload = $this->payloadFormatter->formatPayload($validatedData['payload']);
 
@@ -152,12 +160,12 @@ class StreamController extends Controller
             }
         }
     }
-    
+
     private function handleGroupChatRequest($data, $formattedPayload){
 
         $isUpdate = (bool) ($data['isUpdate'] ?? false);
         $room = Room::where('slug', $data['slug'])->firstOrFail();
-    
+
         // Broadcast initial generation status
         $generationStatus = [
             'type' => 'aiGenerationStatus',
@@ -168,7 +176,7 @@ class StreamController extends Controller
             ]
         ];
         broadcast(new RoomMessageEvent($generationStatus));
-    
+
 
         // Send a full request to the AI model and get the response
         $provider = $this->utilities->getProvider($formattedPayload['model']);
@@ -197,7 +205,7 @@ class StreamController extends Controller
                 'tag' => $encryptiedData['tag'],
                 'content' => $encryptiedData['ciphertext'],
             ]);
-        } 
+        }
         else {
             $nextMessageId = $roomController->generateMessageID($room, $data['threadIndex']);
             $message = Message::create([
@@ -228,7 +236,7 @@ class StreamController extends Controller
 
     }
 
-    
+
     private function createRequest($formattedPayload) {
         $user = User::find(1);
         $avatar_url = $user->avatar_id !== '' ? Storage::disk('public')->url('profile_avatars/' . $user->avatar_id) : null;
@@ -302,6 +310,6 @@ class StreamController extends Controller
             }
         };
 
-        $this->modelConnection->streamToAiModel($formattedPayload, $onData);        
+        $this->modelConnection->streamToAiModel($formattedPayload, $onData);
     }
 }
