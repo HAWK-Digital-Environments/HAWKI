@@ -3,6 +3,7 @@
 namespace App\Services\AI\Providers;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class GWDGProvider extends OpenAIProvider
 {
@@ -45,8 +46,6 @@ class GWDGProvider extends OpenAIProvider
         // Mistral Fix: Additional check for empty choices array
         if (!empty($jsonChunk['usage']) && empty($jsonChunk['choices'])) {
             $usage = $this->extractUsage($jsonChunk);
-            Log::info('GWDG', ['model' => $jsonChunk['model'], 'usage' => $usage]);
-
         }
         
         // Extract content if available
@@ -55,7 +54,9 @@ class GWDGProvider extends OpenAIProvider
         }
         
         return [
-            'content' => $content,
+            'content' => [
+                'text' => $content,
+            ],
             'isDone' => $isDone,
             'usage' => $usage
         ];
@@ -92,55 +93,6 @@ class GWDGProvider extends OpenAIProvider
         }
         
         return $messages;
-    }
-    
-    /**
-     * Ping the GWDG API to check model status
-     *
-     * @param string $modelId
-     * @return string
-     * @throws \Exception
-     */
-    public function checkModelStatus(string $modelId): string
-    {
-        $response = $this->getModelsStatus();
-        $stats = json_decode($response, true)['data'];
-        
-        foreach ($stats as $stat) {
-            if ($stat['id'] === $modelId) {
-                return $stat['status'];
-            }
-        }
-        
-        throw new \Exception("Model not found in status response");
-    }
-    
-    /**
-     * Get status of all models from GWDG
-     *
-     * @return string
-     */
-    protected function getModelsStatus(): string
-    {
-        // Initialize a cURL session
-        $ch = curl_init($this->config['ping_url']);
-        
-        // Configure cURL options
-        $this->setCommonCurlOptions($ch, [], $this->getHttpHeaders());
-        
-        // Execute the request
-        $response = curl_exec($ch);
-        
-        // Handle errors
-        if ($response === false) {
-            $error = 'Curl error: ' . curl_error($ch);
-            curl_close($ch);
-            return json_encode(['error' => $error]);
-        }
-        
-        curl_close($ch);
-        
-        return $response;
     }
     
     /**
@@ -225,5 +177,72 @@ class GWDGProvider extends OpenAIProvider
             ob_flush();
         }
         flush();
+    }
+
+
+
+        /**
+     * Ping the API to check model status
+     *
+     * @param string $modelId
+     * @return string
+     * @throws \Exception
+     */
+    public function getModelsStatus(): array
+    {
+        $response = $this->pingProvider();
+        $referenceList = json_decode($response, true)['data'];
+        $models = $this->config['models'];
+    
+        // Index the referenceList by IDs for O(1) access
+        $referenceMap = [];
+        foreach ($referenceList as $reference) {
+            $referenceMap[$reference['id']] = $reference['status'];
+        }
+    
+        // Update each model with the status from the reference map if it exists
+        foreach ($models as &$model) {
+            if (isset($referenceMap[$model['id']])) {
+                $model['status'] = $referenceMap[$model['id']];
+            } else {
+                $model['status'] = 'unknown'; // or any default value if not found
+            }
+        }
+    
+        return $models;
+    }
+
+    // /**
+    // * Ping the API to check status of all models
+    // */
+    public function checkAllModelsStatus(): array
+    {
+        $response = $this->pingProvider();
+        $referenceList = json_decode($response, true)['data'];
+        return $referenceList;
+    }
+
+
+    /**
+     * Get status of all models
+     *
+     * @return string
+     */
+    protected function pingProvider(): string
+    {        
+        $url = $this->config['ping_url'];
+        $apiKey = $this->config['api_key'];
+
+        try {
+            $response = Http::withToken($apiKey)
+                ->timeout(5) // Set a short timeout
+                ->get($url);
+
+            return $response;
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        return $statuses;
     }
 }

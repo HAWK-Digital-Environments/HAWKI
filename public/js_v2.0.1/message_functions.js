@@ -1,5 +1,8 @@
 
 function addMessageToChatlog(messageObj, isFromServer = false){
+
+    const {messageText, groundingMetadata} = deconstContent(messageObj.content);
+
     /// CLONE
     // clone message element
     const messageTemp = document.getElementById('message-template')
@@ -11,7 +14,8 @@ function addMessageToChatlog(messageObj, isFromServer = false){
     /// DATASET & ID
     // set dataset attributes
     messageElement.dataset.role = messageObj.message_role;
-    messageElement.dataset.rawMsg = messageObj.content;
+    messageElement.dataset.rawMsg = messageText;
+    // messageElement.dataset.groundingMetadata = JSON.stringify(groundingMetadata);
     
     //if date and time is confirmed from the server add them
     if(messageObj.created_at) messageElement.dataset.created_at = messageObj.created_at;
@@ -125,16 +129,30 @@ function addMessageToChatlog(messageObj, isFromServer = false){
     // Setup Message Content
     const msgTxtElement = messageElement.querySelector(".message-text");
 
+    
+
     if(!messageElement.classList.contains('AI')){
-        let processedContent = detectMentioning(messageObj.content).modifiedText;
+        let processedContent = detectMentioning(messageText).modifiedText;
         processedContent = convertHyperlinksToLinks(processedContent);
         msgTxtElement.innerHTML = processedContent;
     }
     else{
-        let markdownProcessed = formatMessage(messageObj.content);
-        markdownProcessed = convertHyperlinksToLinks(markdownProcessed);
+        let markdownProcessed = formatMessage(messageText, groundingMetadata);
         msgTxtElement.innerHTML = markdownProcessed;
         formatMathFormulas(msgTxtElement);
+        
+        if (groundingMetadata && 
+            groundingMetadata != '' && 
+            groundingMetadata.searchEntryPoint && 
+            groundingMetadata.searchEntryPoint.renderedContent) {
+
+            addGoogleRenderedContent(messageElement, groundingMetadata);
+        }
+        else{
+            if(messageElement.querySelector('.google-search')){
+                messageElement.querySelector('.google-search').remove();
+            }
+        }
     }
 
 
@@ -217,17 +235,32 @@ function updateMessageElement(messageElement, messageObj, updateContent = false)
     const msgTxtElement = messageElement.querySelector(".message-text");
 
     if(updateContent){
+        const {messageText, groundingMetadata} = deconstContent(messageObj.content);
         
-        const filteredContent = detectMentioning(messageObj.content);
-        messageElement.dataset.rawMsg = messageObj.content;
+        const filteredContent = detectMentioning(messageText);
+        messageElement.dataset.rawMsg = messageText;
+        // messageElement.dataset.groundingMetadata = JSON.stringify(groundingMetadata);
 
         if(!messageElement.classList.contains('AI')){
             msgTxtElement.innerHTML = filteredContent.modifiedText;
         }
         else{
-            let markdownProcessed = formatMessage(messageObj.content);
+
+            let markdownProcessed = formatMessage(messageText, groundingMetadata);
             msgTxtElement.innerHTML = markdownProcessed;
             formatMathFormulas(msgTxtElement);
+            if (groundingMetadata && 
+                groundingMetadata != '' && 
+                groundingMetadata.searchEntryPoint && 
+                groundingMetadata.searchEntryPoint.renderedContent) {
+    
+                addGoogleRenderedContent(messageElement, groundingMetadata);
+            }
+            else{
+                if(messageElement.querySelector('.google-search')){
+                    messageElement.querySelector('.google-search').remove();
+                }
+            }
         }
 
         // if the read status exists in the data
@@ -243,6 +276,7 @@ function updateMessageElement(messageElement, messageObj, updateContent = false)
         }
 
     }
+
 
     //SET MESSAGE TIME AND EDIT FLAG
     const time = messageObj.created_at.split('+')[1];
@@ -318,6 +352,52 @@ function setDateSpan(activeThread, msgDate, formatDay = true){
         }
     }
 }
+
+
+
+function deconstContent(inputContent){
+    
+    let messageText = '';
+    let groundingMetadata = '';
+    
+    if(isValidJson(inputContent)){
+        const json = JSON.parse(inputContent);
+        if(json.hasOwnProperty('groundingMetadata')){
+            groundingMetadata = json.groundingMetadata
+        }
+        if(json.hasOwnProperty('text')){
+            messageText = json.text;
+        }
+        else{
+            messageText = inputContent;
+        }
+    }
+    else{
+        messageText = inputContent;
+    }
+
+    return {
+        messageText: messageText,
+        groundingMetadata: groundingMetadata
+    }
+
+}
+
+
+function isValidJson(string) {
+    try {
+        JSON.parse(string);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+// Helper function to escape special characters in regular expressions
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 
 /// Finds out if HAWKI is mentioned in the text.
 /// rawText = text from input field or decrypted from server.
@@ -560,6 +640,8 @@ async function confirmEditMessage(provider){
         'iv' : cryptoMsg.iv,
         'tag' : cryptoMsg.tag,
         'message_id': messageElement.id,
+        'model': null,
+        'completion': true
     }
 
     requestMsgUpdate(messageObj, messageElement ,url);

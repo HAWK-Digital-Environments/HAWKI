@@ -72,7 +72,9 @@ class OpenWebUIProvider extends BaseAIModelProvider
         }
                
         return [
-            'content' => $content,
+            'content' => [
+                'text' => $content,
+            ],
             'usage' => $this->extractUsage($jsonContent)
         ];
 
@@ -100,7 +102,6 @@ class OpenWebUIProvider extends BaseAIModelProvider
         // Extract usage data if available
         if (!empty($jsonChunk['usage'])) {
             $usage = $this->extractUsage($jsonChunk);
-            Log::info('OpenWebUI', ['model' => $jsonChunk['model'], 'usage' => $usage]);
         }
         
         // Extract content if available
@@ -112,7 +113,9 @@ class OpenWebUIProvider extends BaseAIModelProvider
         }
         
         return [
-            'content' => $content,
+            'content' => [
+                'text' => $content,
+            ],
             'isDone' => $isDone,
             'usage' => $usage
         ];

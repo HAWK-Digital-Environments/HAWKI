@@ -123,6 +123,12 @@ input:-webkit-autofill:active  {
 .red-text{
     color: red;
 }
+.gray-text{
+    color: gray;
+}
+.sub-descript{
+    font-size: var(--font-xxs);
+}
 .center-text{
     text-align: center;
 }
@@ -436,7 +442,15 @@ button:disabled{
     justify-self: center;
     background-color: green;
 }
-
+.red-c{
+    background-color: red;
+}
+.org-c{
+    background-color: orange;
+}
+.grn-c{
+    background-color: green;
+}
 
 /* SECTION: BURGER MENUS */
 .burger-menu{

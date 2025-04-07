@@ -39,7 +39,11 @@ class AIProviderFactory
     public function getProviderForModel(string $modelId): AIModelProviderInterface
     {
         $providerId = $this->getProviderId($modelId);
-        
+        return $this->getProviderInterface($providerId);
+    }
+    
+    public function getProviderInterface(string $providerId): AIModelProviderInterface
+    {
         switch ($providerId) {
             case 'openai':
                 return new OpenAIProvider($this->config['providers']['openai']);
@@ -55,7 +59,7 @@ class AIProviderFactory
                 throw new \Exception("Unsupported provider: {$providerId}");
         }
     }
-    
+
     /**
      * Determine the provider ID based on the model ID
      * 

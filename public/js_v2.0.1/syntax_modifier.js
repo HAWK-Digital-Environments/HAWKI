@@ -1,4 +1,4 @@
-//#region FORMAT MODIFIERS
+
 //0. initializeMessageFormating: resets all variables to start message.(at request function)
 //1. Gets the received Chunk.
 //2. escape HTML to prevent injection or mistaken rendering.
@@ -11,7 +11,7 @@ function initializeMessageFormating() {
     summedText = '';
 }
 
-function formatChunk(chunk) {
+function formatChunk(chunk, groundingMetadata) {
     // Append the incoming chunk to the summedText
     summedText += chunk;
     let formatText = summedText;
@@ -37,7 +37,7 @@ function formatChunk(chunk) {
     }
 
     // Render the summedText using markdown processor
-    const markdownReplaced = formatMessage(formatText);
+    const markdownReplaced = formatMessage(formatText, groundingMetadata);
     return markdownReplaced;
 }
 
@@ -55,10 +55,24 @@ function escapeHTML(text) {
 
 
 
-function formatMessage(rawContent) {    
-    const { processedContent, mathReplacements, thinkReplacements } = preprocessContent(rawContent);
+function formatMessage(rawContent, groundingMetadata = '') {
+    // Process citations and preserve HTML elements in one step
+    let contentToProcess = formatGoogleCitations(rawContent, groundingMetadata);
+    
+    // Process content with placeholders for math and think blocks
+    const { processedContent, mathReplacements, thinkReplacements } = preprocessContent(contentToProcess);
+    
+    // Apply markdown rendering
     const markdownProcessed = md.render(processedContent);
+    
+    // Restore math and think block content
     let finalContent = postprocessContent(markdownProcessed, mathReplacements, thinkReplacements);
+    
+    finalContent = convertHyperlinksToLinks(finalContent);
+    
+    // Restore preserved HTML elements
+    finalContent = restoreGoogleCitations(finalContent);
+
     return finalContent;
 }
 
@@ -83,10 +97,9 @@ function formatHljs(messageElement){
 
 
 
-// Step 1: Preprocess math formulas with placeholders
-// Step 1: Preprocess math formulas and think blocks with placeholders
+// Preprocess content: Handle math formulas, think blocks, and preserve HTML elements
 function preprocessContent(content) {
-    const mathRegex = /(\$\$.*?\$\$|\$.*?\$|\\\(.*?\\\)|\\\[.*?\\\])/gs;
+    const mathRegex = /(\$\$[^0-9].*?\$\$|\$[^0-9].*?\$|\\\(.*?\\\)|\\\[.*?\\\])/gs;
     const thinkRegex = /<think>[\s\S]*?<\/think>/g;
     const codeBlockRegex = /(```[\s\S]*?```)/g;
 
@@ -102,6 +115,9 @@ function preprocessContent(content) {
         
         // Process and replace math expressions
         const processedSegment = nonCodeSegment.replace(mathRegex, (mathMatch) => {
+            if (/^\$\d+/.test(mathMatch)) { 
+                return mathMatch; // Leave currency values untouched
+            }
             mathReplacements.push(mathMatch);
             return `%%%MATH${mathReplacements.length - 1}%%%`;
         });
@@ -142,8 +158,7 @@ function preprocessContent(content) {
 
 
 
-// Step 2: Replace placeholders after Markdown-it
-// Step 2: Replace placeholders after processing
+// Process content after Markdown rendering
 function postprocessContent(content, mathReplacements, thinkReplacements) {
     // Replace math placeholders
     content = content.replace(/%%%MATH(\d+)%%%/g, (_, index) => {
@@ -187,7 +202,10 @@ function convertHyperlinksToLinks(text) {
     return processedText;
 }
 
-
+// Helper function to escape special characters in regular expressions
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 
 
@@ -206,5 +224,109 @@ function formatMathFormulas(element) {
 }
 
 
+function addGoogleRenderedContent(messageElement, groundingMetadata){
+    // Handle search suggestions/rendered content
+    if (groundingMetadata && typeof groundingMetadata === 'object' &&
+        groundingMetadata.searchEntryPoint &&
+        groundingMetadata.searchEntryPoint.renderedContent) {
+                
+        const render = groundingMetadata.searchEntryPoint.renderedContent;
+        // Extract the HTML Tag (Styles already defined in CSS file)
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(render, 'text/html');
+        const divElement = doc.querySelector('.container');
 
-//#endregion
+        if (divElement) {
+            const chips = divElement.querySelectorAll('a');
+            chips.forEach(chip => {
+                chip.setAttribute('target', "_blank");
+            });
+
+            // Create a new span to hold the content
+            let googleSpan;
+            if(!messageElement.querySelector(".google-search")){
+                googleSpan = document.createElement('span');
+                googleSpan.classList.add('google-search');
+            }
+            else{
+                googleSpan = messageElement.querySelector(".google-search");
+            }
+
+            googleSpan.innerHTML = divElement.outerHTML; 
+            // Append the new span to the target element
+            messageElement.querySelector(".message-content").appendChild(googleSpan);
+        }
+    }
+}
+
+// Temporary storage for HTML elements to preserve
+const preservedHTML = [];
+
+function formatGoogleCitations(content, groundingMetadata = '') {
+    // Clear the previous preserved HTML array
+    preservedHTML.length = 0;
+    
+    let processedContent = content;
+    
+    if (groundingMetadata?.groundingSupports?.length) {
+        groundingMetadata.groundingSupports.forEach((support) => {
+            const segmentText = support.segment?.text || '';
+            const indices = support.groundingChunkIndices;
+
+            if (segmentText && Array.isArray(indices) && indices.length) {
+                // Generate footnote references inline
+                const footnotesRef = `<sup><span>` + indices.map(idx => 
+                    `<a class="inline-citation" href="#source${idx + 1}">${idx + 1}</a>`).join(', ') 
+                    + `</span></sup>`;
+
+                // Replace the text segment with itself plus the footnote reference
+                processedContent = processedContent.replace(
+                    new RegExp(escapeRegExp(segmentText), 'g'), 
+                    match => match + footnotesRef
+                );
+            }
+        });
+    }
+
+    let sourcesMarkdown = '';
+
+    if (groundingMetadata?.groundingChunks?.length) {
+        sourcesMarkdown = `\n\n### Search Sources:\n`;
+
+        groundingMetadata.groundingChunks.forEach((chunk, index) => {
+            if (chunk.web?.uri && chunk.web?.title) {
+                sourcesMarkdown += `${index + 1}. <a id="source${index + 1}" href="${chunk.web.uri}" target="_blank" class="source-link"><b>${chunk.web.title}</b></a>\n`;
+            }
+        });
+
+        if (sourcesMarkdown !== '\n\n### Search Sources:\n') {
+            processedContent += sourcesMarkdown;
+        }
+    }
+
+    // Preserve only necessary HTML elements in the main content (not sources)
+    const htmlPattern = /<sup>.*?<\/sup>|<a\s+.*?<\/a>/g;
+    processedContent = processedContent.replace(htmlPattern, (match) => {
+        const id = preservedHTML.length;
+        preservedHTML.push(match);
+        return `%%HTML_PRESERVED_${id}%%`;
+    });
+
+    return processedContent;
+}
+
+
+// // Restore the preserved HTML after markdown processing
+function restoreGoogleCitations(content) {
+    let result = content;
+    
+    for (let i = 0; i < preservedHTML.length; i++) {
+        // Use a regex with \b (if applicable) or a flexible match
+        const placeholder = new RegExp(`%%HTML_PRESERVED_${i}%%`, 'g');
+        
+        // Replace and ensure a new line is added
+        result = result.replace(placeholder, preservedHTML[i] + '\n');
+    }
+    
+    return result;
+}

@@ -122,43 +122,52 @@ const connectWebSocket = (roomSlug) => {
     // console.log('connected to > ' + roomSlug);
     window.Echo.private(webSocketChannel)
         .listen('RoomMessageEvent', async (e) => {
-            const data = e.data;
+            try {
+                const compressedData = atob(e.data); // Base64 decode
+                const binaryData = new Uint8Array(compressedData.split("").map(c => c.charCodeAt(0))); // Convert to Uint8Array
+                const jsonString = pako.ungzip(binaryData, { to: "string" }); // Decompress Gzip
+                const data = JSON.parse(jsonString); // Convert back to object
 
-            // console.log(`Message received in room ${roomSlug}:`, data); // Debugging
+                console.log(`Message received in room ${roomSlug}:`, data);
+                if(data.type === 'message'){
 
-            if(data.type === 'message'){
-
-                if(activeRoom && activeRoom.slug === roomSlug){
-                    if(data.messageData.message_role !== 'assistant'){
-                        handleUserMessages(data.messageData, roomSlug)
-                    }else{
-                        handleAIMessage(data.messageData, roomSlug)
+                    if(activeRoom && activeRoom.slug === roomSlug){
+                        if(data.messageData.message_role !== 'assistant'){
+                            handleUserMessages(data.messageData, roomSlug)
+                        }else{
+                            handleAIMessage(data.messageData, roomSlug)
+                        }
+                        if(data.messageData.author.username != userInfo.username){
+                            playSound('in');
+                        }
                     }
-                    if(data.messageData.author.username != userInfo.username){
-                        playSound('in');
+                    else{
+                        if(data.messageData.author.username != userInfo.username){
+                            playSound('out');
+                        }
+                        flagRoomUnreadMessages(roomSlug, true);
                     }
                 }
-                else{
-                    if(data.messageData.author.username != userInfo.username){
-                        playSound('out');
+    
+                if(data.type === "messageUpdate"){
+                    handleUpdateMessage(data.messageData, roomSlug)
+                }
+    
+                if(data.type === "aiGenerationStatus"){
+                    // console.log('aiGenerationStatus', data.messageData.isGenerating);
+                    if (data.messageData.isGenerating) {
+                        // Display the typing indicator for the user
+                        addUserToTypingList(data.messageData.model);
+                    } else {
+                        // Hide the typing indicator for the user
+                        removeUserFromTypingList(data.messageData.model);
                     }
-                    flagRoomUnreadMessages(roomSlug, true);
                 }
-            }
 
-            if(data.type === "messageUpdate"){
-                handleUpdateMessage(data.messageData, roomSlug)
-            }
 
-            if(data.type === "aiGenerationStatus"){
-                // console.log('aiGenerationStatus', data.messageData.isGenerating);
-                if (data.messageData.isGenerating) {
-                    // Display the typing indicator for the user
-                    addUserToTypingList(data.messageData.model);
-                } else {
-                    // Hide the typing indicator for the user
-                    removeUserFromTypingList(data.messageData.model);
-                }
+
+            } catch (error) {
+                console.error("Failed to decompress message:", error);
             }
         });
 };
@@ -769,7 +778,7 @@ async function loadRoom(btn=null, slug=null){
     if(!roomData){
         return;
     }
-    // console.log(roomData);
+    
     clearChatlog();
 
     activeRoom = roomData;

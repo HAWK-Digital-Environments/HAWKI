@@ -401,7 +401,10 @@
 .chatlog.start-state #start-title{
     display: block;
 }
-
+.chatlog.start-state #model-selector-burger{
+    max-height: 40vh;
+    overflow-y: scroll;
+}
 
 #start-title{
     display: none;
@@ -1245,3 +1248,133 @@
     bottom: 110%;
     right: 0;
 } */
+
+
+
+
+/* GOOGLE */
+
+.google-search .container {
+  align-items: center;
+  border-radius: 8px;
+  display: flex;
+  font-family: Google Sans, Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  padding: 8px 12px;
+}
+.google-search .chip {
+  display: inline-block;
+  border: solid 1px;
+  border-radius: 16px;
+  min-width: 14px;
+  padding: 5px 16px;
+  text-align: center;
+  user-select: none;
+  margin: 0 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.google-search .carousel {
+  overflow: auto;
+  scrollbar-width: none;
+  white-space: nowrap;
+  margin-right: -12px;
+}
+.google-search .headline {
+  display: flex;
+  margin-right: 4px;
+}
+.google-search .headline svg{
+  stroke: none;
+}
+.google-search .gradient-container {
+  position: relative;
+}
+.google-search .gradient {
+  position: absolute;
+  transform: translate(3px, -9px);
+  height: 36px;
+  width: 9px;
+}
+
+
+.lightMode .google-search .container {
+background-color: #fafafa;
+box-shadow: 0 0 0 1px #0000000f;
+}
+.lightMode .google-search .headline-label {
+color: #1f1f1f;
+}
+.lightMode .google-search .chip {
+background-color: #ffffff;
+border-color: #d2d2d2;
+color: #5e5e5e;
+text-decoration: none;
+}
+.lightMode .google-search .chip:hover {
+background-color: #f2f2f2;
+}
+.lightMode .google-search .chip:focus {
+background-color: #f2f2f2;
+}
+.lightMode .google-search .chip:active {
+background-color: #d8d8d8;
+border-color: #b6b6b6;
+}
+.lightMode .google-search .logo-dark {
+display: none;
+}
+.lightMode .google-search .logo-light {
+display: block;
+}
+.lightMode .google-search .gradient {
+background: linear-gradient(90deg, #fafafa 15%, #fafafa00 100%);
+}
+
+.darkMode .google-search .container {
+background-color: #1f1f1f;
+box-shadow: 0 0 0 1px #ffffff26;
+}
+.darkMode .google-search .headline-label {
+color: #fff;
+}
+.darkMode .google-search .chip {
+background-color: #2c2c2c;
+border-color: #3c4043;
+color: #fff;
+text-decoration: none;
+}
+.darkMode .google-search .chip:hover {
+background-color: #353536;
+}
+.darkMode .google-search .chip:focus {
+background-color: #353536;
+}
+.darkMode .google-search .chip:active {
+background-color: #464849;
+border-color: #53575b;
+}
+.darkMode .google-search .logo-light {
+display: none;
+}
+.darkMode .google-search .logo-dark {
+display: block;
+}
+.darkMode .google-search .gradient {
+background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);
+}
+
+.inline-citation{
+    /* background-color:  red; */
+    background-color: var(--panel-main);
+    padding: 0.2rem 0.4rem !important;
+    border: var(--border-stroke-thin);
+    border-radius: 50%;
+    width: 1rem;
+    height: 1rem;
+    font-size: var(--font-xxs);
+}
+
+sup{
+    margin: 0 .5rem;
+}

@@ -72,13 +72,13 @@
     window.addEventListener('DOMContentLoaded', async function (){
 
         if(await getPassKey()){
+            console.log('keychain synced');
             await syncKeychain(serverKeychainCryptoData);
-            // console.log('keychain synced');
             window.location.href = '/chat';
         }
         else{
-            // console.log('opening passkey enter');
-            window.addEventListener('DOMContentLoaded', switchSlide(1));
+            console.log('opening passkey panel');
+            switchSlide(1)
             setTimeout(() => {
                 if(@json($activeOverlay)){
                     setOverlay(false, true)

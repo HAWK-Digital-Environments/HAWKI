@@ -52,7 +52,6 @@ class StreamController extends Controller
             // Validate request data
             $validatedData = $request->validate([
                 'payload.model' => 'required|string',
-                'payload.stream' => 'required|boolean',
                 'payload.messages' => 'required|array',
                 'payload.messages.*.role' => 'required|string',
                 'payload.messages.*.content' => 'required|array',
@@ -61,42 +60,34 @@ class StreamController extends Controller
         } catch (ValidationException $e) {
             // Return detailed validation error response
             return response()->json([
+                'success' => false,
                 'message' => 'Validation Error',
                 'errors' => $e->errors()
             ], 422);
         }
 
-        try {
-            // Format the payload for internal use
-            $formattedPayload = $this->payloadFormatter->formatPayload($validatedData['payload']);
-        } catch (\Exception $e) {
-            // Handle formatting errors, e.g., unsupported provider/model
-            return response()->json([
-                'message' => 'Payload Formatting Error',
-                'error' => $e->getMessage()
-            ], 400);
-        }
+        $payload = $validatedData['payload'];
+        $payload['stream'] = false;
 
-        //find the target model from config.
-        $models = $this->utilities->getModels()['models'];
-
-        // search and find defined model based on the requested id.
-        $targetID = $formattedPayload['model'];
-        $filteredModels = array_filter($models, function($model) use ($targetID) {
-            return $model['id'] === $targetID;
-        });
-        $model = current($filteredModels);
-
-        if($formattedPayload['stream'] && $model['streamable']){
-            $formattedPayload['stream_options'] = [
-                "include_usage"=> true,
-            ];
-            $this->createStream($formattedPayload);
+        // Handle standard response
+        $result = $this->aiConnectionService->processRequest(
+            $payload,
+            false
+        );
+        
+        // Record usage
+        if (isset($result['usage'])) {
+            $this->usageAnalyzer->submitUsageRecord(
+                $result['usage'], 
+                'api', 
+                $validatedData['payload']['model']
+            );
         }
-        else{
-            $data = $this->createRequest($formattedPayload);
-            return response()->json($data);
-        }
+        // Return response to client
+        return response()->json([
+            'success' => true,
+            'content' => $result['content'],
+        ]);
     }
     
 
@@ -126,7 +117,7 @@ class StreamController extends Controller
 
 
         if ($validatedData['broadcast']) {
-            $this->handleGroupChatRequestNew($validatedData);
+            $this->handleGroupChatRequest($validatedData);
         } else {
             $user = User::find(1); // HAWKI user 
             $avatar_url = $user->avatar_id !== '' ? Storage::disk('public')->url('profile_avatars/' . $user->avatar_id) : null;
@@ -160,7 +151,6 @@ class StreamController extends Controller
                     'model' => $validatedData['payload']['model'],
                     'isDone' => true,
                     'content' => $result['content'],
-                    'groundingMetadata' => $result['groundingMetadata'],
                 ]);
             }
         }
@@ -199,7 +189,7 @@ class StreamController extends Controller
                 
                 // Format the chunk
                 $formatted = $provider->formatStreamChunk($chunk);
-                //Log::info('Formatted Chunk:' . json_encode($formatted));
+                // Log::info('Formatted Chunk:' . json_encode($formatted));
 
                 // Record usage if available
                 if ($formatted['usage']) {
@@ -219,10 +209,8 @@ class StreamController extends Controller
                     ],
                     'model' => $payload['model'],
                     'isDone' => $formatted['isDone'],
-                    'content' => $formatted['content'],
-                    'groundingMetadata' => $formatted['groundingMetadata'] ?? [],
+                    'content' => json_encode($formatted['content']),
                 ];
-                
                 echo json_encode($messageData) . "\n";
             }
         };
@@ -284,7 +272,7 @@ class StreamController extends Controller
     /**
      * Handle group chat requests with the new architecture
      */
-    private function handleGroupChatRequestNew(array $data)
+    private function handleGroupChatRequest(array $data)
     {
         $isUpdate = (bool) ($data['isUpdate'] ?? false);
         $room = Room::where('slug', $data['slug'])->firstOrFail();
@@ -319,7 +307,7 @@ class StreamController extends Controller
         // Encrypt content for storage
         $cryptoController = new EncryptionController();
         $encKey = base64_decode($data['key']);
-        $encryptiedData = $cryptoController->encryptWithSymKey($encKey, $result['content'], false);
+        $encryptiedData = $cryptoController->encryptWithSymKey($encKey, json_encode($result['content']), false);
         
         // Store message
         $roomController = new RoomController();
