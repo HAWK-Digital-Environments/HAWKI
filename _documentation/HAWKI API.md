@@ -17,6 +17,9 @@ To use the HAWKI API, you need a personal access token:
 3. In the "API Tokens" section, create a new token with a descriptive name
 4. Store the generated token securely - it will only be shown once
 
+
+**Note**: Token creation via the web interface may be disabled by administrators. In this case, you will need to contact your system administrator to create an API token for you.
+
 ### Using Tokens
 
 Include your token in all API requests using the Authorization header:
@@ -58,10 +61,11 @@ Administrators can manage API tokens for users through the command line:
 - **Using HAWKI CLI**:
   ```bash
   # Create a token
-  ./hawki token
+  php hawki token
   
   # Revoke a token
-  ./hawki token --revoke
+  php hawki token --revoke
+
   ```
 
 Both methods provide an interactive interface to select a user by username, email address, or user ID, then prompt for token creation or revocation.
@@ -159,13 +163,27 @@ All API requests are tracked and count toward your usage limits. Usage records i
 
 ## Configuration
 
-### Enabling External API Access
 
-API access is controlled by the `ALLOW_EXTERNAL_COMMUNICATION` environment variable. Set this to `true` in your HAWKI environment configuration to enable API access.
+### External API Configuration
+
+Two environment variables control API access in HAWKI:
+
+1. `ALLOW_EXTERNAL_COMMUNICATION`: Controls whether external API requests are allowed at all.
+   - `true`: External API requests are permitted
+   - `false`: All external API requests are blocked
+
+2. `ALLOW_USER_TOKEN_CREATION`: Controls whether users can create their own API tokens via the web interface.
+   - `true`: Users can create, view, and revoke their own API tokens
+   - `false`: Only system administrators can create API tokens through command line tools
+
+These settings can be configured in your HAWKI environment configuration (`.env` file):
 
 ```
 ALLOW_EXTERNAL_COMMUNICATION=true
+ALLOW_USER_TOKEN_CREATION=true
 ```
+
+When `ALLOW_USER_TOKEN_CREATION` is set to `false`, users will see a message indicating that token creation is disabled and they should contact their administrator for API access.
 
 ## Available Models
 
@@ -173,7 +191,7 @@ The available models depend on your HAWKI installation's configuration. Common m
 
 - OpenAI: gpt-4o, gpt-4o-mini, o1-mini
 - GWDG: meta-llama-3.1-8b-instruct, meta-llama-3.1-70b-instruct, mistral-large-instruct
-- Google: gemini-1.5-flash, gemini-2.0-flash-lite, gemini-2.5-pro-exp-03-25
+- Google: gemini-1.5-flash, gemini-2.0-flash-lite
 - Local models (if configured): Ollama or OpenWebUI models
 
 To see the current list of available models and their capabilities, check your HAWKI configuration or consult with your administrator.
@@ -251,6 +269,8 @@ HAWKI administrators can manage API tokens through the command line interface, w
 1. Creating tokens for users in a headless environment
 2. Automating token generation for system integration
 3. Bulk management of tokens for multiple users
+4. Creating tokens when user token creation is disabled
+
 
 The commands can be run either through Laravel's Artisan or the HAWKI CLI tool:
 
@@ -260,8 +280,8 @@ php artisan app:token
 php artisan app:token --revoke
 
 # Using HAWKI CLI
-./hawki token
-./hawki token --revoke
+php hawki token
+php hawki token --revoke
 ```
 
 The workflow for creating a token is:
@@ -284,7 +304,7 @@ Along with token management, HAWKI provides a command to remove users from the s
 php artisan app:removeuser
 
 # Using HAWKI CLI
-./hawki remove-user
+php hawki remove-user
 ```
 
 This interactive command allows administrators to:
@@ -297,9 +317,7 @@ This interactive command allows administrators to:
 When managing tokens and users via the command line:
 - Use secure shell connections when executing commands
 - Do not share the token output over insecure channels
-- Consider implementing token rotation policies
 - Keep logs of token creation and revocation for audit purposes
-- Perform user removals during scheduled maintenance periods
 - Review all tokens before removing a user to ensure services aren't disrupted
 
 ## Support
