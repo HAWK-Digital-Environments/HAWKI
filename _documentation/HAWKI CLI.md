@@ -1,4 +1,5 @@
-# HAWKI Command Line Interface
+
+# HAWKI CLI
 
 ## Overview
 
@@ -9,13 +10,13 @@ The HAWKI Command Line Interface (CLI) provides a set of powerful commands for m
 HAWKI CLI commands can be executed from the project root directory using:
 
 ```bash
-./hawki [command] [options]
+php hawki [command] [options]
 ```
 
 For help with available commands:
 
 ```bash
-./hawki help
+php hawki help
 ```
 
 ## Available Commands
@@ -26,7 +27,7 @@ For help with available commands:
 |---------|-------------|---------|
 | `check` | Check required dependencies | None |
 | `init`, `initialize` | Initialize the project | `-all`: Continue to setup process |
-| `setup` | Configure environment variables | `-g`: General settings<br>`-db`: Database settings<br>`-auth`: Authentication settings<br>`-reverb`: Reverb settings |
+| `setup` | Configure environment variables | `-g`: General settings  |  `-db`: Database settings  |  `-auth`: Authentication settings  |  `-reverb`: Reverb settings |
 | `setup-models` | Configure AI model providers | None |
 | `clear-cache` | Clear all Laravel caches | None |
 | `migrate` | Run database migrations | `--fresh`: Reset and recreate all tables |
@@ -42,7 +43,7 @@ For help with available commands:
 
 | Command | Description | Options |
 |---------|-------------|---------|
-| `run` | Run development or build processes | `-dev`: Start development servers<br>`-build`: Build the project |
+| `run` | Run development or build processes | `-dev`: Start development servers  |  `-build`: Build the project |
 | `stop` | Stop all running processes | None |
 | `help` | Show help message with available commands | None |
 
@@ -55,7 +56,7 @@ For help with available commands:
 Checks if all required dependencies for HAWKI are installed and properly configured on your system.
 
 ```bash
-./hawki check
+php hawki check
 ```
 
 The command verifies:
@@ -71,13 +72,13 @@ For missing dependencies, installation instructions are provided.
 Initializes the HAWKI project by creating necessary configuration files from templates and running essential setup commands.
 
 ```bash
-./hawki init
+php hawki init
 ```
 
 With the `-all` flag, it will continue through the complete setup process:
 
 ```bash
-./hawki init -all
+php hawki init -all
 ```
 
 This command:
@@ -94,13 +95,13 @@ Configures environment variables for different aspects of the HAWKI system.
 
 ```bash
 # Configure all settings interactively
-./hawki setup
+php hawki setup
 
 # Configure only specific settings
-./hawki setup -g    # General settings
-./hawki setup -db   # Database settings
-./hawki setup -auth # Authentication settings
-./hawki setup -reverb # Reverb settings
+php hawki setup -g    # General settings
+php hawki setup -db   # Database settings
+php hawki setup -auth # Authentication settings
+php hawki setup -reverb # Reverb settings
 ```
 
 This interactive command prompts for configuration values with sensible defaults.
@@ -110,7 +111,7 @@ This interactive command prompts for configuration values with sensible defaults
 Configures AI model providers by setting up API keys and selecting default models.
 
 ```bash
-./hawki setup-models
+php hawki setup-models
 ```
 
 The command:
@@ -124,7 +125,7 @@ The command:
 Clears all Laravel caches to ensure the application is running with fresh configurations.
 
 ```bash
-./hawki clear-cache
+php hawki clear-cache
 ```
 
 This command clears:
@@ -141,10 +142,10 @@ Runs database migrations to create or update the database schema.
 
 ```bash
 # Run pending migrations
-./hawki migrate
+php hawki migrate
 
 # Reset database and recreate tables
-./hawki migrate --fresh
+php hawki migrate --fresh
 ```
 
 The `--fresh` option will delete all tables and recreate them, resulting in data loss.
@@ -157,10 +158,10 @@ Creates or revokes API tokens for users, allowing them to access the HAWKI API.
 
 ```bash
 # Create a new token
-./hawki token
+php hawki token
 
 # Revoke an existing token
-./hawki token --revoke
+php hawki token --revoke
 ```
 
 This interactive command:
@@ -174,7 +175,7 @@ This interactive command:
 Removes a user from the HAWKI system, including all associated data.
 
 ```bash
-./hawki remove-user
+php hawki remove-user
 ```
 
 This command:
@@ -190,10 +191,10 @@ Runs development servers or builds the project.
 
 ```bash
 # Start development servers
-./hawki run -dev
+php hawki run -dev
 
 # Build the project for production
-./hawki run -build
+php hawki run -build
 ```
 
 The `-dev` option starts:
@@ -213,7 +214,7 @@ The `-build` option:
 Stops all running HAWKI processes.
 
 ```bash
-./hawki stop
+php hawki stop
 ```
 
 This command finds and terminates:
@@ -252,13 +253,13 @@ This command finds and terminates:
 ```
 ✗ PHP extension: pdo (missing)
 ```
-Run `./hawki check` to get installation instructions for missing dependencies.
+Run `php hawki check` to get installation instructions for missing dependencies.
 
 **Failed Commands**
 ```
 Error: Unable to connect to database
 ```
-Check database configuration with `./hawki setup -db` and ensure the database server is running.
+Check database configuration with `php hawki setup -db` and ensure the database server is running.
 
 **PHP Artisan Errors**
 If direct Artisan commands fail but HAWKI commands work, there might be a path or environment issue. Try using the full PHP path:
@@ -283,9 +284,9 @@ cd /path/to/hawki
 git pull
 
 # Build and deploy
-./hawki run -build
-./hawki clear-cache
-./hawki migrate
+php hawki run -build
+php hawki clear-cache
+php hawki migrate
 
 echo "Deployment complete!"
 ```
