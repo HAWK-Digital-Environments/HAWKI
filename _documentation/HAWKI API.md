@@ -60,10 +60,10 @@ Administrators can manage API tokens for users through the command line:
 - **Using HAWKI CLI**:
   ```bash
   # Create a token
-  ./hawki token
+  php hawki token
   
   # Revoke a token
-  ./hawki token --revoke
+  php hawki token --revoke
   ```
 
 Both methods provide an interactive interface to select a user by username, email address, or user ID, then prompt for token creation or revocation.
@@ -276,8 +276,8 @@ php artisan app:token
 php artisan app:token --revoke
 
 # Using HAWKI CLI
-./hawki token
-./hawki token --revoke
+php hawki token
+php hawki token --revoke
 ```
 
 The workflow for creating a token is:
@@ -300,7 +300,7 @@ Along with token management, HAWKI provides a command to remove users from the s
 php artisan app:removeuser
 
 # Using HAWKI CLI
-./hawki remove-user
+php hawki remove-user
 ```
 
 This interactive command allows administrators to:
