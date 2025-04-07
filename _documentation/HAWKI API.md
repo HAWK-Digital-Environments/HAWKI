@@ -17,6 +17,7 @@ To use the HAWKI API, you need a personal access token:
 3. In the "API Tokens" section, create a new token with a descriptive name
 4. Store the generated token securely - it will only be shown once
 
+
 **Note**: Token creation via the web interface may be disabled by administrators. In this case, you will need to contact your system administrator to create an API token for you.
 
 ### Using Tokens
@@ -64,6 +65,7 @@ Administrators can manage API tokens for users through the command line:
   
   # Revoke a token
   php hawki token --revoke
+
   ```
 
 Both methods provide an interactive interface to select a user by username, email address, or user ID, then prompt for token creation or revocation.
@@ -160,6 +162,7 @@ All API requests are tracked and count toward your usage limits. Usage records i
 - Timestamp
 
 ## Configuration
+
 
 ### External API Configuration
 
@@ -268,6 +271,7 @@ HAWKI administrators can manage API tokens through the command line interface, w
 3. Bulk management of tokens for multiple users
 4. Creating tokens when user token creation is disabled
 
+
 The commands can be run either through Laravel's Artisan or the HAWKI CLI tool:
 
 ```bash
@@ -313,6 +317,7 @@ This interactive command allows administrators to:
 When managing tokens and users via the command line:
 - Use secure shell connections when executing commands
 - Do not share the token output over insecure channels
+- Keep logs of token creation and revocation for audit purposes
 - Review all tokens before removing a user to ensure services aren't disrupted
 
 ## Support
