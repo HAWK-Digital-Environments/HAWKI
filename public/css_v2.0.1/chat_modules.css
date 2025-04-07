@@ -1367,7 +1367,7 @@ background: linear-gradient(90deg, #1f1f1f 15%, #1f1f1f00 100%);
 .inline-citation{
     /* background-color:  red; */
     background-color: var(--panel-main);
-    padding: 0.25rem !important;
+    padding: 0.2rem 0.4rem !important;
     border: var(--border-stroke-thin);
     border-radius: 50%;
     width: 1rem;

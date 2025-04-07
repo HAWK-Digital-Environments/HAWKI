@@ -71,6 +71,8 @@ return [
             'api_key' => '',
             'api_url' => 'https://chat-ai.academiccloud.de/v1/chat/completions',
             'ping_url' => 'https://chat-ai.academiccloud.de/v1/models',
+            'status_check'=>true,
+
             'models' => [
                 [
                     'id' => 'meta-llama-3.1-8b-instruct',
@@ -94,7 +96,12 @@ return [
                 ],
                 [
                     'id' => 'deepseek-r1-distill-llama-70b',
-                    'label' => 'DeepSeek R1 Distill Llama 70B',
+                    'label' => 'GWDG DeepSeek R1 Distill Llama 70B',
+                    'streamable' => true,
+                ],
+                [
+                    'id' => 'codestral-22b',
+                    'label' => 'GWDG Codestral 22b',
                     'streamable' => true,
                 ],
                 

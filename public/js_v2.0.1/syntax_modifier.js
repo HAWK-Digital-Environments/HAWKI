@@ -243,11 +243,18 @@ function addGoogleRenderedContent(messageElement, groundingMetadata){
             });
 
             // Create a new span to hold the content
-            const newSpan = document.createElement('span');
-            newSpan.classList.add('google-search');
-            newSpan.innerHTML = divElement.outerHTML; 
+            let googleSpan;
+            if(!messageElement.querySelector(".google-search")){
+                googleSpan = document.createElement('span');
+                googleSpan.classList.add('google-search');
+            }
+            else{
+                googleSpan = messageElement.querySelector(".google-search");
+            }
+
+            googleSpan.innerHTML = divElement.outerHTML; 
             // Append the new span to the target element
-            messageElement.querySelector(".message-content").appendChild(newSpan);
+            messageElement.querySelector(".message-content").appendChild(googleSpan);
         }
     }
 }
@@ -269,7 +276,7 @@ function formatGoogleCitations(content, groundingMetadata = '') {
             if (segmentText && Array.isArray(indices) && indices.length) {
                 // Generate footnote references inline
                 const footnotesRef = `<sup><span>` + indices.map(idx => 
-                    `<a class="inline-citation" href="#source${idx + 1}">[${idx + 1}]</a>`).join(', ') 
+                    `<a class="inline-citation" href="#source${idx + 1}">${idx + 1}</a>`).join(', ') 
                     + `</span></sup>`;
 
                 // Replace the text segment with itself plus the footnote reference
@@ -284,7 +291,7 @@ function formatGoogleCitations(content, groundingMetadata = '') {
     let sourcesMarkdown = '';
 
     if (groundingMetadata?.groundingChunks?.length) {
-        sourcesMarkdown = '\n\n### Search Sources:\n';
+        sourcesMarkdown = `\n\n### Search Sources:\n`;
 
         groundingMetadata.groundingChunks.forEach((chunk, index) => {
             if (chunk.web?.uri && chunk.web?.title) {

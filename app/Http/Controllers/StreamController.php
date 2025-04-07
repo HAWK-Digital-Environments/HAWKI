@@ -52,7 +52,6 @@ class StreamController extends Controller
             // Validate request data
             $validatedData = $request->validate([
                 'payload.model' => 'required|string',
-                'payload.stream' => 'required|boolean',
                 'payload.messages' => 'required|array',
                 'payload.messages.*.role' => 'required|string',
                 'payload.messages.*.content' => 'required|array',
@@ -61,42 +60,34 @@ class StreamController extends Controller
         } catch (ValidationException $e) {
             // Return detailed validation error response
             return response()->json([
+                'success' => false,
                 'message' => 'Validation Error',
                 'errors' => $e->errors()
             ], 422);
         }
 
-        try {
-            // Format the payload for internal use
-            $formattedPayload = $this->payloadFormatter->formatPayload($validatedData['payload']);
-        } catch (\Exception $e) {
-            // Handle formatting errors, e.g., unsupported provider/model
-            return response()->json([
-                'message' => 'Payload Formatting Error',
-                'error' => $e->getMessage()
-            ], 400);
-        }
+        $payload = $validatedData['payload'];
+        $payload['stream'] = false;
 
-        //find the target model from config.
-        $models = $this->utilities->getModels()['models'];
-
-        // search and find defined model based on the requested id.
-        $targetID = $formattedPayload['model'];
-        $filteredModels = array_filter($models, function($model) use ($targetID) {
-            return $model['id'] === $targetID;
-        });
-        $model = current($filteredModels);
-
-        if($formattedPayload['stream'] && $model['streamable']){
-            $formattedPayload['stream_options'] = [
-                "include_usage"=> true,
-            ];
-            $this->createStream($formattedPayload);
+        // Handle standard response
+        $result = $this->aiConnectionService->processRequest(
+            $payload,
+            false
+        );
+        
+        // Record usage
+        if (isset($result['usage'])) {
+            $this->usageAnalyzer->submitUsageRecord(
+                $result['usage'], 
+                'api', 
+                $validatedData['payload']['model']
+            );
         }
-        else{
-            $data = $this->createRequest($formattedPayload);
-            return response()->json($data);
-        }
+        // Return response to client
+        return response()->json([
+            'success' => true,
+            'content' => $result['content'],
+        ]);
     }
     
 

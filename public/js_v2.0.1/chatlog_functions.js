@@ -393,12 +393,9 @@ function scrollToLast(forceScroll, targetElement = null) {
                 thread.classList.add('visible');
             }
             
-            // Calculate position based on parent message and the message's position in thread
-            const parentMessage = thread.closest('.message');
+            // Calculate position based on thread position and the message's position in thread
             const messageTopOffset = targetElement.offsetTop;
             const threadTopOffset = thread.offsetTop;
-            const parentTopOffset = parentMessage.offsetTop;
-            console.log(targetElement);
             
             // Position should include parent message position plus the position within the thread
             scrollTargetPosition =  threadTopOffset + messageTopOffset;

@@ -43,6 +43,16 @@ switch ($command) {
     case 'migrate':
         migrate($flags);
         break;
+    case 'token':
+        if (isset($flags[0]) && $flags[0] === '--revoke') {
+            passthru('php artisan app:token --revoke');
+        } else {
+            passthru('php artisan app:token');
+        }
+        break;
+    case 'remove-user':
+        passthru('php artisan app:removeuser');
+        break;
     case 'run':
         if (isset($flags[0])) {
             switch ($flags[0]) {
@@ -91,6 +101,8 @@ function showHelp() {
     echo "  setup-models           - Configure AI model providers" . PHP_EOL;
     echo "  clear-cache            - Clear all Laravel caches" . PHP_EOL;
     echo "  migrate [--fresh]      - Run database migrations" . PHP_EOL;
+    echo "  token [--revoke]       - Create or revoke API tokens for a user" . PHP_EOL;
+    echo "  remove-user            - Remove a user from the system" . PHP_EOL;
     echo "  run -dev               - Run development servers" . PHP_EOL;
     echo "  run -build             - Build the project" . PHP_EOL;
     echo "  stop                   - Stop all running processes" . PHP_EOL;
