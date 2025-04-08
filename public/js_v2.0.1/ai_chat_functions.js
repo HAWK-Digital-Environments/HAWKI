@@ -134,6 +134,7 @@ async function buildRequestObjectForAiConv(msgAttributes, messageElement = null,
     // let messageElement;
     let msg = "";
     let messageObj;
+    let metadata;
 
     // Start buildRequestObject processing
     buildRequestObject(msgAttributes, async (data, done) => {
@@ -143,7 +144,13 @@ async function buildRequestObjectForAiConv(msgAttributes, messageElement = null,
                 setSendBtnStatus(SendBtnStatus.STOPPABLE);
             }
 
-            const content = data.content;
+            // console.log(data.content);
+            const {messageText, groundingMetadata} = deconstContent(data.content);
+            if(groundingMetadata != ""){
+                metadata = groundingMetadata;
+            }
+            
+            const content = messageText;
             msg += content;
             messageObj = data;
             messageObj.message_role = 'assistant';
@@ -159,9 +166,23 @@ async function buildRequestObjectForAiConv(msgAttributes, messageElement = null,
     
             const msgTxtElement = messageElement.querySelector(".message-text");
     
-            msgTxtElement.innerHTML = formatChunk(content);
+            msgTxtElement.innerHTML = formatChunk(content, groundingMetadata);
             formatMathFormulas(msgTxtElement);
             formatHljs(messageElement);
+
+            if (groundingMetadata && 
+                groundingMetadata != '' && 
+                groundingMetadata.searchEntryPoint && 
+                groundingMetadata.searchEntryPoint.renderedContent) {
+    
+                addGoogleRenderedContent(messageElement, groundingMetadata);
+            }
+            else{
+                if(messageElement.querySelector('.google-search')){
+                    messageElement.querySelector('.google-search').remove();
+                }
+            }
+
 
             if(messageElement.querySelector('.think')){
                 scrollPanelToLast(messageElement.querySelector('.think').querySelector('.content-container'));
@@ -173,8 +194,13 @@ async function buildRequestObjectForAiConv(msgAttributes, messageElement = null,
         if(done){
             setSendBtnStatus(SendBtnStatus.SENDABLE);
 
+            const cryptoContent = JSON.stringify({
+                text: msg,
+                groundingMetadata : metadata
+            });
+            
             const convKey = await keychainGet('aiConvKey');
-            const cryptoMsg = await encryptWithSymKey(convKey, msg, false);
+            const cryptoMsg = await encryptWithSymKey(convKey, cryptoContent, false);
 
             messageObj.ciphertext = cryptoMsg.ciphertext;
             messageObj.iv = cryptoMsg.iv;
@@ -197,10 +223,13 @@ async function buildRequestObjectForAiConv(msgAttributes, messageElement = null,
             }
             else{
                 requestObj.isAi = true;
+                console.log('checkpoint')
                 const submittedObj = await submitMessageToServer(requestObj, `/req/conv/sendMessage/${activeConv.slug}`);
 
-                submittedObj.content = msg;
+                submittedObj.content = cryptoContent;
                 messageElement.dataset.rawMsg = msg;
+                // messageElement.dataset.groundingMetadata = metadata;
+                addGoogleRenderedContent(messageElement, metadata);
                 updateMessageElement(messageElement, submittedObj);
                 activateMessageControls(messageElement);
             }
@@ -350,7 +379,7 @@ async function generateChatName(firstMessage, convItem) {
             let convName = ""; // Initialize to an empty string
             const onData = (data, done) => {
                 if (data) {
-                    convName += data.content;
+                    convName += deconstContent(data.content).messageText;
                     convElement.innerText = convName;
                 }
                 if (done) {

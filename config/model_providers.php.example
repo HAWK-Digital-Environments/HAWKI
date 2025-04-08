@@ -71,6 +71,8 @@ return [
             'api_key' => '',
             'api_url' => 'https://chat-ai.academiccloud.de/v1/chat/completions',
             'ping_url' => 'https://chat-ai.academiccloud.de/v1/models',
+            'status_check'=>true,
+
             'models' => [
                 [
                     'id' => 'meta-llama-3.1-8b-instruct',
@@ -94,7 +96,12 @@ return [
                 ],
                 [
                     'id' => 'deepseek-r1-distill-llama-70b',
-                    'label' => 'DeepSeek R1 Distill Llama 70B',
+                    'label' => 'GWDG DeepSeek R1 Distill Llama 70B',
+                    'streamable' => true,
+                ],
+                [
+                    'id' => 'codestral-22b',
+                    'label' => 'GWDG Codestral 22b',
                     'streamable' => true,
                 ],
                 
@@ -106,6 +113,7 @@ return [
             'active' => true,
             'api_key' => '',
             'api_url' => 'https://generativelanguage.googleapis.com/v1beta/models/',
+            'streaming_url' => 'https://generativelanguage.googleapis.com/v1beta/models/',
             'ping_url' => '',
             'models' => [
                 [
@@ -114,12 +122,44 @@ return [
                     'streamable' => false,
                 ],
                 [
+                    'id' => 'gemini-2.0-flash-lite',
+                    'label' => 'Google Gemini 2.0 Flash Lite',
+                    'streamable' => true,
+                    'search_tool'=> false,
+                ],
+                [
                     'id' => 'gemini-2.0-flash-exp',
                     'label' => 'Google Gemini 2.0 Flash Exp',
                     'streamable' => false,
-                ],
-                
+                ]
             ]
-        ]
+        ],
+        'ollama'=> [
+            'id' => 'ollama',
+            'active' => false,
+            'api_url' => 'http://localhost:11434/api/generate',
+            'models' => [
+                [
+                    'id' => 'llama3.2',
+                    'label' => 'Llama3.2',
+                    'streamable' => true,
+                ]
+            ]
+        ],
+        'openWebUi' => [
+            'id' => 'openWebUi',
+            'active' => false,
+            'api_key' => '',
+            'api_url' => 'your_url/api/chat/completions',
+            'ping_url' => 'your_url/api/models',
+            'models' => [
+                [
+                    'id' => 'model-id',
+                    'label' => 'Model Name',
+                    'streamable' => true,
+                ]
+            ]
+        ],
+
     ]
 ];

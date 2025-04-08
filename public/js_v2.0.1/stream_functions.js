@@ -99,10 +99,10 @@ async function processStream(stream, onData) {
                 onData(null, true);
                 return;
             }
-            
+
+
             // Append the latest chunk to the buffer
             buffer += textDecoder.decode(value, { stream: true });
-            console.log(buffer);
             // Split the buffer string on newline characters
             const parts = buffer.split("\n");
             // The last part might be incomplete, keep it in the buffer
@@ -110,8 +110,6 @@ async function processStream(stream, onData) {
             for (const part of parts) {
                 if (part.trim()) {
                     try {
-
-                        
                         const data = JSON.parse(part);
                         //send back the data
                         if(data.isDone){
@@ -254,7 +252,7 @@ async function requestPromptImprovement(sender) {
     .then(response => {
         const onData = (data, done) => {
             if (data && data.content != "") {
-                result += data.content;
+                result += deconstContent(data.content).messageText
                 inputField.value = result.trim();
                 resizeInputField(inputField);   
             }
@@ -309,7 +307,7 @@ async function requestChatlogSummery(msgs = null) {
         return new Promise((resolve, reject) => {
             const onData = (data, done) => {
                 if (done) {
-                    resolve(data.content);
+                    resolve(deconstContent(data.content).messageText);
                 }
             };
             processResponse(response, onData);

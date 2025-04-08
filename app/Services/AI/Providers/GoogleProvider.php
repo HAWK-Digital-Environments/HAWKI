@@ -16,8 +16,6 @@ class GoogleProvider extends BaseAIModelProvider
     {
         $messages = $rawPayload['messages'];
         $modelId = $rawPayload['model'];
-        
-        //Log::info("Google rawPayload", $rawPayload);
 
         // Extract system prompt from first message item
         $systemInstruction = [];
@@ -68,16 +66,13 @@ class GoogleProvider extends BaseAIModelProvider
         
         // Google Search only works with gemini >= 2.0
         // Search tool is context sensitive, this means the llm decides if a search is necessary for an answer
-        if ($modelId === "gemini-2.0-flash-exp"){
+        if ($this->config['allow_search'] && $this->getModelDetails($modelId)['search_tool']){
             $payload['tools'] = $rawPayload['tools'] ?? [
                 [
                     "google_search" => new \stdClass()
                 ]
             ];
         }
-
-
-        //Log::info("Google formattedPayload", $payload);
         return $payload;
     }
     
@@ -89,15 +84,17 @@ class GoogleProvider extends BaseAIModelProvider
      */
     public function formatResponse($response): array
     {
-
         $responseContent = $response->getContent();
         $jsonContent = json_decode($responseContent, true);        
-        Log::info($jsonContent);
 
         $content = $jsonContent['candidates'][0]['content']['parts'][0]['text'] ?? '';
-        
+        $groundingMetadata = $jsonContent['candidates'][0]['groundingMetadata'] ?? '';
+
         return [
-            'content' => $content,
+            'content' => [
+                'text' => $content,
+                'groundingMetadata' => $groundingMetadata,
+            ],
             'usage' => $this->extractUsage($jsonContent)
         ];
     }
@@ -125,7 +122,6 @@ class GoogleProvider extends BaseAIModelProvider
 
         // Add search results
         if (isset($jsonChunk['candidates'][0]['groundingMetadata'])) {
-            Log::info('added search results');
             $groundingMetadata = $jsonChunk['candidates'][0]['groundingMetadata'];
         }
         
@@ -141,8 +137,10 @@ class GoogleProvider extends BaseAIModelProvider
         }
         
         return [
-            'content' => $content,
-            'groundingMetadata' => $groundingMetadata,
+            'content' => [
+                'text' => $content,
+                'groundingMetadata' => $groundingMetadata,
+            ],
             'isDone' => $isDone,
             'usage' => $usage
         ];
@@ -156,7 +154,6 @@ class GoogleProvider extends BaseAIModelProvider
      */
     protected function extractUsage(array $data): ?array
     {
-        //Log::info($data);
         if (empty($data['usageMetadata'])) {
             return null;
         }
@@ -200,11 +197,19 @@ class GoogleProvider extends BaseAIModelProvider
         $url = $this->config['api_url'] . $payload['model'] . ':generateContent?key=' . $this->config['api_key'];
         // Extract just the necessary parts for Google's API
         $requestPayload = [
+            'system_instruction' => $payload['system_instruction'],
             'contents' => $payload['contents']
         ];
-        // Add generation config if present
+
+        // Add aditional config parameters if present
+        if (isset($payload['safetySettings'])) {
+            $requestPayload['safetySettings'] = $payload['safetySettings'];
+        }
         if (isset($payload['generationConfig'])) {
             $requestPayload['generationConfig'] = $payload['generationConfig'];
+        }
+        if (isset($payload['tools'])) {
+            $requestPayload['tools'] = $payload['tools'];
         }
         
         // Initialize cURL
@@ -238,14 +243,8 @@ class GoogleProvider extends BaseAIModelProvider
      */
      public function makeStreamingRequest(array $payload, callable $streamCallback)
     {
-        //Log::info("Google CURL payload input", $payload);
-        
-        // Ensure stream is set to true
-        //$payload['stream'] = true;
-        
         // Streaming endpoint for Google Gemini
         $url = $this->config['streaming_url'] . $payload['model'] . ':streamGenerateContent?key=' . $this->config['api_key'];
-        Log::info('url', ['url' => $url]);
 
         // Extract necessary parts for Google's API
         $requestPayload = [
@@ -263,8 +262,6 @@ class GoogleProvider extends BaseAIModelProvider
         if (isset($payload['tools'])) {
             $requestPayload['tools'] = $payload['tools'];
         }
-
-        Log::info('Google CURL REQUESTpayload', $requestPayload);
 
         set_time_limit(120);
         
@@ -290,8 +287,7 @@ class GoogleProvider extends BaseAIModelProvider
             foreach ($httpHeaders as $header) {
                 $headerString .= "-H '" . $header . "' ";
             }
-            $command = "curl -X POST '" . $url . "' " . $headerString . "-d '" . json_encode($requestPayload) . "'";
-            Log::info("Full CURL Command: " . $command);        
+            $command = "curl -X POST '" . $url . "' " . $headerString . "-d '" . json_encode($requestPayload) . "'";    
 
         // Execute the cURL session
         curl_exec($ch);

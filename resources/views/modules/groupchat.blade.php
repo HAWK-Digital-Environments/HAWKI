@@ -79,7 +79,6 @@
 window.addEventListener('DOMContentLoaded', async function (){
 	
 	initializeGroupChatModule(@json($userData['rooms']));
-	console.log(@json($userData['rooms']));
 	
 	const slug = @json($slug);
 	if (slug){
