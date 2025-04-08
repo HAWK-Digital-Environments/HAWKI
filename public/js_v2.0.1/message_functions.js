@@ -422,7 +422,7 @@ function detectMentioning(rawText){
         let processedText = rawText;
         
         for (const mention of mentionMatches) {
-            if (mention.toLowerCase() === "@hawki") {
+            if (mention.toLowerCase() === aiHandle.toLowerCase()) {
                 returnObj.aiMentioned = true;
                 returnObj.aiMention = mention; // Remove the '@' for aiMention
                 processedText = processedText.replace(new RegExp(mention, 'i'), '').trim();

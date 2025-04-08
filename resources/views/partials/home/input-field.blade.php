@@ -174,7 +174,7 @@
 
                 @elseif($activeModule === 'groupchat')
 
-                    placeholder="{{ $translation['Input_Placeholder_Room'] }}" 
+                    placeholder="{{ $translation['Input_Placeholder_Room'] ." ". config('app.aiHandle')}}"
                     oninput="resizeInputField(this); onGroupchatType()" 
                     onkeypress="onHandleKeydownRoom(event)"
                 
