@@ -6,6 +6,7 @@
 /storage/*.key
 /vendor
 .env
+!/_docker_production/.env
 .env.backup
 .env.private
 .env.production
@@ -19,6 +20,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-config/model_providers.php
 config/model_providers.php
 docker-compose.override.yml
