@@ -1,1 +1,0 @@
-dockerStop ${other_args[*]}

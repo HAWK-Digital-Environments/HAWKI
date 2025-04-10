@@ -1,1 +1,0 @@
-dockerDown ${other_args[*]}
