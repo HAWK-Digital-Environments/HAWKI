@@ -85,8 +85,12 @@
 	const defaultModel = @json($models).defaultModel;
 	const systemModels = @json($models).systemModels;
 
+
+	const aiHandle = "{{ config('app.aiHandle') }}";
+
+	
 	window.addEventListener('DOMContentLoaded', async (event) => {
-		
+
 		setSessionCheckerTimer(0);
 		CheckModals()
 

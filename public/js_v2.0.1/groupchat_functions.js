@@ -94,7 +94,7 @@ async function onSendMessageToRoom(inputField) {
 
     // console.log(messageObj);
     // if HAWKI is targeted send copy to stream controller
-    if(submittedObj.filteredContent.aiMention && submittedObj.filteredContent.aiMention.toLowerCase().includes('@hawki')){
+    if(submittedObj.filteredContent.aiMention && submittedObj.filteredContent.aiMention.toLowerCase().includes(aiHandle.toLowerCase())){
 
         const aiCryptoSalt = await fetchServerSalt('AI_CRYPTO_SALT');
         const aiKey = await deriveKey(roomKey, activeRoom.slug, aiCryptoSalt);
