@@ -2,7 +2,7 @@
 
 This guide will walk you through setting up a local Docker environment for developing and testing HAWKI on your local machine.
 Please keep in mind, that this guide is intended for development and testing purposes only. For production,
-please refer to the [production installation guide (coming soon)](#), as it is more secure and robust.
+please refer to the [production installation guide](Docker%20Deployment.md), as it is more secure and robust.
 
 The PHP(8.4) container is based on an alpine linux using FPM which can be found [here](https://github.com/Neunerlei/docker-php),
 we are planning to deploy our own php base image built on a ubuntu distro in the future.
@@ -76,7 +76,8 @@ bin/env open
 Well done!
 
 #### A few words on the `bin/env` script.
-The script is build using [bashly](https://bashly.dev/) and is located in the `bin` folder.
+
+The script is build using node.js and is located in the `bin` folder.
 For the most part it acts as a convenience wrapper around `docker-compose` and `docker` commands, but it also has some additional features.
 To see all available commands, run `bin/env` without any arguments to see a detailed help.
 
