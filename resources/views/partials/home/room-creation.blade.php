@@ -10,7 +10,7 @@
                     <div class="row zero-v-margin">
                         <div class="prop-panel-grid">
                             
-                            <div class="avatar-editable" onclick="selectRoomAvatar(this, true)">
+                            <div class="avatar-editable" onclick="selectRoomAvatar(this, false)">
                                 <img class="selectable-image" id="room-creation-avatar"   alt="">
                                 <div class="edit">
                                     <x-icon name="new"/>
@@ -23,7 +23,7 @@
                                     <input 
                                         class="text-field chat-name zero-v-margin singleLineTextarea" 
                                         id="chat-name-input"
-                                        placeholder="Wähle einen Namen"
+                                        placeholder="{{ $translation["PH_ChooseName"] }}"
                                         maxlength="50"></input>
                                 </div>
                             </div>
@@ -36,7 +36,7 @@
                         <label>{{ $translation["RoomDesc"] }}</label>
                         <textarea 
                             class="text-input"
-                            placeholder="Beschreibung eingeben" 
+                            placeholder="{{ $translation["PH_ChooseDescription"] }}" 
                             name="room-description" 
                             id="room-description-input" 
                             maxlength="300"
@@ -46,7 +46,7 @@
                         <label>{{ $translation["SystemPrompt"] }}</label>
                         <textarea 
                             class="text-input fit-height"
-                            placeholder="Geben Sie Ihre bevorzugte Systemprompt ein" 
+                            placeholder="{{ $translation["PH_SystemPrompt"] }}" 
                             name="system-prompt" 
                             id="system-prompt-input" 
                             maxlength="300"

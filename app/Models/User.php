@@ -20,12 +20,13 @@ class User extends Authenticatable
         'publicKey',
         'avatar_id',
         'bio',
+        'isRemoved'
     ];
 
 
     public function members()
     {
-        return $this->hasMany(Member::class);
+        return $this->hasMany(Member::class)->where('isRemoved', false);
     }
 
     public function rooms()
@@ -50,4 +51,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Invitation::class, 'username', 'username');
     }
+
+    public function revokProfile(){
+        $this->update(['isRemoved'=> 1]);
+    }
+
 }
