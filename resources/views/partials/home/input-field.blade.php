@@ -54,7 +54,7 @@
                         @include('partials.home.components.models-list')
                     </div>
                 
-                    <div class="burger-btn-arrow burger-btn" onclick="openBurgerMenu('model-selector-burger', this, false, true)">
+                    <div class="burger-btn-arrow burger-btn" onclick="openBurgerMenu('model-selector-burger', this, false, true, true)">
                         <div class="icon">
                             <x-icon name="chevron-up"/>
                         </div>

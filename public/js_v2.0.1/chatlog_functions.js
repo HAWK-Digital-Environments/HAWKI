@@ -376,7 +376,6 @@ function setModel(modelID = null){
 // Function to handle the auto-scroll behavior
 let scrollTimeout; // To clear timeout when scrolling
 function scrollToLast(forceScroll, targetElement = null) {
-
     const msgsPanel = document.querySelector('.chatlog .scroll-container');
     if (!msgsPanel) return;
 
@@ -393,21 +392,24 @@ function scrollToLast(forceScroll, targetElement = null) {
                 thread.classList.add('visible');
             }
             
+            const messageHeight = targetElement.offsetHeight;
             // Calculate position based on thread position and the message's position in thread
-            const messageTopOffset = targetElement.offsetTop;
+            const messageTopOffset = targetElement.offsetTop + messageHeight - (window.innerHeight - 200);
+
             const threadTopOffset = thread.offsetTop;
             
             // Position should include parent message position plus the position within the thread
             scrollTargetPosition =  threadTopOffset + messageTopOffset;
             
             // Add some padding to ensure message is fully visible
-            // scrollTargetPosition -= 60;
+            // scrollTargetPosition -= 100;
         } else {
-            // For main thread messages, just use their position
-            scrollTargetPosition = targetElement.offsetTop;
             
             // Add some padding to ensure message is fully visible
             const messageHeight = targetElement.offsetHeight;
+
+            // For main thread messages, just use their position
+            scrollTargetPosition = targetElement.offsetTop + messageHeight;
             if (messageHeight > msgsPanel.clientHeight / 2) {
                 // For tall messages, show the top
                 scrollTargetPosition -= 10;

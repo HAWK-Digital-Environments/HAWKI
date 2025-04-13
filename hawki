@@ -7,11 +7,17 @@
 
 // Define color constants
 define('GREEN', "\033[32m");
+define('BLUE', "\033[34m");
 define('RED', "\033[31m");
 define('YELLOW', "\033[33m");
 define('RESET', "\033[0m");
 define('BOLD', "\033[1m");
-
+define('LOGO', "
+▗▖ ▗▖ ▗▄▖ ▗▖ ▗▖▗▖ ▗▖▗▄▄▄▖
+▐▌ ▐▌▐▌ ▐▌▐▌ ▐▌▐▌▗▞▘  █
+▐▛▀▜▌▐▛▀▜▌▐▌ ▐▌▐▛▚▖   █
+▐▌ ▐▌▐▌ ▐▌▐▙█▟▌▐▌ ▐▌▗▄█▄▖
+");
 // Get the command argument
 $command = $argv[1] ?? 'help';
 $flags = array_slice($argv, 2);
@@ -84,7 +90,8 @@ switch ($command) {
 
 function showHelp() {
 
-    echo PHP_EOL;
+    echo PHP_EOL . BLUE . LOGO . RESET . PHP_EOL . PHP_EOL;
+
     echo BOLD . "HAWKI Command Line Utility" . RESET . PHP_EOL;
     echo "Usage: php hawki [command] [options]" . PHP_EOL . PHP_EOL;
     echo "Available commands:" . PHP_EOL;
@@ -275,8 +282,11 @@ function askForNextStep($nextStep){
 }
 
 function initialize() {
+
     echo BOLD . "Initializing HAWKI project..." . RESET . PHP_EOL;
     
+    echo PHP_EOL . BLUE . LOGO . RESET . PHP_EOL . PHP_EOL;
+
     // Check for .env file
     if (!file_exists('.env')) {
         if (file_exists('.env.example')) {

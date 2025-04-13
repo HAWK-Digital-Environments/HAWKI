@@ -151,7 +151,7 @@ document.addEventListener('click', function(event) {
 
 
 
-function openBurgerMenu(id, sender = null, alignToElement = false, isRelativeToElement = false){
+function openBurgerMenu(id, sender = null, alignToElement = false, isRelativeToElement = false, toggleOnSenderClick = false){
     let menu;
     if(isRelativeToElement){
         menu = sender.parentElement.querySelector(`#${id}`)
@@ -176,16 +176,20 @@ function openBurgerMenu(id, sender = null, alignToElement = false, isRelativeToE
     }
 
 
+    if(toggleOnSenderClick && menu.style.display != 'none'){
+        closeBurgerMenus(null);
+    }
+    else{
+        menu.style.display = `block`;
+        setTimeout(() => {
+            //add some buffer to the width
+            //without buffer bold text on hover changes menu width
+            const menuWidth = menu.getBoundingClientRect().width;
+            menu.style.width = `${menuWidth + 10}px`;
 
-    menu.style.display = `block`;
-    setTimeout(() => {
-        //add some buffer to the width
-        //without buffer bold text on hover changes menu width
-        const menuWidth = menu.getBoundingClientRect().width;
-        menu.style.width = `${menuWidth + 10}px`;
-
-        menu.style.opacity = `1`;
-    }, 50);
+            menu.style.opacity = `1`;
+        }, 50);
+    }
 }
 
 
