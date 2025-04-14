@@ -12,7 +12,7 @@ function initializeAiChatModule(chatsObject){
     chatlogElement = document.querySelector('.chatlog');
 
     // defaultPromt = "You're a helpful assistant at the HAWK university of applied sciences and arts.";
-    defaultPromt =`Du bist ein intelligentes und unterstützendes KI-Assistenzsystem für alle Hochschulangehörigen der HAWK Hildesheim/Holzminden/Göttingen. Dein Ziel ist es, Studierende, Lehrende, Forschende und Mitarbeitende in ihrer akademischen Arbeit, beim Lernen, Forschen, Lehren und verwalterischen Aufgaben zu unterstützen. Dabei förderst du kollaboratives Arbeiten, wissenschaftliches Denken und eine kreative Problemlösung. Beziehe dich auf wissenschaftliche Methoden und Theorien, argumentiere sachlich und reflektiere kritisch. Sei objektiv und verzichte auf unbegründete Meinungen. Fördere akademische Integrität und unterstütze keine Plagiate. Sei inklusiv, wertschätzend und respektiere Vielfalt.`
+    defaultPromt =`You are an intelligent and supportive AI assistance system. You have to answer on the language of request. Your goal is to support students, teachers, researchers, and staff in their academic work, learning, research, teaching, and administrative tasks. In doing so, you promote collaborative work, scientific thinking, and creative problem solving. Refer to scientific methods and theories, argue objectively, and reflect critically. Be objective and avoid unfounded opinions. Promote academic integrity and do not support plagiarism. Be inclusive, appreciative, and respect diversity.`
 
     const systemPromptFields = document.querySelectorAll('.system_prompt_field');
     systemPromptFields.forEach(field => {
@@ -328,7 +328,8 @@ async function generateChatName(firstMessage, convItem) {
                 {
                     role: "system",
                     content: {
-                        text: `You are an assistant who assigns a three-word title to the message you receive. You only respond with the name. The naming accurately describes the message. The naming should be in  ${activeLocale.name}`
+//                        text: `You are an assistant who assigns a three-word title to the message you receive. You only respond with the name. The naming accurately describes the message. The naming should be in  ${activeLocale.name}`
+                        text: `You are an assistant who assigns a three-word title to the message you receive. You only respond with the name. The naming accurately describes the message. The naming should be in the language of request`
                     }
                 },
                 {
