@@ -136,3 +136,6 @@ Route::middleware('prevent_back')->group(function () {
 
 
 });
+
+//use xfel routes like this to override default routes
+@include __DIR__ . '/xfel.php';
