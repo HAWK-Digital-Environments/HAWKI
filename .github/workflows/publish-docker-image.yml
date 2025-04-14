@@ -16,8 +16,6 @@ jobs:
       contents: read
       attestations: write
       id-token: write
-    # Only run this job if a tag is pushed on the main branch
-    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/') && github.ref_name == 'main'
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
