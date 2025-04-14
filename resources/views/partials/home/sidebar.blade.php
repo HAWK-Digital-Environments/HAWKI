@@ -8,6 +8,7 @@
                         {{ $translation["Chat"] }}
                     </div>
                 </button>
+                {{--
                 <button id="groupchat-sb-btn" onclick="onSidebarButtonDown('groupchat')" class="btn-sm sidebar-btn tooltip-parent">
                     <x-icon name="assistant-icon"/>
 
@@ -15,7 +16,7 @@
                         {{ $translation["Groupchat"] }}
                     </div>
                 </button>
-
+                --}}
                 <button id="profile-sb-btn" onclick="onSidebarButtonDown('profile')" class="btn-sm sidebar-btn tooltip-parent">
                     <div class="profile-icon round-icon">
                         <span class="user-inits" style="display:none"></span>
