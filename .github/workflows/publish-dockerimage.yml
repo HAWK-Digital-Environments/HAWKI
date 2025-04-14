@@ -2,6 +2,10 @@ name: Publish Dockerimage
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish"
+        required: true
   push:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
@@ -17,7 +21,7 @@ jobs:
       contents: read
       attestations: write
       id-token: write
-    if: github.ref == 'refs/heads/main' && github.ref_type == 'tag'
+    if: github.ref == 'refs/heads/main' && (github.ref_type == 'tag' || github.event_name == 'workflow_dispatch')
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -25,7 +29,13 @@ jobs:
       - name: Extract tag name
         id: tag
         shell: bash
-        run: echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+        if: github.ref_type == 'tag'
+        run: |
+          if [[ ${{ github.ref }} == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
