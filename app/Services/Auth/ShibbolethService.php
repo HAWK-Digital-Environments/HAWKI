@@ -26,12 +26,12 @@ class ShibbolethService
         // Check if the user is authenticated
         if (!empty($_SERVER['REMOTE_USER'])) {
             // Retrieve configuration variables
-            $nameVar = config('shibboleth.attribute_map.name');
+            $gnameVar = config('shibboleth.attribute_map.sname');
+            $snameVar = config('shibboleth.attribute_map.gname');
             $mailVar = config('shibboleth.attribute_map.email');
             $employeetypeVar = config('shibboleth.attribute_map.employeetype');
-    
             // Check if the required attributes are present in the $_SERVER array
-            if (isset($_SERVER[$nameVar], $_SERVER[$mailVar], $_SERVER[$employeetypeVar])) {
+            if (isset($_SERVER[$snameVar], $_SERVER[$gnameVar], $_SERVER[$mailVar], $_SERVER[$employeetypeVar])) {
                 // Return user information
                 return $userInfo = [
                     'username' => $_SERVER['REMOTE_USER'],
