@@ -248,23 +248,15 @@ async function requestPromptImprovement(sender) {
 
     let result = '';
     postData(requestObject)
-    .then(response => {
-        const onData = (data, done) => {
-            if (data && data.content != "") {
-                result += data.content;
-                inputField.value = result.trim();
-                resizeInputField(inputField);   
-            }
-            if (done) {
-                // console.log('done');
-            }
-        };
-        processStream(response.body, onData);
+    .then((response) => response.json())
+    .then((data) => {
+        if (data && data.content != "") {
+            result += data.content;
+            inputField.value = result.trim();
+            resizeInputField(inputField);
+        }
     })
-    .catch((error) => {
-        // console.log(error);
-    });
-    // write a cool math formula
+    .catch(error => reject(error))
 
 }
 

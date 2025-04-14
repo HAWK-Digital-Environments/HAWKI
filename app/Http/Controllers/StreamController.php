@@ -154,6 +154,7 @@ class StreamController extends Controller
                 $this->createStream($formattedPayload);
             }
             else{
+                $formattedPayload['stream'] = false; //if we are here, then streaming supposed to be turned off
                 $data = $this->createRequest($formattedPayload);
                 return response()->json($data);
 
