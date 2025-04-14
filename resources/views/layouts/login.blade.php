@@ -27,7 +27,7 @@
 <body>
 <div class="wrapper">
     <div class="sidebar">
-        <div class="logo"></div>
+        <div class="logo"><div style="font-size: 10px; margin-top: -15px;">powered by HAWKI</div></div>
 
         <div class="loginPanel">
 			{!! $authForms !!}
@@ -48,9 +48,9 @@
     </div>
 
     <main>
-        <div class="backgroundImageContainer">
-            <video class="image_preview_container" src="" type="video/m4v" preload="none" autoplay loop muted></video>
-            <a href="" target="_blank" class="video-credits"></a>
+        <div class="center-text" style="padding-top: 50px;">
+            <img src="{{url('xfel/xfel_logo.png')}}" alt="European XFEL">
+            <h1>RAY - Reasoning Assistant for You</h1>
         </div>
     </main>
 </div>
