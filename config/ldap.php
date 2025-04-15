@@ -56,9 +56,9 @@ return [
 
         'attribute_map' => [
             'username' => env('LDAP_ATTRIBUTE_USERNAME', 'cn'),
-            'email' => env('LDAP_ATTRIBUTE_USERNAME', 'mail'),
-            'employeetype' => env('LDAP_ATTRIBUTE_USERNAME', 'employeetype'),
-            'name' => env('LDAP_ATTRIBUTE_USERNAME', 'displayname'),
+            'email' => env('LDAP_ATTRIBUTE_EMAIL', 'mail'),
+            'employeetype' => env('LDAP_ATTRIBUTE_EMPLOYEE', 'employeetype'),
+            'name' => env('LDAP_ATTRIBUTE_NAME', 'displayname'),
         ],
     ],
 
