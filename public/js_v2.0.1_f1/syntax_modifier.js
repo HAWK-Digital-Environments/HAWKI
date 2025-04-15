@@ -64,11 +64,12 @@ function formatMessage(rawContent, groundingMetadata = '') {
     
     // Apply markdown rendering
     const markdownProcessed = md.render(processedContent);
+    console.log(markdownProcessed)
     
     // Restore math and think block content
     let finalContent = postprocessContent(markdownProcessed, mathReplacements, thinkReplacements);
-    
     finalContent = convertHyperlinksToLinks(finalContent);
+    console.log(finalContent)
     
     // Restore preserved HTML elements
     finalContent = restoreGoogleCitations(finalContent);
@@ -190,16 +191,60 @@ function postprocessContent(content, mathReplacements, thinkReplacements) {
 }
 
 function convertHyperlinksToLinks(text) {
-    // Regular expression to match URLs
-    const urlRegex = /https?:\/\/[^\s]+/g;
+    const parser = new DOMParser();
+    // HTML-Fragment sicher einbetten
+    const doc = parser.parseFromString(`<div>${text}</div>`, 'text/html');
 
-    // Replace each URL match with an <a> tag
-    const processedText = text.replace(urlRegex, function(url) {
-        return `<a href="${url}" target="_blank">${url}</a>`;
-    });
+    // Liste von Tags, in deren Innerem nichts ersetzt/verlinkt werden soll
+    const EXCLUDED_TAGS = ['a', 'pre', 'code'];
 
-    // Return the processed text
-    return processedText;
+    function processNode(node) {
+        // Falls wir in einem auszuschließenden Tag sind: nichts weiter tun außer ggf. target bei <a>
+        if (node.nodeType === Node.ELEMENT_NODE) {
+            const tag = node.nodeName.toLowerCase();
+            if (tag === 'a') {
+                // target überprüfen/setzen
+                if (node.getAttribute('target') !== '_blank') {
+                    node.setAttribute('target', '_blank');
+                }
+            }
+            if (EXCLUDED_TAGS.includes(tag)) return; // Inneren Inhalt nicht verlinken!
+        }
+
+        // Alle Kindknoten prüfen/verarbeiten
+        for (let child of Array.from(node.childNodes)) {
+            if (child.nodeType === Node.TEXT_NODE) {
+                // URLs in Textknoten ersetzen (außer in excluded tags, was aber hier verboten ist)
+                const urlRegex = /https?:\/\/[^\s<>"']+/g;
+                if (urlRegex.test(child.textContent)) {
+                    const frag = document.createDocumentFragment();
+                    let lastIndex = 0;
+                    child.textContent.replace(urlRegex, (url, index) => {
+                        if (index > lastIndex) {
+                            frag.appendChild(document.createTextNode(child.textContent.slice(lastIndex, index)));
+                        }
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.target = "_blank";
+                        a.textContent = url;
+                        frag.appendChild(a);
+                        lastIndex = index + url.length;
+                        return url;
+                    });
+                    if (lastIndex < child.textContent.length) {
+                        frag.appendChild(document.createTextNode(child.textContent.slice(lastIndex)));
+                    }
+                    node.replaceChild(frag, child);
+                }
+            } else if (child.nodeType === Node.ELEMENT_NODE) {
+                processNode(child); // rekursiv
+            }
+        }
+    }
+
+    processNode(doc.body.firstChild);
+
+    return doc.body.firstChild.innerHTML;
 }
 
 // Helper function to escape special characters in regular expressions
@@ -263,11 +308,20 @@ function addGoogleRenderedContent(messageElement, groundingMetadata){
 const preservedHTML = [];
 
 function formatGoogleCitations(content, groundingMetadata = '') {
-    // Clear the previous preserved HTML array
-    preservedHTML.length = 0;
-    
-    let processedContent = content;
-    
+    // Hilfsarrays zum Zwischenspeichern
+    const codeBlocks = [];
+    const preservedHTML = [];
+
+    // 1. Zuerst alle <pre> und <code>-Blöcke durch Platzhalter ersetzen und merken
+    const codePattern = /(<pre[\s\S]*?<\/pre>|<code[\s\S]*?<\/code>)/gi;
+    let tempContent = content.replace(codePattern, (match) => {
+        codeBlocks.push(match);
+        return `%%CODE_BLOCK_${codeBlocks.length - 1}%%`;
+    });
+
+    let processedContent = tempContent;
+
+    // 2. Fußnoten einfügen (nur im nicht-Code-Teil)
     if (groundingMetadata?.groundingSupports?.length) {
         groundingMetadata.groundingSupports.forEach((support) => {
             const segmentText = support.segment?.text || '';
@@ -276,18 +330,19 @@ function formatGoogleCitations(content, groundingMetadata = '') {
             if (segmentText && Array.isArray(indices) && indices.length) {
                 // Generate footnote references inline
                 const footnotesRef = `<sup><span>` + indices.map(idx => 
-                    `<a class="inline-citation" href="#source${idx + 1}">${idx + 1}</a>`).join(', ') 
-                    + `</span></sup>`;
+                    `${idx + 1}
+`
+                ).join(', ') + `</span></sup>`;
 
-                // Replace the text segment with itself plus the footnote reference
                 processedContent = processedContent.replace(
-                    new RegExp(escapeRegExp(segmentText), 'g'), 
+                    new RegExp(escapeRegExp(segmentText), 'g'),
                     match => match + footnotesRef
                 );
             }
         });
     }
 
+    // 3. Literatur/Quellen anhängen (auch nur am Ende, nicht im Code)
     let sourcesMarkdown = '';
 
     if (groundingMetadata?.groundingChunks?.length) {
@@ -295,7 +350,7 @@ function formatGoogleCitations(content, groundingMetadata = '') {
 
         groundingMetadata.groundingChunks.forEach((chunk, index) => {
             if (chunk.web?.uri && chunk.web?.title) {
-                sourcesMarkdown += `${index + 1}. <a id="source${index + 1}" href="${chunk.web.uri}" target="_blank" class="source-link"><b>${chunk.web.title}</b></a>\n`;
+                sourcesMarkdown += `${index + 1}. ${chunk.web.title}\n`;
             }
         });
 
@@ -304,7 +359,7 @@ function formatGoogleCitations(content, groundingMetadata = '') {
         }
     }
 
-    // Preserve only necessary HTML elements in the main content (not sources)
+    // 4. Nur die gewünschten HTML-Elemente im sonstigen Inhalt erhalten
     const htmlPattern = /<sup>.*?<\/sup>|<a\s+.*?<\/a>/g;
     processedContent = processedContent.replace(htmlPattern, (match) => {
         const id = preservedHTML.length;
@@ -312,7 +367,18 @@ function formatGoogleCitations(content, groundingMetadata = '') {
         return `%%HTML_PRESERVED_${id}%%`;
     });
 
+    // 5. Jetzt die Codeblöcke wieder zurückersetzen
+    processedContent = processedContent.replace(/%%CODE_BLOCK_(\d+)%%/g, (_, idx) => codeBlocks[idx]);
+
+    // 6. Ggf. die preserved HTML-Elemente wieder zurückersetzen
+    processedContent = processedContent.replace(/%%HTML_PRESERVED_(\d+)%%/g, (_, idx) => preservedHTML[idx]);
+
     return processedContent;
+}
+
+// Hilfsfunktion, falls nicht im Scope vorhanden:
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 
