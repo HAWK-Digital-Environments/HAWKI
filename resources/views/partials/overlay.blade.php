@@ -9,7 +9,10 @@
 >
     <div id="overlay-wrapper">
         <div id="overlay-logo">
-            <img src="{{ asset('img/logo.png') }}" alt="">
+            <div class="center-text" style="padding-top: 50px;">
+                <img src="{{url('xfel/xfel_logo.png')}}" alt="European XFEL">
+                <h1>RAY - Reasoning Assistant for You</h1>
+            </div>
         </div>  
     </div>
 </div>
