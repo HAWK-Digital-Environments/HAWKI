@@ -55,10 +55,10 @@ return [
         'ldap_filter'=> env('LDAP_FILTER'),
 
         'attribute_map' => [
-            'username' => 'cn',
-            'email' => 'mail',
-            'employeetype' => 'employeetype',
-            'name' => 'displayname',
+            'username' => env('LDAP_ATTRIBUTE_USERNAME', 'cn'),
+            'email' => env('LDAP_ATTRIBUTE_USERNAME', 'mail'),
+            'employeetype' => env('LDAP_ATTRIBUTE_USERNAME', 'employeetype'),
+            'name' => env('LDAP_ATTRIBUTE_USERNAME', 'displayname'),
         ],
     ],
 
