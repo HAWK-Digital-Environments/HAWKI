@@ -968,7 +968,7 @@ async function searchUser(searchBar) {
 
                     const option = document.createElement('li');
                     option.dataset.value = JSON.stringify(user);
-                    option.innerText = user.username;
+                    option.innerText = `${user.name} - ${user.username} (${user.email})`;
                     option.addEventListener('click', ()=>{
                         searchBar.value = user.username; // Fill the search bar with the selected username
                         tempSearchResult = JSON.stringify(user);

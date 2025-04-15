@@ -49,7 +49,7 @@
                             placeholder="{{ $translation["PH_SystemPrompt"] }}" 
                             name="system-prompt" 
                             id="system-prompt-input" 
-                            maxlength="300"
+                            {{-- maxlength="300" --}}
                             oninput="resizeInputField(this)"></textarea>
                     </div>
                     <div class="row flex-col  top-gap-2">

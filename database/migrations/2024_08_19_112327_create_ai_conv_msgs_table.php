@@ -31,6 +31,8 @@ return new class extends Migration
             
             $table->longText('content');
             
+            $table->boolean('completion');
+
             $table->timestamps();
         });
     }

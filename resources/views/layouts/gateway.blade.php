@@ -8,14 +8,14 @@
 
     <title>{{ env('APP_NAME') }}</title>
 
-    <link rel="stylesheet" href="{{ asset('css_v2.0.1/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('css_v2.0.1/handshake_style.css') }}">
-    <link rel="stylesheet" href="{{ asset('css_v2.0.1/settings_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css_v2.0.1_f1/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css_v2.0.1_f1/handshake_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css_v2.0.1_f1/settings_style.css') }}">
 
-    <script src="{{ asset('js_v2.0.1/functions.js') }}"></script>
-    <script src="{{ asset('js_v2.0.1/handshake_functions.js') }}"></script>
-    <script src="{{ asset('js_v2.0.1/encryption.js') }}"></script>
-    <script src="{{ asset('js_v2.0.1/settings_functions.js') }}"></script>
+    <script src="{{ asset('js_v2.0.1_f1/functions.js') }}"></script>
+    <script src="{{ asset('js_v2.0.1_f1/handshake_functions.js') }}"></script>
+    <script src="{{ asset('js_v2.0.1_f1/encryption.js') }}"></script>
+    <script src="{{ asset('js_v2.0.1_f1/settings_functions.js') }}"></script>
 	
 	{!! $settingsPanel !!}
     
