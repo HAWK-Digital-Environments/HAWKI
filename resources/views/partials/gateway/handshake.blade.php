@@ -36,6 +36,16 @@
             </div>
             <p class="red-text" id="backup-alert-message"></p>
 
+            {{-- appears after "Please enter your backup code" message --}}
+            @if(env('USER_DELETE_SELF'))
+                <div class="center-text">
+                    If you do not remember your <i>Passkey</i> and do not have <i>Backup code</i> your encrypted 
+                    data (chat history, personal settings etc) can not be recovered.<br> 
+                    The only way to continue using the application is ro
+                    <a href="user/delete" style="color: red; text-decoration: underline; white-space: nowrap">delete your RAY user record</a><br> 
+                    and login/register again.<br>
+                </div>
+            @endif
         </div>
 
         <div class="slide" data-index="3">
