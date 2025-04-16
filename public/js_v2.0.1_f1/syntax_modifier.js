@@ -64,7 +64,6 @@ function formatMessage(rawContent, groundingMetadata = '') {
     
     // Apply markdown rendering
     const markdownProcessed = md.render(processedContent);
-    console.log(markdownProcessed)
     
     // Restore math and think block content
     let finalContent = postprocessContent(markdownProcessed, mathReplacements, thinkReplacements);
