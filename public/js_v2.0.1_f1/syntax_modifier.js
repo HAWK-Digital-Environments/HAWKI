@@ -68,7 +68,6 @@ function formatMessage(rawContent, groundingMetadata = '') {
     // Restore math and think block content
     let finalContent = postprocessContent(markdownProcessed, mathReplacements, thinkReplacements);
     finalContent = convertHyperlinksToLinks(finalContent);
-    console.log(finalContent)
     
     // Restore preserved HTML elements
     finalContent = restoreGoogleCitations(finalContent);
