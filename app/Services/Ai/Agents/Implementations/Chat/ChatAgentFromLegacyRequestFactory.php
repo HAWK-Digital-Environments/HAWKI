@@ -115,6 +115,9 @@ class ChatAgentFromLegacyRequestFactory extends AbstractAgentFactory
      * Attachment UUIDs are resolved to stored files; missing files are collected as errors on
      * the {@see UserMessageAttachments} instance rather than aborting processing. The resulting
      * message list is fed through {@see AlternatingMessageHistory} to guarantee alternating roles.
+     * Assistant messages may carry an `assistant_handle` attribution which becomes an
+     * ANSWER_SOURCE metadata block so the model can distinguish answers from different
+     * assistants in conversations that switched mid-way.
      *
      * The `broadcast` flag controls which storage category (group vs. private) is used when
      * resolving attachment UUIDs.
@@ -156,7 +159,10 @@ class ChatAgentFromLegacyRequestFactory extends AbstractAgentFactory
                 continue;
             }
 
-            $history->registerAiMessage($payloadMessage['content']['text']);
+            $history->registerAiMessage(
+                $payloadMessage['content']['text'],
+                is_string($payloadMessage['assistant_handle'] ?? null) ? $payloadMessage['assistant_handle'] : null
+            );
         }
 
         return [...$history->build()];

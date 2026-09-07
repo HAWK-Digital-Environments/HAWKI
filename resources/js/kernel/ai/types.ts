@@ -8,6 +8,10 @@ export interface AiMessageContent {
 export interface AiMessage {
     role: AiMessageRole;
     content: AiMessageContent;
+    /** Attribution for past assistant turns: the authoring assistant's bare
+     *  handle (no `@`). The backend embeds it as an HKI_META_ANSWER_SOURCE
+     *  block so the model can tell apart answers from different assistants. */
+    assistant_handle?: string | null;
 }
 
 export type AiModelParameters = Record<string, unknown> | unknown[];

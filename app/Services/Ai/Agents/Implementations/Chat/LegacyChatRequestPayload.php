@@ -16,7 +16,7 @@ namespace App\Services\Ai\Agents\Implementations\Chat;
  *         'messages'  => [                    // required
  *             ['role' => 'system',    'content' => ['text' => '...']],  // system instructions (optional)
  *             ['role' => 'user',      'content' => ['text' => '...', 'attachments' => ['uuid1']]],
- *             ['role' => 'assistant', 'content' => ['text' => '...']],
+ *             ['role' => 'assistant', 'content' => ['text' => '...'], 'assistant_handle' => 'math-tutor'], // optional attribution
  *             // ... more turns ...
  *         ],
  *         'params'    => ['temp' => 0.7, 'top_p' => 1.0, 'max_tokens' => 2048],  // optional

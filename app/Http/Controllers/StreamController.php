@@ -98,6 +98,7 @@ class StreamController extends Controller
                 'payload.messages.*.content' => 'required|array',
                 'payload.messages.*.content.text' => 'nullable|string',
                 'payload.messages.*.content.attachments' => 'nullable|array',
+                'payload.messages.*.assistant_handle' => 'nullable|string|max:255',
                 'payload.tools' => 'nullable|array',
                 'payload.params' => 'nullable|array',
                 'payload.assistant_handle' => 'nullable|string|exists:assistants,handle',
