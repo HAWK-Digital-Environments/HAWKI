@@ -292,6 +292,36 @@ class OpenAiAdapterTest extends TestCase
         static::assertSame([], $result);
     }
 
+    public function testItGetAdditionalDriverOptionsAfterEmptyToolGeneratorWasConsumed(): void
+    {
+        $context = $this->makeRequestContext(hasReasoning: false);
+        $tools = (static function (): \Generator {
+            yield from [];
+        })();
+        $agent = $this->makeTextAgent($context, $tools);
+
+        // The SDK collects tools before the gateway requests provider options.
+        static::assertSame([], [...$agent->tools()]);
+        static::assertSame([], $this->makeAdapter()->getAdditionalDriverOptions($agent, $context));
+    }
+
+    public function testItRetainsWebSearchOptionsAfterToolGeneratorWasConsumed(): void
+    {
+        $context = $this->makeRequestContext(hasReasoning: true);
+        $webSearch = new WebSearch();
+        $tools = (static function () use ($webSearch): \Generator {
+            yield $webSearch;
+        })();
+        $agent = $this->makeTextAgent($context, $tools);
+
+        static::assertSame([$webSearch], [...$agent->tools()]);
+        static::assertSame([
+            'reasoning' => ['summary' => 'auto'],
+            'include' => ['web_search_call.action.sources'],
+        ], $this->makeAdapter()->getAdditionalDriverOptions($agent, $context));
+        static::assertSame([$webSearch], [...$agent->tools()]);
+    }
+
     // =========================================================================
     // getNativeToolFactoryForCapability
     // =========================================================================
