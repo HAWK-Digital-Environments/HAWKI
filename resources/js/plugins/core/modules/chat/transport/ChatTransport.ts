@@ -95,7 +95,12 @@ export class ChatTransport implements MessageSenderTransportInterface {
             this.store.beginGeneration(targetSlug);
             generationStarted = true;
             if (optimisticMessage) this.store.appendMessage(targetSlug, optimisticMessage);
-            if (conversationCreated) this.options.onConversationCreated?.(targetSlug);
+            if (conversationCreated) {
+                this.options.onConversationCreated?.(targetSlug);
+                // Runs concurrently with the assistant response instead of
+                // waiting for the stream to finish.
+                if (provisionalTitle !== null) void this.generateAndApplyTitle(targetSlug, sentMessage, provisionalTitle);
+            }
 
             await this.uploadAttachments(opt);
             if (status.failed) {
@@ -137,9 +142,6 @@ export class ChatTransport implements MessageSenderTransportInterface {
                 await this.streamAssistant(conversationSlug, opt, response);
             } finally {
                 this.store.finishGeneration(conversationSlug);
-                if (conversationCreated && provisionalTitle !== null) {
-                    void this.generateAndApplyTitle(conversationSlug, sentMessage, provisionalTitle);
-                }
             }
         });
     }
