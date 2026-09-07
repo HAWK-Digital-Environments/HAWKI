@@ -165,6 +165,22 @@ export class ChatStore implements DataStore {
         if (summary) summary.name = name;
     }
 
+    /**
+     * Keeps the persisted conversation binding in sync with the assistant the
+     * latest send addressed: switching assistants mid-chat rebinds, sending
+     * without an assistant handle clears the binding (plain HAWKI chat).
+     * No-ops while the cached binding already matches.
+     */
+    public async updateAssistantHandle(slug: string, assistantHandle: string | null): Promise<void> {
+        if (this.getConversation(slug)?.assistant_handle === assistantHandle) {
+            return;
+        }
+
+        await this.dependencies.restApi.updateResource('ai-convs', slug, {assistant_handle: assistantHandle});
+        const conversation = this.getConversation(slug);
+        if (conversation) conversation.assistant_handle = assistantHandle;
+    }
+
     public conversationName(slug: string): string | null {
         return this.getConversation(slug)?.name
             ?? this.conversations.find(item => item.slug === slug)?.name
@@ -378,7 +394,8 @@ export class ChatStore implements DataStore {
         return {
             name: candidate.name,
             icon: candidate.icon,
-            ...(typeof candidate.tint === 'string' ? {tint: candidate.tint} : {})
+            ...(typeof candidate.tint === 'string' ? {tint: candidate.tint} : {}),
+            ...(typeof candidate.handle === 'string' ? {handle: candidate.handle} : {})
         };
     }
 

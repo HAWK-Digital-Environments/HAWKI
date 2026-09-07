@@ -6,8 +6,8 @@
   a live chat's `ModelSlice` / `ToolSlice`. Shows why the model is unsupported
   (the specific missing tool when there's exactly one, a generic message
   otherwise) and lists compatible models as clickable replacement cards —
-  picking one calls `builder.setModel(m.id)`, mirroring
-  `ModelConflictPicker`'s `composerContext.model.set(m.id)`.
+  picking one calls `builder.setModel(m.model_id)`, mirroring
+  `ModelConflictPicker`'s `composerContext.model.set(...)`.
 
   Renders nothing when no model is selected yet, no tools are enabled, or the
   selected model already supports every enabled tool.
@@ -40,7 +40,7 @@
     const activeTools = $derived(builder.draft.aiTools ?? []);
 
     const currentModel = $derived(
-        modelStore.models.find(m => m.id === builder.draft.model) ?? null
+        modelStore.getOneById(builder.draft.model)
     );
 
     function isModelUsable(model: AiModel): boolean {
@@ -89,7 +89,7 @@
                 <div class="conflict-models-scroll">
                     {#each usableModels as m (m.id)}
                         <button
-                            onclick={() => builder.setModel(m.id)}
+                            onclick={() => builder.setModel(m.model_id)}
                             class="conflict-model-card"
                         >
                             <div class="conflict-card-top">

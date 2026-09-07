@@ -67,12 +67,18 @@ exists; a generation started there keeps streaming through the store.
     // A conversation bound to an assistant keeps addressing it: seed the
     // composer with the bound `@handle` once so the next message continues
     // the assistant run (the backend resolves the assistant from the handle
-    // inside the message text). The composer is remounted per slug, so one
-    // seeding per conversation suffices.
+    // inside the message text). Strictly one seed per conversation entry:
+    // afterwards removing or swapping the handle is the user's choice, and
+    // the send path persists that choice on `ai_convs.assistant_handle`.
+    let seededSlug: string | null = null;
+
     $effect(() => {
-        const boundHandle = store.active?.assistant_handle;
-        if (!composer || !boundHandle || !store.active) return;
+        const conversation = store.active;
+        if (!conversation || !composer) return;
+        const boundHandle = conversation.assistant_handle;
+        if (!boundHandle || seededSlug === conversation.slug) return;
         if (composer.handlesInMessage.length === 0 && composer.message.trim() === '') {
+            seededSlug = conversation.slug;
             composer.addHandleToMessage(`@${boundHandle}`);
         }
     });

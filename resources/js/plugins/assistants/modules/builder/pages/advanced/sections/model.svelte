@@ -26,9 +26,10 @@
 
     // The maxTokens slider is bounded by the selected model's own output limit
     // (`limits.max_output_tokens`, e.g. 128000); without a model or a declared
-    // limit it falls back to the previous fixed range.
+    // limit it falls back to the previous fixed range. `getOneById` also
+    // resolves legacy drafts that still store the model's numeric row id.
     const maxOutputTokens = $derived.by(() => {
-        const model = modelStore.models.find(m => m.id === builder.draft.model);
+        const model = modelStore.getOneById(builder.draft.model);
         return model ? getMaxOutputTokensLimit(model) : null;
     });
     const maxTokensMax = $derived(maxOutputTokens ?? 4096);

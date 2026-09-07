@@ -10,6 +10,9 @@ export interface ChatAssistantIdentity {
     icon: string;
     /** One hsl() color stop from its appearance, tinting the icon circle. */
     tint?: string;
+    /** Bare handle (no `@`) of the assistant that authored the message; lets a
+     *  regen re-run with the same assistant even after the composer switched. */
+    handle?: string;
 }
 
 export interface ChatSummary {

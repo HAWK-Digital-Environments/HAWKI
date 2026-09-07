@@ -103,7 +103,19 @@ export class ChatTransport implements MessageSenderTransportInterface {
             if (optimisticMessage) this.store.appendMessage(targetSlug, optimisticMessage);
             if (conversationCreated) this.options.onConversationCreated?.(targetSlug);
 
-            await this.uploadAttachments(opt);
+            // The persisted binding follows the assistant this send addresses
+            // (null = plain HAWKI chat). Awaited alongside the uploads so a
+            // failed rebind fails the send visibly instead of silently
+            // diverging from what the run used; freshly created conversations
+            // already carry the binding from `create`.
+            if (conversationCreated) {
+                await this.uploadAttachments(opt);
+            } else {
+                await Promise.all([
+                    this.uploadAttachments(opt),
+                    this.store.updateAssistantHandle(targetSlug, send.assistantHandle)
+                ]);
+            }
             if (status.failed) {
                 if (optimisticMessage) this.store.removeCachedMessage(targetSlug, optimisticMessage.message_id);
                 this.store.finishGeneration(targetSlug);
@@ -214,6 +226,13 @@ export class ChatTransport implements MessageSenderTransportInterface {
      * the exchange to an addressed assistant and adapt the run to it.
      */
     private resolveSendDescriptor(context: ComposerContext): ChatSendDescriptor {
+        // A regen overwrites an existing assistant message; hooks use it to
+        // keep the run pinned to the assistant that authored that answer.
+        const regenState = context.mode.isRegen ? context.mode.getState('regen') : null;
+        const regenMessage = regenState && this.store.active
+            ? this.store.findMessage(this.store.active.slug, regenState.messageId)
+            : null;
+
         return this.app.hooks.apply('chatSend', {
             assistantHandle: null,
             assistant: null,
@@ -223,7 +242,8 @@ export class ChatTransport implements MessageSenderTransportInterface {
             params: context.modelParameters.list
         }, {
             composer: context,
-            conversation: this.store.active
+            conversation: this.store.active,
+            regenMessage
         });
     }
 

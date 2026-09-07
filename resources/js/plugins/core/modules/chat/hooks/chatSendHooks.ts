@@ -42,6 +42,8 @@ export interface ChatSendContext {
     composer: ComposerContext;
     /** The conversation the send goes into; null while the first message creates it. */
     conversation: ChatConversation | null;
+    /** The assistant message a regen overwrites, when the composer is in regen mode. */
+    regenMessage: ChatMessage | null;
 }
 
 declare module '$lib/kernel/extendableTypes.js' {

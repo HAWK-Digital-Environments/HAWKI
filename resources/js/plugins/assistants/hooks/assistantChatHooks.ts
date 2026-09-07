@@ -1,6 +1,5 @@
 import type {ChatSendContext, ChatSendDescriptor} from '$plugins/core/modules/chat/hooks/chatSendHooks.js';
 import type {ChatWelcomeContext, ChatWelcomeSection} from '$plugins/core/modules/chat/hooks/chatWelcomeHooks.js';
-import type {ChatConversation} from '$plugins/core/modules/chat/types.js';
 import type {ComposerContext} from '$plugins/core/modules/chat/components/composer/contexts/ComposerContext.svelte.js';
 import type {Assistant} from '$plugins/assistants/types/assistant';
 import {assistantRowAppearance} from '$plugins/assistants/utils/assistantRowAppearance';
@@ -10,17 +9,23 @@ import {assistantHandlesStore} from '$plugins/assistants/stores/AssistantHandles
  * Chat integration of the assistants plugin, registered as handlers for the
  * chat module's `chatSend` and `chatWelcome` hooks (see `assistants.plugin.ts`).
  *
- * When the composer addresses one of the user's assistants via its `@handle`
- * — or the opened conversation is already bound to one
- * (`ai_convs.assistant_handle`) — the send is pinned to that assistant:
+ * When the composer addresses one of the user's assistants via its `@handle`,
+ * the send is pinned to that assistant:
  *
- * - the conversation is created with the assistant binding,
+ * - the conversation binding (`ai_convs.assistant_handle`) follows the
+ *   addressed handle, so switching assistants mid-chat rebinds and removing
+ *   the handle turns the conversation into a plain HAWKI chat,
  * - model/tools/params of the run (and the persisted message metadata) come
  *   from the assistant (the model only stays user-selected when the
  *   assistant allows it),
  * - the streamed response shows the assistant's name as its author,
  * - the welcome hero shows the assistant's name, greeting and starter
- *   prompts.
+ *   prompts (there the conversation binding still acts as a display
+ *   fallback while the composer is still seeding).
+ *
+ * A regen keeps the run pinned to the assistant that authored the original
+ * answer (read from the message's persisted identity) even after the
+ * composer switched or cleared its handle.
  *
  * The backend independently assembles the run from the `@handle` inside the
  * message text (see `AssistantChatAgentFactory`), so the rewritten values
@@ -41,10 +46,7 @@ function addressableAssistants(): Map<string, AddressableAssistant> {
     return rows;
 }
 
-function resolveAddressedAssistant(
-    composer: ComposerContext | null,
-    conversation: ChatConversation | null
-): AddressableAssistant | null {
+function addressedByComposer(composer: ComposerContext | null): AddressableAssistant | null {
     const byHandle = addressableAssistants();
 
     for (const handle of composer?.handlesInMessage ?? []) {
@@ -54,9 +56,25 @@ function resolveAddressedAssistant(
         }
     }
 
-    const boundHandle = conversation?.assistant_handle;
-    if (boundHandle !== null && boundHandle !== undefined) {
-        return byHandle.get(boundHandle) ?? null;
+    return null;
+}
+
+/**
+ * The assistant a send is pinned to: the composer's live `@handle` choice,
+ * else the original author of the message a regen overwrites, else none.
+ * The conversation binding deliberately does not feed back here — the
+ * transport rebases it on this result, so consulting it would resurrect a
+ * removed assistant.
+ */
+function resolveSendAssistant(ctx: ChatSendContext): AddressableAssistant | null {
+    const addressed = addressedByComposer(ctx.composer);
+    if (addressed) {
+        return addressed;
+    }
+
+    const regenHandle = ctx.regenMessage?.assistant?.handle;
+    if (regenHandle !== undefined) {
+        return addressableAssistants().get(regenHandle) ?? null;
     }
 
     return null;
@@ -64,7 +82,7 @@ function resolveAddressedAssistant(
 
 /** Handler for the `chatSend` hook. */
 export function assistantChatSend(send: ChatSendDescriptor, ctx: ChatSendContext): ChatSendDescriptor {
-    const assistant = resolveAddressedAssistant(ctx.composer, ctx.conversation);
+    const assistant = resolveSendAssistant(ctx);
     if (!assistant) {
         return send;
     }
@@ -79,7 +97,8 @@ export function assistantChatSend(send: ChatSendDescriptor, ctx: ChatSendContext
         assistant: {
             name: assistant.name,
             icon: appearance.icon,
-            tint: appearance.colors.from
+            tint: appearance.colors.from,
+            handle: assistant.handle
         },
         author: {
             username: assistant.handle,
@@ -102,7 +121,16 @@ export function assistantChatWelcome(
     _section: ChatWelcomeSection | null,
     ctx: ChatWelcomeContext
 ): ChatWelcomeSection | null {
-    const assistant = resolveAddressedAssistant(ctx.composer, ctx.conversation);
+    let assistant = addressedByComposer(ctx.composer);
+    if (!assistant) {
+        // Display-only: until the composer has seeded the bound handle, the
+        // conversation binding decides which assistant the hero presents.
+        const boundHandle = ctx.conversation?.assistant_handle;
+        if (boundHandle !== null && boundHandle !== undefined) {
+            assistant = addressableAssistants().get(boundHandle) ?? null;
+        }
+    }
+
     if (!assistant) {
         return null;
     }

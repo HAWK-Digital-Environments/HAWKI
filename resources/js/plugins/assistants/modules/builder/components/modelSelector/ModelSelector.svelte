@@ -20,7 +20,9 @@
 
     const options = $derived<SelectOption[]>([
         {value: '', label: 'Select a Model', disabled: true},
-        ...modelStore.models.map((model) => ({value: model.id, label: model.label})),
+        // The assistant stores the provider-side model identifier (`model_id`,
+        // e.g. "gpt-4.1-nano"), not the model's numeric row id.
+        ...modelStore.models.map((model) => ({value: model.model_id, label: model.label})),
     ]);
 
 </script>

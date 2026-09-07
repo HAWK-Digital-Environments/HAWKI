@@ -95,8 +95,12 @@ function toExportMessages(conversation: ChatConversation): ExportMessage[] {
     return conversation.messages.map(message => ({
         id: message.message_id,
         role: message.message_role,
-        author: message.author.name,
-        model: message.model,
+        // An assistant-authored message presents its identity (the browser
+        // renders the same preference, see `ChatMessage.svelte`); its raw
+        // `model` column holds whatever the assistant pinned — possibly a
+        // bare model row id — so no model annotation is shown for it.
+        author: message.assistant?.name ?? message.author.name,
+        model: message.assistant ? null : message.model,
         message: message.content.text,
         created_at: message.created_at,
         attachments: (message.content.attachments ?? []).map(({fileData}) => ({

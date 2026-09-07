@@ -298,7 +298,7 @@ export class BuilderContext {
   setModel(modelId: string): void {
     if (modelId === this.draft.model) return;
 
-    const model = this.aiModelStore.models.find((m) => m.id === modelId);
+    const model = this.aiModelStore.models.find((m) => m.model_id === modelId);
     const patch: Partial<Assistant> = { model: modelId };
     if (model) {
       // `parameters` is a free-form map keyed by the wire's parameter names
