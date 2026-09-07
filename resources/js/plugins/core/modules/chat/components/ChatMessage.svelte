@@ -51,7 +51,7 @@
     const experiments = useStore('experiments');
     const isAssistant = $derived(message.message_role === 'assistant');
     const showStats = $derived(isAssistant && experiments.isEnabled('statsForNerds') && Boolean(message.stats));
-    const isReasoning = $derived(message.status === 'reasoning' || message.status === 'reasoning_delta');
+    const isReasoning = $derived(message.status === 'reasoning' || message.status === 'reasoning_delta' || message.status === 'reasoning_end');
     const streamStatusLabel = $derived(
         isReasoning || !message.status || message.status === 'running' ? __('chat.page.thinking') : __('chat.page.generating')
     );

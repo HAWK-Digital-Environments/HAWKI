@@ -246,6 +246,7 @@ export class ChatTransport implements MessageSenderTransportInterface {
 
         let text = '';
         let reasoning: ReasoningPart[] = [];
+        let reasoningTextPartOpen = false;
         let citations: UrlCitation[] = [];
         let completion = false;
         // Generation metrics for the "Stats for Nerds" experiment. Timing is
@@ -284,11 +285,16 @@ export class ChatTransport implements MessageSenderTransportInterface {
                     const value = typeof packet.status === 'object' ? packet.status?.value : undefined;
                     if (status === 'reasoning_delta' && typeof value === 'string') {
                         const last = reasoning.at(-1);
-                        reasoning = last?.type === 'text'
+                        reasoning = reasoningTextPartOpen && last?.type === 'text'
                             ? [...reasoning.slice(0, -1), {type: 'text', text: last.text + value}]
                             : [...reasoning, {type: 'text', text: value}];
+                        reasoningTextPartOpen = true;
                         this.store.patchMessage(conversationSlug, temporaryId, {status, reasoning});
+                    } else if (status === 'reasoning' || status === 'reasoning_end') {
+                        reasoningTextPartOpen = false;
+                        this.store.patchMessage(conversationSlug, temporaryId, {status});
                     } else if (status === 'web_search' && value && typeof value === 'object') {
+                        reasoningTextPartOpen = false;
                         const search = value as {type?: unknown; query?: unknown; sources?: unknown};
                         reasoning = [...reasoning, {
                             type: 'web_search',

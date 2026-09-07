@@ -6,12 +6,16 @@ namespace App\Services\Ai\Providers\Adapters\Implementations;
 
 
 use App\Models\Ai\AiProvider;
+use App\Services\Ai\Agents\Adapters\AbstractTextGeneratingAgent;
+use App\Services\Ai\Agents\Values\AgentRequestContext;
 use App\Services\Ai\Exceptions\InvalidProviderConfigurationException;
 use App\Services\Ai\Providers\Adapters\AbstractProviderAdapter;
 use App\Services\Ai\Providers\Adapters\DriverFactory;
 use App\Services\Ai\Providers\Values\AiProviderProxy;
 use Aws\Bedrock\BedrockClient;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Gateway\Bedrock\Concerns\CreatesBedrockClient;
 use Laravel\Ai\Providers\Provider as Driver;
@@ -76,6 +80,57 @@ class AwsBedrockAdapter extends AbstractProviderAdapter
                 'key' => $token
             ]
         );
+    }
+
+    /**
+     * Enables Claude extended thinking for reasoning-capable Anthropic text models.
+     *
+     * Thinking tokens count towards `maxTokens`, so the requested budget is limited to half
+     * of the effective output limit and kept above Anthropic's 1,024-token minimum. Models
+     * with limits too small for a valid budget keep thinking disabled. Anthropic rejects
+     * temperature values other than 1 and any top-p value while thinking is enabled, so the
+     * replacement inference config neutralises configured sampling values for this request.
+     *
+     * @see https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-anthropic-claude-messages-extended-thinking.html
+     */
+    public function getAdditionalDriverOptions(Agent $agent, AgentRequestContext $context): array
+    {
+        $modelId = strtolower($context->model->model_id);
+        if (
+            !$agent instanceof AbstractTextGeneratingAgent
+            || !$context->model->flags->hasStrengthReasoning()
+            || (!str_contains($modelId, 'anthropic.') && !str_contains($modelId, 'claude'))
+        ) {
+            return [];
+        }
+
+        $maxTokens = $agent->maxTokens() ?? $context->modelParameters->getMaxTokens();
+        $budgetTokens = max(1_024, min(
+            $context->modelParameters->getMaxThinkingTokens(),
+            intdiv($maxTokens, 2),
+        ));
+
+        if ($budgetTokens >= $maxTokens) {
+            return [];
+        }
+
+        $options = [
+            'additionalModelRequestFields' => [
+                'thinking' => [
+                    'type' => 'enabled',
+                    'budget_tokens' => $budgetTokens,
+                ],
+            ],
+        ];
+
+        if ($agent->temperature() !== null || $agent->topP() !== null) {
+            $options['inferenceConfig'] = Arr::whereNotNull([
+                'maxTokens' => $agent->maxTokens(),
+                'temperature' => 1.0,
+            ]);
+        }
+
+        return $options;
     }
 
     /**

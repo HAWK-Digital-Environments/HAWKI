@@ -25,6 +25,7 @@ use Laravel\Ai\Streaming\Events\Citation;
 use Laravel\Ai\Streaming\Events\Error;
 use Laravel\Ai\Streaming\Events\ProviderToolEvent;
 use Laravel\Ai\Streaming\Events\ReasoningDelta;
+use Laravel\Ai\Streaming\Events\ReasoningEnd;
 use Laravel\Ai\Streaming\Events\ReasoningStart;
 use Laravel\Ai\Streaming\Events\StreamEnd;
 use Laravel\Ai\Streaming\Events\TextDelta;
@@ -287,6 +288,9 @@ class StreamController extends Controller
                         break;
                     case $chunk instanceof ReasoningDelta:
                         yield $formatStatus('reasoning_delta', $chunk->delta);
+                        break;
+                    case $chunk instanceof ReasoningEnd:
+                        yield $formatStatus('reasoning_end');
                         break;
                     case $chunk instanceof ProviderToolEvent:
                         yield $formatStatus('provider_tool_call', $chunk->type);

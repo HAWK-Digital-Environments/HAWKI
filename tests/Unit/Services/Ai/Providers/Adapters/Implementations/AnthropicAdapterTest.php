@@ -5,6 +5,11 @@ namespace Tests\Unit\Services\Ai\Providers\Adapters\Implementations;
 
 use App\Models\Ai\AiModel;
 use App\Models\Ai\AiProvider;
+use App\Services\Ai\Agents\Implementations\Chat\ChatAgent;
+use App\Services\Ai\Agents\Values\AgentRequestContext;
+use App\Services\Ai\Models\Flags\Values\AiModelFlags;
+use App\Services\Ai\Models\Flags\Values\WellKnownModelFlags;
+use App\Services\Ai\Models\Parameters\Values\AiModelParameters;
 use App\Services\Ai\Providers\Adapters\Contracts\ProviderAdapterInterface;
 use App\Services\Ai\Providers\Adapters\DriverFactory;
 use App\Services\Ai\Providers\Adapters\Implementations\AnthropicAdapter;
@@ -13,6 +18,7 @@ use App\Services\Ai\Providers\Adapters\ModelList\ModelListResponse;
 use App\Services\Ai\Providers\Values\AiProviderProxy;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
+use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Providers\Provider as Driver;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Tests\TestCase;
@@ -62,6 +68,40 @@ class AnthropicAdapterTest extends TestCase
             ->willReturn($response);
 
         return $client;
+    }
+
+    private function makeRequestContext(
+        bool $hasReasoning,
+        bool $hasSamplingParameters = false,
+        AiModelParameters|null $parameters = null,
+    ): AgentRequestContext {
+        $flagNames = $hasReasoning ? [WellKnownModelFlags::FEATURE_REASONING] : [];
+        if ($hasSamplingParameters) {
+            $flagNames[] = WellKnownModelFlags::FEATURE_SAMPLING_PARAMETERS;
+        }
+
+        $flags = AiModelFlags::fromArray($flagNames);
+        $model = $this->createMock(AiModel::class);
+        $model->method('__get')->willReturnCallback(
+            fn(string $key) => $key === 'flags' ? $flags : null
+        );
+
+        return new AgentRequestContext(
+            provider: $this->makeProvider(),
+            model: $model,
+            modelParameters: $parameters ?? new AiModelParameters(),
+        );
+    }
+
+    private function makeTextAgent(AgentRequestContext $context): ChatAgent
+    {
+        return new ChatAgent(
+            context: $context,
+            instructions: 'Be helpful.',
+            messages: [],
+            tools: [],
+            promptString: 'Hello AI',
+        );
     }
 
     // =========================================================================
@@ -182,6 +222,132 @@ class AnthropicAdapterTest extends TestCase
         $result = $sut->getModels($provider);
 
         static::assertCount(0, $result);
+    }
+
+    // =========================================================================
+    // getAdditionalDriverOptions
+    // =========================================================================
+
+    public function testItDoesNotEnableThinkingForNonReasoningModels(): void
+    {
+        $context = $this->makeRequestContext(hasReasoning: false);
+
+        static::assertSame([], $this->makeAdapter()->getAdditionalDriverOptions(
+            $this->makeTextAgent($context),
+            $context,
+        ));
+    }
+
+    public function testItDoesNotEnableThinkingForNonTextAgents(): void
+    {
+        $context = $this->makeRequestContext(hasReasoning: true);
+
+        static::assertSame([], $this->makeAdapter()->getAdditionalDriverOptions(
+            $this->createMock(Agent::class),
+            $context,
+        ));
+    }
+
+    public function testItEnablesThinkingWithoutSamplingParameters(): void
+    {
+        $context = $this->makeRequestContext(hasReasoning: true);
+
+        static::assertSame([
+            'thinking' => [
+                'type' => 'enabled',
+                'budget_tokens' => 2_048,
+            ],
+        ], $this->makeAdapter()->getAdditionalDriverOptions(
+            $this->makeTextAgent($context),
+            $context,
+        ));
+    }
+
+    public function testItLimitsThinkingBudgetAndNeutralisesTemperature(): void
+    {
+        $parameters = (new AiModelParameters())
+            ->setMaxTokens(8_192)
+            ->setMaxThinkingTokens(6_000)
+            ->setTemperature(0.7);
+        $context = $this->makeRequestContext(
+            hasReasoning: true,
+            hasSamplingParameters: true,
+            parameters: $parameters,
+        );
+
+        static::assertSame([
+            'thinking' => [
+                'type' => 'enabled',
+                'budget_tokens' => 4_096,
+            ],
+            'temperature' => 1.0,
+        ], $this->makeAdapter()->getAdditionalDriverOptions(
+            $this->makeTextAgent($context),
+            $context,
+        ));
+    }
+
+    public function testItClampsThinkingBudgetToAnthropicsMinimum(): void
+    {
+        $parameters = (new AiModelParameters())
+            ->setMaxTokens(8_192)
+            ->setMaxThinkingTokens(512);
+        $context = $this->makeRequestContext(
+            hasReasoning: true,
+            hasSamplingParameters: true,
+            parameters: $parameters,
+        );
+
+        $result = $this->makeAdapter()->getAdditionalDriverOptions($this->makeTextAgent($context), $context);
+
+        static::assertSame(1_024, $result['thinking']['budget_tokens']);
+    }
+
+    public function testItDoesNotEnableThinkingWhenMaxTokensIsTooSmall(): void
+    {
+        $parameters = (new AiModelParameters())
+            ->setMaxTokens(1_024)
+            ->setMaxThinkingTokens(512);
+        $context = $this->makeRequestContext(
+            hasReasoning: true,
+            hasSamplingParameters: true,
+            parameters: $parameters,
+        );
+
+        static::assertSame([], $this->makeAdapter()->getAdditionalDriverOptions(
+            $this->makeTextAgent($context),
+            $context,
+        ));
+    }
+
+    public function testItNeutralisesTopPBelowAnthropicsMinimum(): void
+    {
+        $parameters = (new AiModelParameters())
+            ->setTopP(0.9);
+        $context = $this->makeRequestContext(
+            hasReasoning: true,
+            hasSamplingParameters: true,
+            parameters: $parameters,
+        );
+
+        $result = $this->makeAdapter()->getAdditionalDriverOptions($this->makeTextAgent($context), $context);
+
+        static::assertSame(1.0, $result['top_p']);
+    }
+
+    public function testItLeavesCompatibleTopPUnchanged(): void
+    {
+        $parameters = (new AiModelParameters())
+            ->setTopP(0.97);
+        $context = $this->makeRequestContext(
+            hasReasoning: true,
+            hasSamplingParameters: true,
+            parameters: $parameters,
+        );
+
+        $result = $this->makeAdapter()->getAdditionalDriverOptions($this->makeTextAgent($context), $context);
+
+        static::assertArrayNotHasKey('top_p', $result);
     }
 
     // =========================================================================

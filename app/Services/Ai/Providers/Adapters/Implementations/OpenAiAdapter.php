@@ -72,28 +72,35 @@ class OpenAiAdapter extends AbstractProviderAdapter
     }
 
     /**
-     * Requests reasoning summaries for reasoning-capable models so the Responses API
-     * streams `response.reasoning_summary_text.delta` events. Without `reasoning.summary`
-     * OpenAI never exposes the model's thinking, and the gateway cannot emit
-     * {@see \Laravel\Ai\Streaming\Events\ReasoningDelta} events for the UI.
+     * Adds Responses API options required by HAWKI's text-generating agents.
      *
-     * Only applies to text-generating agents on models flagged with
-     * {@see \App\Services\Ai\Models\Flags\Values\WellKnownModelFlags::FEATURE_REASONING};
-     * non-reasoning models reject the `reasoning` parameter.
+     * Reasoning-capable models receive `reasoning.summary` so the gateway can stream
+     * {@see \Laravel\Ai\Streaming\Events\ReasoningDelta} events. Agents with OpenAI's
+     * native {@see WebSearch} tool receive the web-search sources include path, regardless
+     * of whether the model supports reasoning.
      */
     public function getAdditionalDriverOptions(Agent $agent, AgentRequestContext $context): array
     {
-        if ($agent instanceof AbstractTextGeneratingAgent && $context->model->flags->hasStrengthReasoning()) {
-            return [
-                'reasoning' => [
-                    'summary' => 'auto',
-                ],
-                // Expose the sources a native web search found, so the UI can show them alongside the reasoning.
-                'include' => ['web_search_call.action.sources'],
+        if (!$agent instanceof AbstractTextGeneratingAgent) {
+            return [];
+        }
+
+        $options = [];
+
+        if ($context->model->flags->hasStrengthReasoning()) {
+            $options['reasoning'] = [
+                'summary' => 'auto',
             ];
         }
 
-        return [];
+        foreach ($agent->tools() as $tool) {
+            if ($tool instanceof WebSearch) {
+                $options['include'] = ['web_search_call.action.sources'];
+                break;
+            }
+        }
+
+        return $options;
     }
 
     /**
