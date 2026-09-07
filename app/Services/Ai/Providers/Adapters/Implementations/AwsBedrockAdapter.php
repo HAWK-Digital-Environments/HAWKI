@@ -11,6 +11,7 @@ use App\Services\Ai\Agents\Values\AgentRequestContext;
 use App\Services\Ai\Exceptions\InvalidProviderConfigurationException;
 use App\Services\Ai\Providers\Adapters\AbstractProviderAdapter;
 use App\Services\Ai\Providers\Adapters\DriverFactory;
+use App\Services\Ai\Providers\Adapters\Values\AnthropicThinkingConfig;
 use App\Services\Ai\Providers\Values\AiProviderProxy;
 use Aws\Bedrock\BedrockClient;
 use Illuminate\Support\Arr;
@@ -19,6 +20,7 @@ use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Gateway\Bedrock\Concerns\CreatesBedrockClient;
 use Laravel\Ai\Providers\Provider as Driver;
+use Psr\Log\LoggerInterface;
 
 /**
  * Provider adapter for AWS Bedrock.
@@ -37,6 +39,12 @@ use Laravel\Ai\Providers\Provider as Driver;
 class AwsBedrockAdapter extends AbstractProviderAdapter
 {
     use CreatesBedrockClient;
+
+    public function __construct(
+        private readonly LoggerInterface $logger,
+    )
+    {
+    }
 
     /**
      * Creates a Bedrock driver instance from the provider's API key.
@@ -85,11 +93,11 @@ class AwsBedrockAdapter extends AbstractProviderAdapter
     /**
      * Enables Claude extended thinking for reasoning-capable Anthropic text models.
      *
-     * Thinking tokens count towards `maxTokens`, so the requested budget is limited to half
-     * of the effective output limit and kept above Anthropic's 1,024-token minimum. Models
-     * with limits too small for a valid budget keep thinking disabled. Anthropic rejects
-     * temperature values other than 1 and any top-p value while thinking is enabled, so the
-     * replacement inference config neutralises configured sampling values for this request.
+     * Budget and sampling decisions are made by the shared {@see AnthropicThinkingConfig}
+     * (Bedrock runs the same Claude thinking feature); this adapter only maps the result
+     * into Bedrock's Converse envelope: thinking rides in `additionalModelRequestFields`,
+     * and neutralised sampling values replace the inference config for this request.
+     * Every deviation from the user-configured parameters is logged as a warning.
      *
      * @see https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-anthropic-claude-messages-extended-thinking.html
      */
@@ -104,26 +112,28 @@ class AwsBedrockAdapter extends AbstractProviderAdapter
             return [];
         }
 
-        $maxTokens = $agent->maxTokens() ?? $context->modelParameters->getMaxTokens();
-        $budgetTokens = max(1_024, min(
-            $context->modelParameters->getMaxThinkingTokens(),
-            intdiv($maxTokens, 2),
-        ));
+        $config = AnthropicThinkingConfig::from(
+            requestedBudgetTokens: $context->modelParameters->getMaxThinkingTokens(),
+            maxTokens: $agent->maxTokens() ?? $context->modelParameters->getMaxTokens(),
+            temperature: $agent->temperature(),
+            topP: $agent->topP(),
+        );
 
-        if ($budgetTokens >= $maxTokens) {
+        foreach ($config->warnings as $warning) {
+            $this->logger->warning($warning);
+        }
+
+        if (!$config->enabled) {
             return [];
         }
 
         $options = [
             'additionalModelRequestFields' => [
-                'thinking' => [
-                    'type' => 'enabled',
-                    'budget_tokens' => $budgetTokens,
-                ],
+                'thinking' => $config->thinking,
             ],
         ];
 
-        if ($agent->temperature() !== null || $agent->topP() !== null) {
+        if ($config->overridesSampling) {
             $options['inferenceConfig'] = Arr::whereNotNull([
                 'maxTokens' => $agent->maxTokens(),
                 'temperature' => 1.0,

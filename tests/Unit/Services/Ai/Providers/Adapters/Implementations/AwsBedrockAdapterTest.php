@@ -29,9 +29,9 @@ class AwsBedrockAdapterTest extends TestCase
     // Helpers
     // =========================================================================
 
-    private function makeAdapter(): AwsBedrockAdapter
+    private function makeAdapter(\Psr\Log\LoggerInterface|null $logger = null): AwsBedrockAdapter
     {
-        return new AwsBedrockAdapter();
+        return new AwsBedrockAdapter($logger ?? new \Psr\Log\NullLogger());
     }
 
     private function makeProvider(string $apiKey, array $adapterSettings = []): AiProvider
@@ -333,8 +333,13 @@ class AwsBedrockAdapterTest extends TestCase
         ));
     }
 
-    public function testItClampsThinkingBudgetToAnthropicsMinimum(): void
+    public function testItDisablesThinkingAndWarnsWhenRequestedBudgetIsBelowAnthropicsMinimum(): void
     {
+        $logger = $this->createMock(\Psr\Log\LoggerInterface::class);
+        $logger->expects(static::once())
+            ->method('warning')
+            ->with(static::stringContains("below Anthropic's minimum"));
+
         $parameters = (new AiModelParameters())
             ->setMaxTokens(8_192)
             ->setMaxThinkingTokens(512);
@@ -344,16 +349,17 @@ class AwsBedrockAdapterTest extends TestCase
             parameters: $parameters,
         );
 
-        $result = $this->makeAdapter()->getAdditionalDriverOptions($this->makeTextAgent($context), $context);
-
-        static::assertSame(1_024, $result['additionalModelRequestFields']['thinking']['budget_tokens']);
+        static::assertSame([], $this->makeAdapter($logger)->getAdditionalDriverOptions(
+            $this->makeTextAgent($context),
+            $context,
+        ));
     }
 
     public function testItDoesNotEnableThinkingWhenMaxTokensIsTooSmall(): void
     {
         $parameters = (new AiModelParameters())
             ->setMaxTokens(1_024)
-            ->setMaxThinkingTokens(512);
+            ->setMaxThinkingTokens(2_048);
         $context = $this->makeRequestContext(
             hasReasoning: true,
             hasSamplingParameters: true,

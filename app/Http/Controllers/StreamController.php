@@ -20,7 +20,6 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Laravel\Ai\Responses\Data\ToolCall;
 use Laravel\Ai\Streaming\Events\Citation;
 use Laravel\Ai\Streaming\Events\Error;
 use Laravel\Ai\Streaming\Events\ProviderToolEvent;
@@ -29,6 +28,8 @@ use Laravel\Ai\Streaming\Events\ReasoningEnd;
 use Laravel\Ai\Streaming\Events\ReasoningStart;
 use Laravel\Ai\Streaming\Events\StreamEnd;
 use Laravel\Ai\Streaming\Events\TextDelta;
+use Laravel\Ai\Streaming\Events\ToolCall as ToolCallEvent;
+use Laravel\Ai\Streaming\Events\ToolResult;
 use Psr\Log\LoggerInterface;
 
 class StreamController extends Controller
@@ -204,7 +205,7 @@ class StreamController extends Controller
             ], JSON_THROW_ON_ERROR) . "\n";
 
         $formatData = function (
-            string|object $content,
+            string|array|object $content,
             string        $type,
             bool          $isDone = false,
             array|null    $status = null,
@@ -285,37 +286,33 @@ class StreamController extends Controller
                         break;
                     case $chunk instanceof ReasoningStart:
                         yield $formatStatus('reasoning');
+                        yield $formatData(content: $chunk->toArray(), type: 'reasoning_start');
                         break;
                     case $chunk instanceof ReasoningDelta:
                         yield $formatStatus('reasoning_delta', $chunk->delta);
+                        yield $formatData(content: $chunk->toArray(), type: 'reasoning_delta');
                         break;
                     case $chunk instanceof ReasoningEnd:
-                        yield $formatStatus('reasoning_end');
+                        yield $formatData(content: $chunk->toArray(), type: 'reasoning_end');
                         break;
                     case $chunk instanceof ProviderToolEvent:
                         yield $formatStatus('provider_tool_call', $chunk->type);
-                        if ($chunk->type === 'web_search_call' && $chunk->status === 'completed') {
-                            $action = data_get($chunk->data, 'action', []);
-                            $sources = collect(data_get($action, 'sources', []))
-                                ->map(static fn($source) => is_array($source) ? ($source['url'] ?? null) : (is_string($source) ? $source : null))
-                                ->filter()
-                                ->unique()
-                                ->values();
-                            if (is_string($action['url'] ?? null) && $sources->isEmpty()) {
-                                $sources->push($action['url']);
-                            }
-                            $query = data_get($action, 'query');
-                            if ($sources->isNotEmpty() || (is_string($query) && $query !== '')) {
-                                yield $formatStatus('web_search', [
-                                    'type' => data_get($action, 'type', 'search'),
-                                    'query' => is_string($query) ? $query : null,
-                                    'sources' => $sources->all(),
-                                ]);
-                            }
-                        }
+                        yield $formatData(content: $chunk->toArray(), type: 'provider_tool_event');
                         break;
-                    case $chunk instanceof ToolCall:
-                        yield $formatStatus('tool_call', $chunk->name);
+                    case $chunk instanceof ToolCallEvent:
+                        // WANRING!! — pre-existing bug fixed here: this case used to compare
+                        // against `Laravel\Ai\Responses\Data\ToolCall` (the data object)
+                        // instead of `Laravel\Ai\Streaming\Events\ToolCall` (the event), so
+                        // the `tool_call` status NEVER fired on the stream. Both UIs now
+                        // receive tool-call notifications for the first time.
+                        // TODO: test tool-calling conversations thoroughly, legacy UI included — its
+                        // status value must stay an array of tool names (the legacy renderer
+                        // iterates it with `new Set(value)`).
+                        yield $formatStatus('tool_call', [$chunk->toolCall->name]);
+                        yield $formatData(content: $chunk->toArray(), type: 'tool_call');
+                        break;
+                    case $chunk instanceof ToolResult:
+                        yield $formatData(content: $chunk->toArray(), type: 'tool_result');
                         break;
                     case $chunk instanceof StreamEnd:
                         foreach ($this->citationCleaner->cleanMany($citations) as $cleanedCitation) {
