@@ -119,7 +119,19 @@ padding so the composer stays aligned with the centred message column).
         text-align: center;
     }
 
+    /* On narrow screens the avatar gutter would push the composer off-centre,
+       so the card spans the full row instead. Mobile scrollbars overlay the
+       content, so the mirrored gutter is dropped too — reserving space for a
+       scrollbar that takes no layout width just shifts the composer left. */
     @media (--bp-sm-and-smaller) {
-        .composer-row { padding-inline: var(--space-3); }
+        .composer-dock { padding-right: 0; }
+        .composer-dock::before { right: 0; }
+
+        .composer-row {
+            grid-template-columns: minmax(0, 1fr);
+            padding-inline: var(--space-5);
+        }
+
+        .composer-row :global(.chat-composer-wrapper) { grid-column: 1; }
     }
 </style>
