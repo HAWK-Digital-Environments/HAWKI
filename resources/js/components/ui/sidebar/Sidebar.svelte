@@ -55,9 +55,11 @@
         flex-direction: column;
         width: var(--nav-track);
         height: 100%;
-        /* A little more breathing room at the top and bottom edges than on the
-           sides, so the header and the footer row don't sit on the edge. */
-        padding: var(--space-3) var(--space-2);
+        /* A little more breathing room at the bottom edge than on the sides, so
+           the footer row doesn't sit on the edge. At the top the header brings
+           its own inset, so the padding here is trimmed to leave the same gap
+           above the header as the header leaves below itself. */
+        padding: calc(var(--nav-group-gap) - var(--space-1)) var(--space-2) var(--space-3);
         border-right: var(--divider);
     }
 
