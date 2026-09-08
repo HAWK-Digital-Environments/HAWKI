@@ -172,6 +172,9 @@
     /* ── Overlay ──────────────────────────────────────────────────────── */
 
     :global(.sheet-overlay) {
+        /* Portaled to the body, so it needs the overlay layer to clear the
+           fixed off-canvas sidebar (--app-sidebar-z). */
+        z-index: var(--layer-overlay);
         position: fixed;
         inset: 0;
         background-color: color-mix(in oklch, var(--color-bg) 55%, transparent);
@@ -190,6 +193,7 @@
     :global(.sheet-content) {
         --sheet-bg: var(--color-surface-raised);
 
+        z-index: var(--layer-overlay);
         position: fixed;
         inset-inline: 0;
         bottom: 0;
