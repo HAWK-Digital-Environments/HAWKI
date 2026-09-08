@@ -1,10 +1,11 @@
 import type {HawkiApp} from '$lib/kernel/HawkiApp.js';
-import type {ChatMessage, MessageStats, ReasoningPart} from '$plugins/core/modules/chat/types.js';
+import type {ChatMessage, MessageStats} from '$plugins/core/modules/chat/types.js';
 import type {MessageSenderTransportInterface, MessageSenderTransportOptions} from '$plugins/core/modules/chat/components/composer/contexts/sending/transport/MessageSenderTransportInterface.js';
 import type {ChatStore} from '$plugins/core/stores/ChatStore.svelte.js';
 import {aiPacketText} from '$lib/kernel/ai/AiApi.js';
 import type {AiMessage} from '$lib/kernel/ai/types.js';
 import type {SendMessageResponse} from '$plugins/core/modules/chat/components/composer/contexts/sending/SendMessageResponse.svelte.js';
+import {applyThinkingEvent, emptyThinkingTimeline} from '$plugins/core/modules/chat/utils/thinkingEvents.js';
 import type {UrlCitation} from '$lib/components/ui/citations/types.js';
 
 interface ChatTransportOptions {
@@ -245,8 +246,7 @@ export class ChatTransport implements MessageSenderTransportInterface {
         else this.store.appendMessage(conversationSlug, temporary);
 
         let text = '';
-        let reasoning: ReasoningPart[] = [];
-        let reasoningTextPartOpen = false;
+        let thinking = emptyThinkingTimeline();
         let citations: UrlCitation[] = [];
         let completion = false;
         // Generation metrics for the "Stats for Nerds" experiment. Timing is
@@ -280,37 +280,24 @@ export class ChatTransport implements MessageSenderTransportInterface {
             }, {signal: controller.signal})) {
                 responseWriter.triggerBodyChunk(JSON.stringify(packet));
                 if (packet.type === 'error') throw new Error(String(packet.content ?? this.app.translator.__('chat.page.requestFailed')));
-                if (packet.type === 'status') {
+                if (packet.type === 'reasoning_start' || packet.type === 'reasoning_delta'
+                    || packet.type === 'reasoning_end' || packet.type === 'provider_tool_event') {
+                    thinking = applyThinkingEvent(thinking, packet);
+                    // The stream carries no separate status for thinking; derive it from the events.
+                    const status = packet.type === 'reasoning_end' ? 'running' : 'reasoning';
+                    this.store.patchMessage(conversationSlug, temporaryId, {reasoning: thinking.parts, status});
+                } else if (packet.type === 'status') {
                     const status = typeof packet.status === 'string' ? packet.status : packet.status?.key;
-                    const value = typeof packet.status === 'object' ? packet.status?.value : undefined;
-                    if (status === 'reasoning_delta' && typeof value === 'string') {
-                        const last = reasoning.at(-1);
-                        reasoning = reasoningTextPartOpen && last?.type === 'text'
-                            ? [...reasoning.slice(0, -1), {type: 'text', text: last.text + value}]
-                            : [...reasoning, {type: 'text', text: value}];
-                        reasoningTextPartOpen = true;
-                        this.store.patchMessage(conversationSlug, temporaryId, {status, reasoning});
-                    } else if (status === 'reasoning' || status === 'reasoning_end') {
-                        reasoningTextPartOpen = false;
-                        this.store.patchMessage(conversationSlug, temporaryId, {status});
-                    } else if (status === 'web_search' && value && typeof value === 'object') {
-                        reasoningTextPartOpen = false;
-                        const search = value as {type?: unknown; query?: unknown; sources?: unknown};
-                        reasoning = [...reasoning, {
-                            type: 'web_search',
-                            action: typeof search.type === 'string' ? search.type : 'search',
-                            query: typeof search.query === 'string' ? search.query : null,
-                            sources: Array.isArray(search.sources) ? search.sources.filter((url): url is string => typeof url === 'string') : []
-                        }];
-                        this.store.patchMessage(conversationSlug, temporaryId, {status, reasoning});
-                    } else {
-                        this.store.patchMessage(conversationSlug, temporaryId, {status: status ?? 'running'});
-                    }
+                    this.store.patchMessage(conversationSlug, temporaryId, {status: status ?? 'running'});
                 } else if (packet.type === 'message') {
                     const delta = aiPacketText(packet.content);
                     if (delta) firstTokenAt ??= performance.now();
                     text += delta;
-                    this.store.patchMessage(conversationSlug, temporaryId, {content: {...temporary.content, text}, stats: buildStats()});
+                    this.store.patchMessage(conversationSlug, temporaryId, {
+                        content: {...temporary.content, text},
+                        stats: buildStats(),
+                        ...(delta ? {status: 'generating'} : {})
+                    });
                 } else if (packet.type === 'citation' && packet.content) {
                     citations = [...citations, packet.content as UrlCitation];
                     this.store.patchMessage(conversationSlug, temporaryId, {citations});
@@ -325,7 +312,7 @@ export class ChatTransport implements MessageSenderTransportInterface {
             const stats = buildStats();
 
             const finalText = text.trim() ? text : this.app.translator.__('chat.page.noResponse');
-            const encrypted = await this.store.encryptText(JSON.stringify({text: finalText, citations, ...(reasoning.length ? {reasoning} : {}), stats}));
+            const encrypted = await this.store.encryptText(JSON.stringify({text: finalText, citations, ...(thinking.parts.length ? {reasoning: thinking.parts} : {}), stats}));
             const saved = await this.store.persistMessage(conversationSlug, {
                 isAi: true,
                 ...(regenState ? {message_id: regenState.messageId} : {threadId: Number.isFinite(threadId) ? threadId : 0}),
@@ -338,7 +325,7 @@ export class ChatTransport implements MessageSenderTransportInterface {
                 completion,
                 __plainText: finalText,
                 __citations: citations,
-                __reasoning: reasoning.length ? reasoning : undefined,
+                __reasoning: thinking.parts.length ? thinking.parts : undefined,
                 __stats: stats
             }, Boolean(regenState));
             // Keep the render key of the streamed message so the keyed list

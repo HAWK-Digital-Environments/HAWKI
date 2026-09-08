@@ -28,11 +28,12 @@ use Laravel\Ai\Streaming\Events\TextEnd;
  * streaming and processes citations once a {@see StreamEnd} event is detected.
  *
  * OpenAI streams a reasoning item as several summary parts (typically
- * "**Title**\n\nBody") with no delimiter between them, and the parent gateway only
- * emits {@see ReasoningStart}/{@see ReasoningEnd} once per reasoning item. This gateway
- * watches the raw `response.reasoning_summary_part.done` frames and emits a paired
- * {@see ReasoningEnd}/{@see ReasoningStart} before the next {@see ReasoningDelta}, so
- * clients can separate the parts using the regular reasoning lifecycle events.
+ * "**Title**\n\nBody") while the parent gateway concatenates their deltas into one
+ * undelimited stream, gluing a part's last line to the next part's `**Title**`
+ * heading. This gateway watches the raw `response.reasoning_summary_part.done`
+ * frames and prefixes the first delta of each subsequent part with a blank line,
+ * so the concatenated reasoning text keeps the markdown block structure the
+ * parts imply (each part renders as its own section).
  *
  * Multiple annotation entries for the same URL are merged into one
  * {@see UrlMultiCitation} with accumulated ranges, so the client receives one
@@ -76,8 +77,8 @@ class ExtendedOpenAiGateway extends OpenAiGateway
     /**
      * @inheritDoc
      *
-     * Converts OpenAI reasoning summary part boundaries to reasoning lifecycle
-     * events and injects {@see Citation} events immediately before {@see StreamEnd}.
+     * Separates OpenAI reasoning summary parts with a blank line and injects
+     * {@see Citation} events immediately before {@see StreamEnd}.
      */
     protected function processTextStream(string $invocationId, Provider $provider, string $model, $streamBody): Generator
     {
@@ -95,17 +96,17 @@ class ExtendedOpenAiGateway extends OpenAiGateway
 
             if ($event instanceof ReasoningDelta && $reasoningStarted && $this->reasoningPartBoundaryPending) {
                 $this->reasoningPartBoundaryPending = false;
-                yield (new ReasoningEnd(
-                    $this->generateEventId(),
+                $separated = new ReasoningDelta(
+                    $event->id,
                     $event->reasoningId,
-                    time(),
-                ))->withInvocationId($invocationId);
-
-                yield (new ReasoningStart(
-                    $this->generateEventId(),
-                    $event->reasoningId,
-                    time(),
-                ))->withInvocationId($invocationId);
+                    "\n\n" . $event->delta,
+                    $event->timestamp,
+                    $event->summary,
+                );
+                if ($event->invocationId !== null) {
+                    $separated->withInvocationId($event->invocationId);
+                }
+                $event = $separated;
             }
 
             if ($event instanceof ReasoningEnd) {

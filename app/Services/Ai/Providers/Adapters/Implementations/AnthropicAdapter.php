@@ -10,12 +10,14 @@ use App\Services\Ai\Agents\Adapters\AbstractTextGeneratingAgent;
 use App\Services\Ai\Agents\Values\AgentRequestContext;
 use App\Services\Ai\Providers\Adapters\AbstractProviderAdapter;
 use App\Services\Ai\Providers\Adapters\DriverFactory;
+use App\Services\Ai\Providers\Adapters\Values\AnthropicThinkingConfig;
 use App\Services\Ai\Providers\Values\AiProviderProxy;
 use Illuminate\Support\Collection;
 use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Gateway\Anthropic\Concerns\CreatesAnthropicClient;
 use Laravel\Ai\Providers\Provider as Driver;
+use Psr\Log\LoggerInterface;
 
 
 /**
@@ -29,6 +31,12 @@ use Laravel\Ai\Providers\Provider as Driver;
 class AnthropicAdapter extends AbstractProviderAdapter
 {
     use CreatesAnthropicClient;
+
+    public function __construct(
+        private readonly LoggerInterface $logger,
+    )
+    {
+    }
 
     /**
      * Creates an Anthropic driver instance authenticated with the provider's API key.
@@ -46,11 +54,8 @@ class AnthropicAdapter extends AbstractProviderAdapter
     /**
      * Enables Anthropic extended thinking for reasoning-capable text models.
      *
-     * Thinking tokens count towards `max_tokens`, so the requested budget is limited to half
-     * of the effective output limit and kept above Anthropic's 1,024-token minimum. Models
-     * with limits too small for a valid budget keep thinking disabled. Anthropic rejects most
-     * sampling values while thinking is enabled, so incompatible configured temperature and
-     * top-p values are neutralised for this request instead of making it fail.
+     * Budget and sampling decisions are made by {@see AnthropicThinkingConfig}; every
+     * deviation from the user-configured parameters is logged as a warning.
      *
      * @see https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking
      */
@@ -60,33 +65,27 @@ class AnthropicAdapter extends AbstractProviderAdapter
             return [];
         }
 
-        $maxTokens = $agent->maxTokens() ?? 64_000;
-        $budgetTokens = min(
-            $context->modelParameters->getMaxThinkingTokens(),
-            intdiv($maxTokens, 2),
+        $config = AnthropicThinkingConfig::from(
+            requestedBudgetTokens: $context->modelParameters->getMaxThinkingTokens(),
+            maxTokens: $agent->maxTokens() ?? 64_000,
+            temperature: $agent->temperature(),
+            topP: $agent->topP(),
         );
-        $budgetTokens = max(1_024, $budgetTokens);
 
-        if ($budgetTokens >= $maxTokens) {
+        $this->logWarnings($config);
+
+        if (!$config->enabled) {
             return [];
         }
 
-        $options = [
-            'thinking' => [
-                'type' => 'enabled',
-                'budget_tokens' => $budgetTokens,
-            ],
-        ];
+        return ['thinking' => $config->thinking] + $config->samplingOverrides;
+    }
 
-        if ($agent->temperature() !== null) {
-            $options['temperature'] = 1.0;
+    private function logWarnings(AnthropicThinkingConfig $config): void
+    {
+        foreach ($config->warnings as $warning) {
+            $this->logger->warning($warning);
         }
-
-        if ($agent->topP() !== null && $agent->topP() < 0.95) {
-            $options['top_p'] = 1.0;
-        }
-
-        return $options;
     }
 
     /**
