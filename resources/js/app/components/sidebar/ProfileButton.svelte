@@ -18,11 +18,18 @@
     import {useStore} from '$lib/app/hooks/useStore.svelte.js';
     import {useTranslator} from '$lib/app/hooks/useTranslator.svelte.js';
     import {useConnection} from '$lib/app/hooks/useConnection.svelte.js';
+    import {useBreakpoint} from '$lib/components/util/breakpoints/useBreakpoint.svelte.js';
 
     const app = useApp();
     const themeStore = useStore('theme');
     const {__} = useTranslator();
     const connection = useConnection();
+    // The sidebar bumps its rows up a notch on small screens; the avatar and the
+    // settings glyph follow the same step so the footer row stays proportional.
+    const breakpoint = useBreakpoint();
+    const compact = $derived(breakpoint.is('bpMdAndSmaller'));
+    const triggerAvatarSize = $derived(compact ? 24 : 22);
+    const triggerIconSize = $derived(compact ? 18 : 16);
     const userinfo = $derived(connection.hasUserInfo ? connection.userinfo : null);
     const userName = $derived(userinfo?.name || __('ui.profile.fallbackName'));
     const userEmail = $derived(userinfo?.email ?? '');
@@ -63,10 +70,10 @@
     {#snippet trigger({props})}
         <SidebarItem label={userName} active={menuOpen} {...props}>
             {#snippet media()}
-                <Avatar src={avatarUrl} name={userName} label={userName} size={22}/>
+                <Avatar src={avatarUrl} name={userName} label={userName} size={triggerAvatarSize}/>
             {/snippet}
             {#snippet trailing()}
-                <Settings03Icon size={16} strokeWidth={2}/>
+                <Settings03Icon size={triggerIconSize} strokeWidth={2}/>
             {/snippet}
         </SidebarItem>
     {/snippet}
