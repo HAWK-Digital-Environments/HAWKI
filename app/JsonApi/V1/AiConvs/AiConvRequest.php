@@ -16,15 +16,17 @@ class AiConvRequest extends ResourceRequest
      * symmetrically encrypted prompt; the server never sees the plain text.
      *
      * The assistant handle optionally binds the conversation to an assistant
-     * (plaintext metadata, not chat content). Only assistants visible to the
-     * requesting user may be bound.
+     * (plaintext metadata, not chat content). It travels inside the
+     * `hawkiExtensions` envelope — the JSON:API home for HAWKI-specific
+     * extensions. Only assistants visible to the requesting user may be
+     * bound.
      */
     public function rules(): array
     {
         return [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
             'system_prompt' => ['sometimes', 'nullable', 'string'],
-            'assistant_handle' => [
+            'hawkiExtensions.assistant_handle' => [
                 'sometimes',
                 'nullable',
                 'string',

@@ -114,7 +114,7 @@ export class AiApi {
                 messages: request.messages,
                 ...(request.tools === undefined ? {} : {tools: request.tools}),
                 ...(request.params === undefined ? {} : {params: request.params}),
-                ...(request.assistantHandle ? {assistant_handle: request.assistantHandle} : {})
+                ...(request.assistantHandle ? {hawkiExtensions: {assistant_handle: request.assistantHandle}} : {})
             }
         };
     }

@@ -13,9 +13,10 @@ use Illuminate\Foundation\Http\FormRequest;
  * Validates a generic, stateless chat exchange submitted to
  * {@see \App\Http\Controllers\Api\V1\OpenaiResponsesController}.
  *
- * The request is assistant-aware but not assistant-scoped: callers may pass an
- * optional {@see $assistant_handle} to build the exchange from an assistant
- * (system prompt, tools, parameters, model), or omit it for a bare model run.
+ * The request is assistant-aware but not assistant-scoped: callers may pass
+ * an optional `hawkiExtensions.assistant_handle` to build the exchange from
+ * an assistant (system prompt, tools, parameters, model), or omit it for a
+ * bare model run.
  */
 class OpenaiResponseRequest extends FormRequest
 {
@@ -34,14 +35,14 @@ class OpenaiResponseRequest extends FormRequest
             'messages' => ['nullable', 'array'],
             'stream' => ['nullable', 'boolean'],
             'model' => ['nullable', 'string'],
-            'assistant_handle' => ['nullable', 'string', 'exists:assistants,handle'],
+            'hawkiExtensions.assistant_handle' => ['nullable', 'string', 'exists:assistants,handle'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'assistant_handle.exists' => "No assistant found for handle ':input'.",
+            'hawkiExtensions.assistant_handle.exists' => "No assistant found for handle ':input'.",
         ];
     }
 
@@ -84,7 +85,8 @@ class OpenaiResponseRequest extends FormRequest
     }
 
     /**
-     * Resolve and cache the assistant referenced by {@see $assistant_handle}.
+     * Resolve and cache the assistant referenced by
+     * `hawkiExtensions.assistant_handle`.
      *
      * Existence is already enforced declaratively via the `exists:assistants,handle`
      * validation rule, so this only performs a lookup when a handle was
@@ -99,7 +101,7 @@ class OpenaiResponseRequest extends FormRequest
 
         $this->assistantLoaded = true;
 
-        $handle = $this->input('assistant_handle');
+        $handle = $this->input('hawkiExtensions.assistant_handle');
 
         if ($handle === null || $handle === '') {
             return null;

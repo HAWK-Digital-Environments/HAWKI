@@ -16,9 +16,9 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Agent factory that claims legacy-shaped chat requests carrying an explicit
- * `payload.assistant_handle`, delegating the actual agent creation to
- * {@see ChatAgentFromLegacyRequestFactory} with an assistant-assembled
- * payload.
+ * `payload.hawkiExtensions.assistant_handle`, delegating the actual agent
+ * creation to {@see ChatAgentFromLegacyRequestFactory} with an
+ * assistant-assembled payload.
  *
  * The handle is the sole detection mechanism — the assistant's `@handle`
  * inside the message text is addressing chrome, never a trigger. Senders of
@@ -53,8 +53,8 @@ class AssistantChatAgentFactory implements AgentFactoryInterface
 
     /**
      * Returns an assistant-driven {@see ChatAgent} when the request carries
-     * an explicit `assistant_handle` referencing a visible assistant, null
-     * otherwise.
+     * an explicit `hawkiExtensions.assistant_handle` referencing a visible
+     * assistant, null otherwise.
      */
     public function createAgent(mixed $request): AgentInterface|null
     {
@@ -114,7 +114,7 @@ class AssistantChatAgentFactory implements AgentFactoryInterface
             ...$payload->tools(),
         ]));
 
-        unset($inner['assistant_handle']);
+        unset($inner['hawkiExtensions']);
 
         return ['payload' => $inner];
     }

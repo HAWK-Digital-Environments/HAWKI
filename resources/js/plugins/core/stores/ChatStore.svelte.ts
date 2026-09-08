@@ -112,7 +112,7 @@ export class ChatStore implements DataStore {
                 name: source.name,
                 slug: source.slug,
                 system_prompt: source.system_prompt ? await this.decryptText(source.system_prompt, key) : '',
-                assistant_handle: source.assistant_handle ?? null,
+                assistant_handle: source.hawkiExtensions?.assistant_handle ?? null,
                 messages: await Promise.all((source.messages ?? []).map(message => this.decryptMessage(message, key)))
             };
             if (requestId === this.activeLoad) {
@@ -138,7 +138,7 @@ export class ChatStore implements DataStore {
         const resource = await this.dependencies.restApi.createResource('ai-convs', {
             name,
             system_prompt: JSON.stringify(encryptedPrompt),
-            ...(assistantHandle === null ? {} : {assistant_handle: assistantHandle})
+            ...(assistantHandle === null ? {} : {hawkiExtensions: {assistant_handle: assistantHandle}})
         });
         const conversation: ChatConversation = {
             name,
@@ -176,7 +176,7 @@ export class ChatStore implements DataStore {
             return;
         }
 
-        await this.dependencies.restApi.updateResource('ai-convs', slug, {assistant_handle: assistantHandle});
+        await this.dependencies.restApi.updateResource('ai-convs', slug, {hawkiExtensions: {assistant_handle: assistantHandle}});
         const conversation = this.getConversation(slug);
         if (conversation) conversation.assistant_handle = assistantHandle;
     }

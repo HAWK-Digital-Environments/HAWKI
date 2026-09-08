@@ -298,7 +298,7 @@ export class ComposerContext {
 
     /** Assistant handle (without `@`) the addressed participant binds the
      *  exchange to, or null when no assistant-backed participant is
-     *  addressed. Travels as `payload.assistant_handle`. */
+     *  addressed. Travels as `payload.hawkiExtensions.assistant_handle`. */
     public readonly addressedAssistantHandle = $derived.by(() => {
         for (const assistant of this.addressedAssistants) {
             if (assistant.chatBinding) {

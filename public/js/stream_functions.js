@@ -22,7 +22,9 @@ async function buildRequestObject(msgAttributes, onData, onError) {
             messages: msgs,
             tools: msgAttributes['metadata']?.tools ?? null,
             params: msgAttributes['metadata']?.params ?? null,
-            assistant_handle: msgAttributes['assistantHandle'] ?? null
+            hawkiExtensions: {
+                assistant_handle: msgAttributes['assistantHandle'] ?? null
+            }
         }
     };
 

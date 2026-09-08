@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  * at POST /api/openai/v1/responses.
  *
  * Two resolution modes, selected by the request body:
- *  - assistant handle provided: the exchange is built from the assistant via
+ *  - hawkiExtensions.assistant_handle provided: the exchange is built from the assistant via
  *    AssistantRunComposer (composed system prompt, attached tools as
  *    tool-transfer strings, temp/top_p/max_tokens params, model from the
  *    assistant unless the client overrides it and the assistant allows model

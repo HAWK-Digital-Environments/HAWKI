@@ -12,16 +12,17 @@ import type {ComposerContext} from '$plugins/core/modules/chat/components/compos
  * assistants plugin pins model/tools/params to the addressed assistant's
  * configuration and supplies its display identity — and mark the exchange
  * as bound to an assistant handle. The handle travels as
- * `payload.assistant_handle` (the backend's sole assistant-detection
- * mechanism, mirroring the OpenAI responses endpoint) and is persisted as
- * the conversation binding (`ai-convs.assistant_handle`).
+ * `payload.hawkiExtensions.assistant_handle` (the backend's sole
+ * assistant-detection mechanism, mirroring the OpenAI responses endpoint)
+ * and is persisted as the conversation binding
+ * (`ai-convs.hawkiExtensions.assistant_handle`).
  */
 export interface ChatSendDescriptor {
     /**
      * Assistant handle (without the leading `@`) the exchange is bound to,
-     * or null for a plain model run. Travels as `payload.assistant_handle`
-     * (the backend assembles the assistant from it) and is persisted as the
-     * conversation binding.
+     * or null for a plain model run. Travels as
+     * `payload.hawkiExtensions.assistant_handle` (the backend assembles the
+     * assistant from it) and is persisted as the conversation binding.
      */
     assistantHandle: string | null;
     /** Display identity for the AI message's author; null keeps the model-label rendering. */

@@ -44,7 +44,7 @@ class AssistantAgentResolutionTest extends TestCase
         $resolved = $this->app->get(AiService::class)->getAgent([
             'payload' => [
                 'model' => 'user-model',
-                'assistant_handle' => 'math-tutor',
+                'hawkiExtensions' => ['assistant_handle' => 'math-tutor'],
                 'messages' => [
                     ['role' => 'system', 'content' => ['text' => 'Conversation prompt.']],
                     ['role' => 'user', 'content' => ['text' => '@math-tutor explain derivatives']],
@@ -80,7 +80,7 @@ class AssistantAgentResolutionTest extends TestCase
         $resolved = $this->app->get(AiService::class)->getAgent([
             'payload' => [
                 'model' => 'user-model',
-                'assistant_handle' => 'math-tutor',
+                'hawkiExtensions' => ['assistant_handle' => 'math-tutor'],
                 'messages' => [
                     ['role' => 'system', 'content' => ['text' => 'Conversation prompt.']],
                     ['role' => 'user', 'content' => ['text' => '@math-tutor explain derivatives']],

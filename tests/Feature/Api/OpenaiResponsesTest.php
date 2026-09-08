@@ -21,7 +21,7 @@ use Tests\TestCase;
  * Covers the generic, stateless chat exchange endpoint POST /api/openai/v1/responses.
  *
  * The endpoint supports two resolution modes:
- *  - assistant_handle provided: builds the exchange from an assistant
+ *  - hawkiExtensions.assistant_handle provided: builds the exchange from an assistant
  *    (system prompt, tools, parameters, model).
  *  - no handle: a bare model run, or the system default model when none requested.
  */
@@ -188,8 +188,8 @@ class OpenaiResponsesTest extends TestCase
         $this->actingAsUser($user);
 
         $this->assertValidationPointer(
-            $this->postJson(self::ENDPOINT, $this->payload(['assistant_handle' => 'does-not-exist'])),
-            'assistant_handle',
+            $this->postJson(self::ENDPOINT, $this->payload(['hawkiExtensions' => ['assistant_handle' => 'does-not-exist']])),
+            'hawkiExtensions/assistant_handle',
         );
     }
 
@@ -201,7 +201,7 @@ class OpenaiResponsesTest extends TestCase
         $otherUser = User::factory()->create();
         $this->actingAsUser($otherUser);
 
-        $this->postJson(self::ENDPOINT, $this->payload(['assistant_handle' => $assistant->handle]))
+        $this->postJson(self::ENDPOINT, $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle]]))
             ->assertForbidden();
     }
 
@@ -215,7 +215,7 @@ class OpenaiResponsesTest extends TestCase
 
         $response = $this->postJson(
             self::ENDPOINT,
-            $this->payload(['assistant_handle' => $assistant->handle]),
+            $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle]]),
         );
 
         $response->assertStatus(200);
@@ -232,7 +232,7 @@ class OpenaiResponsesTest extends TestCase
 
         [$response, $body] = $this->performStreamingRequest(
             self::ENDPOINT,
-            $this->payload(['assistant_handle' => $assistant->handle]),
+            $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle]]),
         );
 
         $response->assertStatus(200);
@@ -263,7 +263,7 @@ class OpenaiResponsesTest extends TestCase
 
         [$response, $body] = $this->performStreamingRequest(
             self::ENDPOINT,
-            $this->payload(['assistant_handle' => $assistant->handle]),
+            $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle]]),
         );
 
         $response->assertStatus(200);
@@ -295,7 +295,7 @@ class OpenaiResponsesTest extends TestCase
 
         [$response, $body] = $this->performStreamingRequest(
             self::ENDPOINT,
-            $this->payload(['assistant_handle' => $assistant->handle]),
+            $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle]]),
         );
 
         $response->assertStatus(200);
@@ -324,7 +324,7 @@ class OpenaiResponsesTest extends TestCase
 
         [$response, $body] = $this->performStreamingRequest(
             self::ENDPOINT,
-            $this->payload(['assistant_handle' => $assistant->handle]),
+            $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle]]),
         );
 
         $response->assertStatus(200);
@@ -358,7 +358,7 @@ class OpenaiResponsesTest extends TestCase
 
         [$response, $body] = $this->performStreamingRequest(
             self::ENDPOINT,
-            $this->payload(['assistant_handle' => $assistant->handle]),
+            $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle]]),
         );
 
         $response->assertStatus(200);
@@ -388,7 +388,7 @@ class OpenaiResponsesTest extends TestCase
 
         [$response, $body] = $this->performStreamingRequest(
             self::ENDPOINT,
-            $this->payload(['assistant_handle' => $assistant->handle]),
+            $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle]]),
         );
 
         $response->assertStatus(200);
@@ -461,7 +461,7 @@ class OpenaiResponsesTest extends TestCase
 
         $this->performStreamingRequest(
             self::ENDPOINT,
-            $this->payload(['assistant_handle' => $assistant->handle]),
+            $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle]]),
         );
     }
 
@@ -493,7 +493,7 @@ class OpenaiResponsesTest extends TestCase
 
         $this->performStreamingRequest(
             self::ENDPOINT,
-            $this->payload(['assistant_handle' => $assistant->handle, 'model' => 'gpt-4.1']),
+            $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle], 'model' => 'gpt-4.1']),
         );
     }
 
@@ -525,7 +525,7 @@ class OpenaiResponsesTest extends TestCase
 
         $this->performStreamingRequest(
             self::ENDPOINT,
-            $this->payload(['assistant_handle' => $assistant->handle, 'model' => 'gpt-5']),
+            $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle], 'model' => 'gpt-5']),
         );
     }
 
@@ -541,7 +541,7 @@ class OpenaiResponsesTest extends TestCase
         $this->assertValidationPointer(
             $this->postJson(
                 self::ENDPOINT,
-                $this->payload(['assistant_handle' => $assistant->handle, 'model' => 'gpt-4.1']),
+                $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle], 'model' => 'gpt-4.1']),
             ),
             'model',
         );
@@ -561,7 +561,7 @@ class OpenaiResponsesTest extends TestCase
         $this->assertValidationPointer(
             $this->postJson(
                 self::ENDPOINT,
-                $this->payload(['assistant_handle' => $assistant->handle, 'model' => 'nonexistent-model-12345']),
+                $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle], 'model' => 'nonexistent-model-12345']),
             ),
             'model',
         );
@@ -580,7 +580,7 @@ class OpenaiResponsesTest extends TestCase
 
         [$response, $body] = $this->performStreamingRequest(
             self::ENDPOINT,
-            $this->payload(['assistant_handle' => $assistant->handle]),
+            $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle]]),
         );
 
         $response->assertStatus(200);
@@ -622,7 +622,7 @@ class OpenaiResponsesTest extends TestCase
         $this->performStreamingRequest(
             self::ENDPOINT,
             [
-                'assistant_handle' => $assistant->handle,
+                'hawkiExtensions' => ['assistant_handle' => $assistant->handle],
                 'input' => [
                     ['role' => 'user', 'content' => [
                         ['type' => 'input_text', 'text' => 'Hello'],
@@ -663,7 +663,7 @@ class OpenaiResponsesTest extends TestCase
         $this->performStreamingRequest(
             self::ENDPOINT,
             [
-                'assistant_handle' => $assistant->handle,
+                'hawkiExtensions' => ['assistant_handle' => $assistant->handle],
                 'input' => [
                     ['role' => 'user', 'content' => [['type' => 'input_text', 'text' => 'Hello']]],
                     ['role' => 'assistant', 'content' => [['type' => 'output_text', 'text' => 'Hi there']]],
@@ -700,7 +700,7 @@ class OpenaiResponsesTest extends TestCase
         $this->performStreamingRequest(
             self::ENDPOINT,
             [
-                'assistant_handle' => $assistant->handle,
+                'hawkiExtensions' => ['assistant_handle' => $assistant->handle],
                 'input' => 'Hello world',
             ],
         );
@@ -742,7 +742,7 @@ class OpenaiResponsesTest extends TestCase
 
         [$response, $body] = $this->performStreamingRequest(
             self::ENDPOINT,
-            $this->payload(['assistant_handle' => $assistant->handle]),
+            $this->payload(['hawkiExtensions' => ['assistant_handle' => $assistant->handle]]),
         );
 
         $response->assertStatus(200);

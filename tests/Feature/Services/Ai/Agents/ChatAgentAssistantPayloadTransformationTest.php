@@ -115,10 +115,10 @@ class ChatAgentAssistantPayloadTransformationTest extends TestCase
 
         $payload = $this->frontendPayload();
         // No payload-level handle: a plain HAWKI run over the same mixed history.
-        unset($payload['payload']['assistant_handle']);
+        unset($payload['payload']['hawkiExtensions']);
         // Only the inventore assistant exists in this scenario, so the second
         // attributed turn also belongs to it.
-        $payload['payload']['messages'][6]['assistant_handle'] = self::INVENTORE_HANDLE;
+        $payload['payload']['messages'][6]['hawkiExtensions'] = ['assistant_handle' => self::INVENTORE_HANDLE];
 
         $agent = $this->app->get(AiService::class)->getAgent($payload);
         $agent->send();
@@ -166,14 +166,14 @@ class ChatAgentAssistantPayloadTransformationTest extends TestCase
                     ['role' => 'user', 'content' => ['text' => 'hello']],
                     ['role' => 'assistant', 'content' => ['text' => 'Hello! How can I support you today?']],
                     ['role' => 'user', 'content' => ['text' => '@' . self::INVENTORE_HANDLE . ' hello']],
-                    ['role' => 'assistant', 'content' => ['text' => '1 + 5 = 6'], 'assistant_handle' => self::INVENTORE_HANDLE],
+                    ['role' => 'assistant', 'content' => ['text' => '1 + 5 = 6'], 'hawkiExtensions' => ['assistant_handle' => self::INVENTORE_HANDLE]],
                     ['role' => 'user', 'content' => ['text' => 'hello']],
-                    ['role' => 'assistant', 'content' => ['text' => 'Hello! How can I help you today?'], 'assistant_handle' => self::ELIGENDI_HANDLE],
+                    ['role' => 'assistant', 'content' => ['text' => 'Hello! How can I help you today?'], 'hawkiExtensions' => ['assistant_handle' => self::ELIGENDI_HANDLE]],
                     ['role' => 'user', 'content' => ['text' => '@' . self::INVENTORE_HANDLE . ' hello you']],
                 ],
                 'tools' => [],
                 'params' => ['temp' => 0.16, 'top_p' => 0.82, 'max_tokens' => 2805],
-                'assistant_handle' => self::INVENTORE_HANDLE,
+                'hawkiExtensions' => ['assistant_handle' => self::INVENTORE_HANDLE],
             ],
         ];
     }

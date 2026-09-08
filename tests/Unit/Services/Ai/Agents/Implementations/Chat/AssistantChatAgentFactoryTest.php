@@ -172,7 +172,7 @@ class AssistantChatAgentFactoryTest extends TestCase
 
         static::assertNull($this->sut->createAgent($this->makeRequest(
             [['role' => 'user', 'content' => ['text' => 'Hello']]],
-            ['assistant_handle' => 'math-tutor'],
+            ['hawkiExtensions' => ['assistant_handle' => 'math-tutor']],
         )));
     }
 
@@ -193,7 +193,7 @@ class AssistantChatAgentFactoryTest extends TestCase
 
         static::assertNull($this->sut->createAgent($this->makeRequest(
             [['role' => 'user', 'content' => ['text' => 'Hello']]],
-            ['assistant_handle' => 'math-tutor'],
+            ['hawkiExtensions' => ['assistant_handle' => 'math-tutor']],
         )));
     }
 
@@ -206,7 +206,7 @@ class AssistantChatAgentFactoryTest extends TestCase
 
         static::assertNull($this->sut->createAgent($this->makeRequest(
             [['role' => 'user', 'content' => ['text' => 'Hello']]],
-            ['assistant_handle' => 'math-tutor'],
+            ['hawkiExtensions' => ['assistant_handle' => 'math-tutor']],
         )));
     }
 
@@ -224,7 +224,7 @@ class AssistantChatAgentFactoryTest extends TestCase
                 ['role' => 'system', 'content' => ['text' => 'Old prompt.']],
                 ['role' => 'user', 'content' => ['text' => '@math-tutor please help']],
             ],
-            ['assistant_handle' => 'math-tutor', 'params' => [], 'tools' => []],
+            ['hawkiExtensions' => ['assistant_handle' => 'math-tutor'], 'params' => [], 'tools' => []],
         ));
 
         static::assertSame($this->delegatedAgent, $agent);
@@ -235,7 +235,7 @@ class AssistantChatAgentFactoryTest extends TestCase
         static::assertSame('please help', $payload['messages'][1]['content']['text']);
         static::assertSame(['temp' => 0.3], $payload['params']);
         static::assertSame(['assistant_tool'], $payload['tools']);
-        static::assertArrayNotHasKey('assistant_handle', $payload);
+        static::assertArrayNotHasKey('hawkiExtensions', $payload);
     }
 
     public function testItKeepsTheClientModelWhenTheAssistantAllowsSelection(): void
@@ -245,7 +245,7 @@ class AssistantChatAgentFactoryTest extends TestCase
 
         $this->sut->createAgent($this->makeRequest(
             [['role' => 'user', 'content' => ['text' => 'Hello']]],
-            ['assistant_handle' => 'math-tutor'],
+            ['hawkiExtensions' => ['assistant_handle' => 'math-tutor']],
         ));
 
         static::assertSame('user-model', $captured[0]['payload']['model']);
@@ -259,7 +259,7 @@ class AssistantChatAgentFactoryTest extends TestCase
         $this->sut->createAgent($this->makeRequest(
             [['role' => 'user', 'content' => ['text' => 'Hello']]],
             [
-                'assistant_handle' => 'math-tutor',
+                'hawkiExtensions' => ['assistant_handle' => 'math-tutor'],
                 'params' => ['max_thinking_tokens' => 512],
                 'tools' => ['capability:web_search:auto'],
             ],
@@ -277,7 +277,7 @@ class AssistantChatAgentFactoryTest extends TestCase
 
         $this->sut->createAgent($this->makeRequest(
             [['role' => 'user', 'content' => ['text' => 'Hello']]],
-            ['assistant_handle' => 'math-tutor'],
+            ['hawkiExtensions' => ['assistant_handle' => 'math-tutor']],
         ));
 
         $messages = $captured[0]['payload']['messages'];
@@ -297,7 +297,7 @@ class AssistantChatAgentFactoryTest extends TestCase
                 ['role' => 'assistant', 'content' => ['text' => '@math-tutor stays untouched']],
                 ['role' => 'user', 'content' => ['text' => 'mid @math-tutor second question']],
             ],
-            ['assistant_handle' => 'math-tutor'],
+            ['hawkiExtensions' => ['assistant_handle' => 'math-tutor']],
         ));
 
         $messages = $captured[0]['payload']['messages'];

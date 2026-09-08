@@ -16,7 +16,7 @@ namespace App\Services\Ai\Agents\Implementations\Chat;
  *         'messages'  => [                    // required
  *             ['role' => 'system',    'content' => ['text' => '...']],  // system instructions (optional)
  *             ['role' => 'user',      'content' => ['text' => '...', 'attachments' => ['uuid1']]],
- *             ['role' => 'assistant', 'content' => ['text' => '...'], 'assistant_handle' => 'math-tutor'], // optional attribution
+ *             ['role' => 'assistant', 'content' => ['text' => '...'], 'hawkiExtensions' => ['assistant_handle' => 'math-tutor']], // optional attribution
  *             // ... more turns ...
  *         ],
  *         'params'    => ['temp' => 0.7, 'top_p' => 1.0, 'max_tokens' => 2048],  // optional
@@ -114,14 +114,15 @@ readonly class LegacyChatRequestPayload
     }
 
     /**
-     * The explicitly requested assistant handle (`payload.assistant_handle`),
-     * or null when absent. Accepted by the stream validation rules, so both
-     * the chat clients and the server-side streamer
-     * ({@see \App\Services\Ai\Streaming\AgentStreamer}) may set it.
+     * The explicitly requested assistant handle
+     * (`payload.hawkiExtensions.assistant_handle`), or null when absent.
+     * Accepted by the stream validation rules, so both the chat clients and
+     * the server-side streamer ({@see \App\Services\Ai\Streaming\AgentStreamer})
+     * may set it.
      */
     public function assistantHandle(): string|null
     {
-        $handle = $this->payload['assistant_handle'] ?? null;
+        $handle = $this->payload['hawkiExtensions']['assistant_handle'] ?? null;
 
         return \is_string($handle) && $handle !== '' ? $handle : null;
     }

@@ -43,7 +43,7 @@ class AgentStreamer implements AgentStreamerInterface
                 'messages' => $messages,
                 'params' => $params,
                 'tools' => array_values($tools),
-                ...(null === $assistantHandle ? [] : ['assistant_handle' => $assistantHandle]),
+                ...(null === $assistantHandle ? [] : ['hawkiExtensions' => ['assistant_handle' => $assistantHandle]]),
             ],
         ];
 

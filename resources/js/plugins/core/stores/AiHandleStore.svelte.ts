@@ -47,9 +47,10 @@ export interface AiAssistant {
         toolSelect: boolean;
     };
     /** Assistant handle (without leading `@`) the exchange binds to when
-     *  this participant is addressed — sent as `payload.assistant_handle`
-     *  so the backend assembles the assistant run. Absent for participants
-     *  that are not assistant-backed (HAWKI). */
+     *  this participant is addressed — sent as
+     *  `payload.hawkiExtensions.assistant_handle` so the backend assembles
+     *  the assistant run. Absent for participants that are not
+     *  assistant-backed (HAWKI). */
     chatBinding?: string;
     /** Presentation override; falls back to the shared default appearance. */
     appearance?: AssistantAppearance;

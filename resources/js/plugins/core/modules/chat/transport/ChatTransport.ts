@@ -375,9 +375,11 @@ export class ChatTransport implements MessageSenderTransportInterface {
                         // Past-assistant attribution: lets the model
                         // distinguish answers from different assistants when
                         // the conversation switched mid-way. Default HAWKI
-                        // answers stay unattributed.
+                        // answers stay unattributed. Rides the HAWKI-specific
+                        // hawkiExtensions envelope, not the OpenAI-shaped
+                        // message fields.
                         ...(message.message_role === 'assistant' && message.assistant?.handle
-                            ? {assistant_handle: message.assistant.handle}
+                            ? {hawkiExtensions: {assistant_handle: message.assistant.handle}}
                             : {})
                     };
                 })

@@ -32,7 +32,7 @@ class AiConvAssistantHandleTest extends TestCase
                     'attributes' => [
                         'name' => 'Tutoring session',
                         'system_prompt' => null,
-                        'assistant_handle' => 'math-tutor',
+                        'hawkiExtensions' => ['assistant_handle' => 'math-tutor'],
                     ],
                 ],
             ],
@@ -41,7 +41,7 @@ class AiConvAssistantHandleTest extends TestCase
 
         $response
             ->assertCreated()
-            ->assertJsonPath('data.attributes.assistant_handle', 'math-tutor');
+            ->assertJsonPath('data.attributes.hawkiExtensions.assistant_handle', 'math-tutor');
 
         $conversation = AiConv::query()->sole();
         self::assertSame('math-tutor', $conversation->assistant_handle);
@@ -59,7 +59,7 @@ class AiConvAssistantHandleTest extends TestCase
                     'attributes' => [
                         'name' => 'Broken session',
                         'system_prompt' => null,
-                        'assistant_handle' => 'does-not-exist',
+                        'hawkiExtensions' => ['assistant_handle' => 'does-not-exist'],
                     ],
                 ],
             ],
@@ -86,7 +86,7 @@ class AiConvAssistantHandleTest extends TestCase
                     'attributes' => [
                         'name' => 'Forbidden session',
                         'system_prompt' => null,
-                        'assistant_handle' => 'math-tutor',
+                        'hawkiExtensions' => ['assistant_handle' => 'math-tutor'],
                     ],
                 ],
             ],
@@ -113,7 +113,7 @@ class AiConvAssistantHandleTest extends TestCase
                     'attributes' => [
                         'name' => 'Public session',
                         'system_prompt' => null,
-                        'assistant_handle' => 'math-tutor',
+                        'hawkiExtensions' => ['assistant_handle' => 'math-tutor'],
                     ],
                 ],
             ],
@@ -138,7 +138,7 @@ class AiConvAssistantHandleTest extends TestCase
                 $this->jsonApiHeaders(),
             )
             ->assertOk()
-            ->assertJsonPath('data.attributes.assistant_handle', 'math-tutor');
+            ->assertJsonPath('data.attributes.hawkiExtensions.assistant_handle', 'math-tutor');
     }
 
     /**
@@ -174,14 +174,14 @@ class AiConvAssistantHandleTest extends TestCase
                         'type' => 'ai-convs',
                         'id' => $conversation->slug,
                         'attributes' => [
-                            'assistant_handle' => 'latin-tutor',
+                            'hawkiExtensions' => ['assistant_handle' => 'latin-tutor'],
                         ],
                     ],
                 ],
                 $this->jsonApiHeaders(),
             )
             ->assertOk()
-            ->assertJsonPath('data.attributes.assistant_handle', 'latin-tutor');
+            ->assertJsonPath('data.attributes.hawkiExtensions.assistant_handle', 'latin-tutor');
 
         self::assertSame('latin-tutor', $conversation->fresh()->assistant_handle);
     }
@@ -210,14 +210,14 @@ class AiConvAssistantHandleTest extends TestCase
                         'type' => 'ai-convs',
                         'id' => $conversation->slug,
                         'attributes' => [
-                            'assistant_handle' => null,
+                            'hawkiExtensions' => ['assistant_handle' => null],
                         ],
                     ],
                 ],
                 $this->jsonApiHeaders(),
             )
             ->assertOk()
-            ->assertJsonPath('data.attributes.assistant_handle', null);
+            ->assertJsonPath('data.attributes.hawkiExtensions.assistant_handle', null);
 
         self::assertNull($conversation->fresh()->assistant_handle);
     }
@@ -248,7 +248,7 @@ class AiConvAssistantHandleTest extends TestCase
                         'type' => 'ai-convs',
                         'id' => $conversation->slug,
                         'attributes' => [
-                            'assistant_handle' => 'math-tutor',
+                            'hawkiExtensions' => ['assistant_handle' => 'math-tutor'],
                         ],
                     ],
                 ],

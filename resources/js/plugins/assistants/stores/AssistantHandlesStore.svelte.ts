@@ -137,7 +137,7 @@ class AssistantHandlesStore implements DataStore {
             // selection) and tools are fixed while it is addressed.
             capabilities: {modelSelect: assistant.allowModelSelect, toolSelect: false},
             // Addressing the assistant binds the exchange to it — the raw
-            // handle travels as `payload.assistant_handle`.
+            // handle travels as `payload.hawkiExtensions.assistant_handle`.
             chatBinding: assistant.handle,
             appearance: assistantRowAppearance(assistant),
             onTogglePin: (pinned: boolean) => {

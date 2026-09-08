@@ -49,7 +49,7 @@ class AiConvController extends Controller
         $conversation = $this->conversationRepository->create(
             $validated['name'] ?? null,
             $validated['system_prompt'] ?? null,
-            $validated['assistant_handle'] ?? null,
+            $validated['hawkiExtensions']['assistant_handle'] ?? null,
         );
 
         return DataResponse::make($conversation)
