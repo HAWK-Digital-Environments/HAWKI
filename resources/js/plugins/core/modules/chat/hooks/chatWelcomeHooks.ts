@@ -23,6 +23,13 @@ export interface ChatWelcomeSection {
      * one pre-fills the composer (and re-addresses `handle` when present).
      */
     starterPrompts?: string[];
+    /**
+     * The participant's glyph (e.g. its emoji) shown in the hero's icon
+     * circle; without one the default HAWKI icon stands in.
+     */
+    icon?: string;
+    /** Color the icon circle is tinted with when `icon` is present. */
+    tint?: string;
     /** `@handle` re-inserted into the composer when a starter prompt is selected. */
     handle?: string;
 }

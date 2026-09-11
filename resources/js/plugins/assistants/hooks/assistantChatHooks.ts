@@ -135,11 +135,17 @@ export function assistantChatWelcome(
         return null;
     }
 
+    // The same glyph and color that identify the assistant in the `@` menu
+    // identify it in the welcome hero.
+    const appearance = assistantRowAppearance(assistant);
+
     return {
         id: 'assistants:welcome',
         title: assistant.name,
         description: assistant.greeting || assistant.description,
         starterPrompts: assistant.starterPrompts,
+        icon: appearance.icon,
+        tint: appearance.colors.from,
         handle: `@${assistant.handle}`
     };
 }

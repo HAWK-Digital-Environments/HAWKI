@@ -56,6 +56,13 @@ plugin shows the addressed assistant's name, greeting and starter prompts.
 
 {#if section}
     <div class="welcome">
+        <span class="welcome-icon" class:personalized={section.icon} style:--assistant-tint={section.tint} aria-hidden="true">
+            {#if section.icon}
+                <span class="welcome-glyph">{section.icon}</span>
+            {:else}
+                <AiChat01Icon size={28} />
+            {/if}
+        </span>
         <h1>{section.title}</h1>
         {#if section.description}
             <p>{section.description}</p>
@@ -100,6 +107,17 @@ plugin shows the addressed assistant's name, greeting and starter prompts.
         border-radius: var(--corner-lg);
         background: var(--color-active-surface);
         color: var(--color-active-text);
+    }
+
+    /* A section that brings its own glyph paints the square in its tint —
+       the same treatment an assistant-authored message's circle gets. */
+    .welcome-icon.personalized {
+        background: color-mix(in oklab, var(--assistant-tint, var(--color-active-surface)) 18%, transparent);
+    }
+
+    .welcome-glyph {
+        font-size: 1.6rem;
+        line-height: 1;
     }
 
     h1 { margin: 0 0 var(--space-2); font-size: var(--font-size-xl); font-weight: var(--font-weight-medium); }
